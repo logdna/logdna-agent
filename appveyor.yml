@@ -1,0 +1,29 @@
+# Build with this version of Node.js
+environment:
+  nodejs_version: "4.1.2"
+
+cache:
+  - node_modules
+  # the nexe temp folder
+  - ~
+
+# Install scripts. (runs after repo cloning)
+install:
+  - ps: Install-Product node $env:nodejs_version
+  # install modules
+  - npm install
+  - npm install grunt-cli -g
+  - npm install nexe -g
+  - npm install mocha -g
+
+# Post-install test scripts
+test_script:
+  # Output info for debugging.
+  - node --version
+  - npm --version
+  # run tests
+  - grunt test
+
+# Build steps
+build_script:
+  - npm version
