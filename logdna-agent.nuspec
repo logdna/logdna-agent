@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>logdna-agent</id>
+    <title>LogDNA Agent for Windows</title>
+    <version>1.0.0</version>
+    <authors>sedouard</authors>
+    <owners>leeliu</owners>
+    <summary>LogDNA Collector agent for Windows</summary>
+    <description>An executable that can stream log files from your machine.</description>
+    <projectUrl>https://github.com/logdna/logdna-agent</projectUrl>
+    <packageSourceUrl>https://github.com/logdna/logdna-agent</packageSourceUrl>
+    <docsUrl>https://github.com/logdna/logdna-agent</docsUrl>
+    <bugTrackerUrl>https://github.com/logdna/logdna-agent/issues</bugTrackerUrl>
+    <tags>logdna-agent logging devops logdna</tags>
+    <copyright>2016 Microsoft and Contributors</copyright>
+    <licenseUrl>https://github.com/logdna/logdna-agent/blob/master/LICENSE.md</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://logdna.com/assets/images/logdna_logo.png</iconUrl>
+    <releaseNotes>Initial Release of LogDNA Agent for Windows</releaseNotes>
+    <dependencies>
+      <dependency id="nssm" version="2.24.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
