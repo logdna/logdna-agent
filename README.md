@@ -25,11 +25,30 @@ sudo node index.js --help
 
 # configure
 sudo node index.js -k <YOUR LOGDNA AGENT KEY>
+# On Linux, this will generate a config file: /etc/logdna.conf.
+# On Windows, this will generate a config file: C:\ProgramData\logdna\logdna.conf.
 # /var/log is monitored/added by default (recursively), optionally specify more folders here
 sudo node index.js -d /path/to/log/folders
 
 # start the agent
 sudo node index.js
+```
+
+### Configuration File
+
+Instead of generating a config file, you can create your own config file: `logdna.conf`:
+
+```conf
+logdir = /var/log/myapp
+key = <YOUR LOGDNA KEY>
+autoupdate = 1
+```
+On Windows, you can use Windows paths, just make sure to use `\\` as a separator:
+
+```conf
+logdir = C:\\Users\\username\\AppData\\logdna
+key = <YOUR LOGDNA KEY>
+autoupdate = 1
 ```
 
 ## Windows Event Log
@@ -84,4 +103,4 @@ The LogDNA agent authenticates using your LogDNA agent key and opens a secure we
 
 ## Contributing
 
-Contributions are always welcome. See the [contributing guide]() to learn how you can help.
+Contributions are always welcome. See the [contributing guide](/CONTRIBUTING.md) to learn how you can help.

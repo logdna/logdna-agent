@@ -68,7 +68,7 @@ You can use this to control which parts of the agent logs it's debug output.
 
 ## Building
 
-To build the agent ensure you have [nexe](https://npmjs.com/) installed. This packages the logdna agent as a native executable
+To build the agent, ensure you have [nexe](https://www.npmjs.com/package/nexe) installed. This packages the logdna agent as a native executable
 with the node.js runtime bundled. This will automatically build the runtime from source.
 
 ### Linux/OS X
@@ -87,7 +87,7 @@ To start the build do:
 grunt build
 ```
 
-This takes a bit of time and will output a binary at `./logdna-agent` (or `.\lodna-agent.exe` if on Windows).
+This takes a bit of time and will output a binary at `./logdna-agent` (or `.\logdna-agent.exe` if on Windows).
 
 ## Packaging
 
