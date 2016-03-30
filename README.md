@@ -9,7 +9,7 @@ LogDNA's collector agent which streams log files to your LogDNA account.
 
 ### From an Official Release
 
-Check out the offical [LogDNA site](https://logdna.com/) on how to get started from a released version of LogDNA CLI and agent.
+Check out the official [LogDNA site](https://logdna.com/) on how to get started from a released version of LogDNA CLI and agent.
 
 ### From Source
 
@@ -25,9 +25,11 @@ sudo node index.js --help
 
 # configure
 sudo node index.js -k <YOUR LOGDNA AGENT KEY>
-# On Linux, this will generate a config file: /etc/logdna.conf.
-# On Windows, this will generate a config file: C:\ProgramData\logdna\logdna.conf.
-# /var/log is monitored/added by default (recursively), optionally specify more folders here
+# On Linux, this will generate a config file: /etc/logdna.conf
+# On Windows, this will generate a config file: C:\ProgramData\logdna\logdna.conf
+
+# On Linux, /var/log is monitored/added by default (recursively), optionally specify more folders
+# On Windows, C:\ProgramData\logs is monitored/added by default (recursively), optionally specify more folders
 sudo node index.js -d /path/to/log/folders
 
 # start the agent
@@ -36,20 +38,25 @@ sudo node index.js
 
 ### Configuration File
 
-Instead of generating a config file, you can create your own config file: `logdna.conf`:
+Normally a config file is automatically generated (e.g. when you set a key using `-k`), but you can create your own config file `/etc/logdna.conf` on Linux and `C:\ProgramData\logdna\logdna.conf` on Windows:
 
 ```conf
-logdir = /var/log/myapp
+logdir = /var/log/myapp,/path/to/2nd/dir
 key = <YOUR LOGDNA KEY>
-autoupdate = 1
 ```
 On Windows, you can use Windows paths, just make sure to use `\\` as a separator:
 
 ```conf
-logdir = C:\\Users\\username\\AppData\\logdna
+logdir = C:\\Users\\username\\AppData\\myapp
 key = <YOUR LOGDNA KEY>
-autoupdate = 1
 ```
+
+#### Options
+`logdir`: sets the paths that the agent will monitor for new files (separate multiple paths using `,`)
+`key`: your LogDNA Agent Key. You can obtain one by creating an account on LogDNA and retrieve it using "Host install instructions" at the bottom left corner of the webapp.
+`tags`: host tagging to create dynamic groups on the webapp
+`windowseventlogprovider`: see section below
+`autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
 
 ## Windows Event Log
 
