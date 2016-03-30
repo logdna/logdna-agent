@@ -52,11 +52,11 @@ key = <YOUR LOGDNA KEY>
 ```
 
 #### Options
-`logdir`: sets the paths that the agent will monitor for new files (separate multiple paths using `,`)
-`key`: your LogDNA Agent Key. You can obtain one by creating an account on LogDNA and retrieve it using "Host install instructions" at the bottom left corner of the webapp.
-`tags`: host tagging to create dynamic groups on the webapp
-`windowseventlogprovider`: see section below
-`autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
+* `logdir`: sets the paths that the agent will monitor for new files (separate multiple paths using `,`)
+* `key`: your LogDNA Agent Key. You can obtain one by creating an account on LogDNA and retrieve it using "Host install instructions" at the bottom left corner of the webapp.
+* `tags`: host tagging to create dynamic groups on the webapp
+* `windowseventlogprovider`: see section below
+* `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
 
 ## Windows Event Log
 
