@@ -39,7 +39,7 @@ The LogDNA agent supports reading from the Application log on Windows. To stream
 windowseventlogprovider = yourprovidername
 ```
 
-Then for exmaple in a C# application you can do:
+Then in a C# application you can do:
 
 ```cs
 using System;
@@ -54,7 +54,7 @@ namespace LogDNATest
     {
         static void Main(string[] args)
         {
-            string source = "csharpapp";
+            string source = "yourprovidername";
             string log = "application";
             string eventMessage = "someevent";
 
@@ -73,7 +73,6 @@ namespace LogDNATest
         }
     }
 }
-
 ```
 
 And you'll see your event log messages appear on the LogDNA dashboard.
