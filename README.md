@@ -1,6 +1,6 @@
 # logdna-agent
 
-[![Build Status](http://logdna-ci.westus.cloudapp.azure.com/api/badges/sedouard/logdna-agent/status.svg)](http://logdna-ci.westus.cloudapp.azure.com/sedouard/logdna-agent)
+[![Build Status](https://travis-ci.org/logdna/logdna-agent.svg?branch=master)](https://travis-ci.org/logdna/logdna-agent)[![Build status](https://ci.appveyor.com/api/projects/status/g2gqxio9yl5pyb2o/branch/master?svg=true)](https://ci.appveyor.com/project/ritazh/logdna-agent/branch/master)
 
 LogDNA's collector agent which streams log files to your LogDNA account.
 
