@@ -31,6 +31,53 @@ sudo node index.js -d /path/to/log/folders
 sudo node index.js
 ```
 
+## Windows Event Log
+
+The LogDNA agent supports reading from the Application log on Windows. To stream these events, you'll need to add an additional property to your configuration file:
+
+```
+windowseventlogprovider = yourprovidername
+```
+
+Then for exmaple in a C# application you can do:
+
+```cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+namespace LogDNATest
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string source = "csharpapp";
+            string log = "application";
+            string eventMessage = "someevent";
+
+            if (!EventLog.SourceExists(source))
+            {
+                EventLog.CreateEventSource(source, log);
+            }
+
+            while(true)
+            {
+                EventLog.WriteEntry(source, eventMessage);
+                Console.WriteLine("logged event message");
+                System.Threading.Thread.Sleep(1000);
+            }
+                
+        }
+    }
+}
+
+```
+
+And you'll see your event log messages appear on the LogDNA dashboard.
+
 ## How it Works
 
 The LogDNA agent authenticates using your LogDNA agent key and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log files added to your specific logging directories, watching for file changes. Those changes are sent to to LogDNA via the secure web socket.
