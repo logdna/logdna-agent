@@ -20,6 +20,7 @@
     "always-tail": "^0.2.0",
     "async": "^1.5.2",
     "bluebird": "^3.3.3",
+    "bufferutil": "^1.2.1",
     "commander": "^2.8.1",
     "debug": "^2.2.0",
     "getos": "^2.4.0",
@@ -28,8 +29,9 @@
     "lodash": "^3.10.1",
     "macaddress": "^0.2.8",
     "properties": "^1.2.1",
+    "utf-8-validate": "^1.2.1",
     "windows-event-reader": "^1.0.1",
-    "ws": "^0.8.0"
+    "ws": "^1.0.1"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.11"
