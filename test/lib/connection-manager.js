@@ -57,7 +57,7 @@ describe('lib:connection-manager', function () {
         var port = 8080;
         // tests use live local web sockets so give plenty of timeout
         this.timeout(20000);
-        it('sends 5 stat messages at 1 sec fequency', function () {
+        it('sends 5 stat messages at 0.05 sec fequency', function () {
             port += 1;
             const testServer = new WebSocketServer({ port: port });
             var messageCount = 0;
@@ -69,7 +69,7 @@ describe('lib:connection-manager', function () {
                 LOGDNA_LOGHOST: 'localhost',
                 LOGDNA_LOGPORT: port.toString(),
                 LOGDNA_RECONNECT: false,
-                STATS_INTERVAL: 1000
+                STATS_INTERVAL: 50
             };
             return new Promise(resolve => {
                 testServer.on('connection', socket => {
@@ -102,7 +102,6 @@ describe('lib:connection-manager', function () {
         it('sends logdna log messages', function () {
             port += 1;
             const testServer = new WebSocketServer({ port: port });
-            var messageCount = 0;
             var config = {
                 autoupdate: 0,
                 auth_token: 'abcxyz',
@@ -120,17 +119,16 @@ describe('lib:connection-manager', function () {
                     socket.on('message', data => {
                         var message = JSON.parse(data);
                         // filter only for log messages
-                        if (message.e === 'l') {
+                        if (message.e === 'ls') {
                             debug('received logdna message:');
-                            debug(message);
+                            debug(message.ls);
                             // validate message body
-                            var validation = skeemas.validate(message, logSchema);
+                            var validation = skeemas.validate(message.ls, logSchema);
 
                             assert(validation.valid, JSON.stringify(validation.errors));
                             // this is the expeceted message format of logdna web sockets
-                            messageCount += 1;
 
-                            if (messageCount >= 5) {
+                            if (message.ls.length === 10) {
                                 debug('closing connection');
                                 socket.close();
                                 testServer.close();
@@ -151,7 +149,7 @@ describe('lib:connection-manager', function () {
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), '\narbitraryData4');
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), '\narbitraryData5');
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), '\narbitraryData6');
-                    }, 1000);
+                    }, 100);
                 });
 
                 var connectionManager = require('../../lib/connection-manager');

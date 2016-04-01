@@ -115,16 +115,13 @@ describe('lib:file-utilities', function () {
                 var expectedCount = 2;
                 var count = 0;
                 server.on('message', data => {
-                    count += 1;
                     debug('received message! ' + count);
                     debug(data);
                     var message = JSON.parse(data);
-                    if (count === 1) {
-                        assert(message.l, 'arbitraryData2');
-                    } else if (count === 2) {
-                        assert(message.l, 'arbitraryData3');
-                    }
-                    if (count === expectedCount) {
+                    assert(message.ls[0].l, 'arbitraryData2');
+                    assert(message.ls[1].l, 'arbitraryData3');
+
+                    if (message.ls.length === expectedCount) {
                         resolve(true);
                     }
                 });
