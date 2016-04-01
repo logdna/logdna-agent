@@ -33,8 +33,6 @@
     "requireCapitalizedConstructors": true,
     "requireCommaBeforeLineBreak": true,
     "requireCurlyBraces": [
-        "if",
-        "else",
         "for",
         "while",
         "do",
@@ -54,15 +52,11 @@
         "case",
         "return",
         "try",
-        "function",
         "typeof"
     ],
     "requireSpaceAfterLineComment": "allowSlash",
     "requireSpaceBeforeBinaryOperators": true,
     "requireSpaceBeforeBlockStatements": true,
-    "requireSpacesInAnonymousFunctionExpression": {
-        "beforeOpeningRoundBrace": true
-    },
     "requireSpacesInConditionalExpression": true,
     "safeContextKeyword": [
         "self"
