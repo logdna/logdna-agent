@@ -107,33 +107,34 @@ describe('lib:file-utilities', function () {
             var server = new MockServer('ws://localhost:3000');
             var socket = new MockWebSocket('ws://localhost:3000');
             socket.connected = true;
+            var lineBuffer = require('../../lib/linebuffer');
+            lineBuffer.setSocket(socket);
             var fileUtilities = require('../../lib/file-utilities');
 
             return new Promise((resolve) => {
                 var expectedCount = 2;
                 var count = 0;
                 server.on('message', data => {
-                    debug('recieved message!');
-                    debug(data);
                     count += 1;
+                    debug('received message! ' + count);
+                    debug(data);
                     var message = JSON.parse(data);
-                    // TODO: Are we supposed to not get the last line?
                     if (count === 1) {
-                        assert.equal(message.l, '');
-                    } else if (count === 2) {
                         assert(message.l, 'arbitraryData2');
+                    } else if (count === 2) {
+                        assert(message.l, 'arbitraryData3');
                     }
-                    if (count >= expectedCount) {
+                    if (count === expectedCount) {
                         resolve(true);
                     }
                 });
 
-                fs.writeFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData1');
-                fileUtilities.streamDir(tempDir, socket);
+                fs.writeFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData1\n');
+                fileUtilities.streamDir(tempDir);
 
                 // simulate a program writing to a log file
-                fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), '\narbitraryData2');
-                fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), '\narbitraryData3');
+                fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData2\n');
+                fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData3\n');
                 debug(socket);
             });
         });

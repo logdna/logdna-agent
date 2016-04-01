@@ -75,7 +75,7 @@ describe('lib:connection-manager', function () {
                 testServer.on('connection', socket => {
                     debug('connection manager connected to socket');
                     socket.on('message', message => {
-                        debug('recieved logdna message:');
+                        debug('received logdna message:');
                         debug(message);
                         // validate message body
                         var validation = skeemas.validate(message, statsSchema);
@@ -121,7 +121,7 @@ describe('lib:connection-manager', function () {
                         var message = JSON.parse(data);
                         // filter only for log messages
                         if (message.e === 'l') {
-                            debug('recieved logdna message:');
+                            debug('received logdna message:');
                             debug(message);
                             // validate message body
                             var validation = skeemas.validate(message, logSchema);
