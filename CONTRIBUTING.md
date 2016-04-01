@@ -68,8 +68,7 @@ You can use this to control which parts of the agent logs it's debug output.
 
 ## Building
 
-To build the agent, ensure you have [nexe](https://www.npmjs.com/package/nexe) installed. This packages the logdna agent as a native executable
-with the node.js runtime bundled. This will automatically build the runtime from source.
+To build the agent, ensure you have [nexe](https://www.npmjs.com/package/nexe) installed. This packages the logdna agent as a native executable with the node.js runtime bundled. This will automatically build the runtime from source.
 
 ### Linux/OS X
 
@@ -87,6 +86,12 @@ To start the build do:
 grunt build
 ```
 
+For first-time initial build, use:
+```
+grunt build --force
+```
+Node.js is built on initial build and grunt might timeout and fail, using --force will override timeout.
+
 This takes a bit of time and will output a binary at `./logdna-agent` (or `.\logdna-agent.exe` if on Windows).
 
 ## Packaging
@@ -96,7 +101,7 @@ This takes a bit of time and will output a binary at `./logdna-agent` (or `.\log
 Install [fpm](https://github.com/jordansissel/fpm) using `gem`. Then do:
 
 ```
-grunt release
+grunt linux
 ```
 
 This will output the `deb` and `yum` files to the root of the repo.
@@ -106,7 +111,7 @@ This will output the `deb` and `yum` files to the root of the repo.
 Install [chocolatey](https://chocolatey.org). Then do:
 
 ```
-grunt release-windows
+grunt windows
 ```
 
 This will output the chocolatey package under `./.builds/windows`.

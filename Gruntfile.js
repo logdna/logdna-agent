@@ -76,8 +76,9 @@ module.exports = function (grunt) {
     grunt.registerTask('test', ['mochacli', 'jshint', 'jscs']);
     grunt.registerTask('validate', ['jshint', 'jscs']);
     grunt.registerTask('build', ['lineremover', 'exec:nexe']);
-    grunt.registerTask('release', ['build', 'exec:fpm_rpm', 'exec:fpm_deb']);
-    grunt.registerTask('release-windows', [
+    grunt.registerTask('linux', ['build', 'exec:fpm_rpm', 'exec:fpm_deb']);
+    grunt.registerTask('windows', [
+        'build',
         'copy:nuspec',
         'copy:winexe',
         'copy:windowsScripts',
