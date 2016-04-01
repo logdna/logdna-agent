@@ -22,6 +22,8 @@ describe('lib:windows-utilities', function () {
             var server = new MockServer('ws://localhost:40002');
             var socket = new MockWebSocket('ws://localhost:40002');
             socket.connected = true;
+            var lineBuffer = require('../../lib/linebuffer');
+            lineBuffer.setSocket(socket);
             var windowsUtilities = requireUncached('../../lib/windows-utilities');
 
             return new Promise((resolve) => {
