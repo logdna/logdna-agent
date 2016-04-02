@@ -121,17 +121,16 @@ describe('lib:file-utilities', function () {
                     assert(message.ls[0].l, 'arbitraryData2');
                     assert(message.ls[1].l, 'arbitraryData3');
 
-                    if (message.ls.length === expectedCount) {
-                        resolve(true);
-                    }
+                    assert.equal(message.ls.length, expectedCount);
+                    resolve(true);
                 });
 
-                fs.writeFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData1\n');
+                fs.writeFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData1\n');
                 fileUtilities.streamDir(tempDir);
 
                 // simulate a program writing to a log file
-                fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData2\n');
-                fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData3\n');
+                fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData2\n');
+                fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData3\n');
                 debug(socket);
             });
         });
