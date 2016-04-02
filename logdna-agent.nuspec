@@ -11,6 +11,7 @@
     <description>LogDNA's collector agent which streams log files to your LogDNA account.</description>
     <projectUrl>https://logdna.com/</projectUrl>
     <projectSourceUrl>https://github.com/logdna/logdna-agent</projectSourceUrl>
+    <packageSourceUrl>https://github.com/logdna/logdna-agent</packageSourceUrl>
     <docsUrl>https://github.com/logdna/logdna-agent</docsUrl>
     <bugTrackerUrl>https://github.com/logdna/logdna-agent/issues</bugTrackerUrl>
     <tags>logdna-agent logging devops logdna</tags>
