@@ -86,12 +86,6 @@ To start the build do:
 grunt build
 ```
 
-For first-time initial build, use:
-```
-grunt build --force
-```
-Node.js is built on initial build and grunt might timeout and fail, using --force will override timeout.
-
 This takes a bit of time and will output a binary at `./logdna-agent` (or `.\logdna-agent.exe` if on Windows).
 
 ## Packaging
