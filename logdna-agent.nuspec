@@ -9,8 +9,8 @@
     <owners>leeliu</owners>
     <summary>LogDNA Collector Agent for Windows</summary>
     <description>LogDNA's collector agent which streams log files to your LogDNA account.</description>
-    <projectUrl>https://github.com/logdna/logdna-agent</projectUrl>
-    <packageSourceUrl>https://github.com/logdna/logdna-agent</packageSourceUrl>
+    <projectUrl>https://logdna.com/</projectUrl>
+    <projectSourceUrl>https://github.com/logdna/logdna-agent</projectSourceUrl>
     <docsUrl>https://github.com/logdna/logdna-agent</docsUrl>
     <bugTrackerUrl>https://github.com/logdna/logdna-agent/issues</bugTrackerUrl>
     <tags>logdna-agent logging devops logdna</tags>
