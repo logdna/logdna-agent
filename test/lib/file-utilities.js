@@ -16,43 +16,39 @@ describe('lib:file-utilities', function () {
         });
     });
 
-    describe('#getFiles()', function () {
-        it('retrieves all *log files', function () {
+    describe.only('#getFiles()', function () {
+        it('retrieves all *.log and extensionless files', function () {
             var fileUtilities = require('../../lib/file-utilities');
             var testFiles = [
                 path.join(tempDir, 'somelog1.log'),
-                path.join(tempDir, 'somelog2.log'),
-                path.join(tempDir, 'somelog3.log')
+                path.join(tempDir, 'somelog2'),
+                path.join(tempDir, 'somelog3-file'),
+                path.join(tempDir, 'wtmp')
             ];
 
-            fs.writeFileSync(testFiles[0], 'arbitraryData1');
-            fs.writeFileSync(testFiles[1], 'arbitraryData2');
-            fs.writeFileSync(testFiles[2], 'arbitraryData3');
+            for (var i = 0; i < testFiles.length; i++) {
+                fs.writeFileSync(testFiles[i], 'arbitraryData');
+            }
 
-            var array = [];
-            fileUtilities.getFiles(tempDir, array);
-
+            var array = fileUtilities.getFiles(tempDir);
             debug(array);
-            assert.equal(array.length, testFiles.length);
-
-            array.forEach(path => {
-                var index = testFiles.indexOf(path);
-
-                if (index > -1) {
-                    testFiles.splice(index, 1);
-                }
-            });
-
-            debug(testFiles);
-            assert.equal(testFiles.length, 0, 'Expected to find all log test log files');
+            assert.equal(array.length, testFiles.length, 'Expected to find all log files');
         });
 
-        it('retrieves no *log files', function () {
+        it('retrieves no *.log, nor extensionless files', function () {
             var fileUtilities = require('../../lib/file-utilities');
+            var testFiles = [
+                path.join(tempDir, 'somelog1.log.1'),
+                path.join(tempDir, 'somelog2.txt'),
+                path.join(tempDir, 'somelog3-20150928'), // exception (we dont tail extensionless with date stamps)
+                path.join(tempDir, 'testexclude')        // in globalExclude
+            ];
 
-            var array = [];
-            fileUtilities.getFiles(tempDir, array);
+            for (var i = 0; i < testFiles.length; i++) {
+                fs.writeFileSync(testFiles[i], 'arbitraryData');
+            }
 
+            var array = fileUtilities.getFiles(tempDir);
             debug(array);
             assert.equal(array.length, 0, 'Expected to find no log files');
         });

@@ -49,7 +49,7 @@ module.exports = function (grunt) {
             windowsScripts: {
                 files: [{
                     src: './scripts/windows/chocolateyInstall.ps1',
-                    dest: './.builds/windows/tools//chocolateyInstall.ps1'
+                    dest: './.builds/windows/tools/chocolateyInstall.ps1'
                 },
                 {
                     src: './scripts/windows/chocolateyUninstall.ps1',
