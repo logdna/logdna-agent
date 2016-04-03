@@ -6,7 +6,7 @@ var debug = require('debug')('logdna:test:lib:windows-utilities');
 var provider = 'testapp';
 var os = require('os');
 
-describe('lib:windows-utilities', function () {
+describe('lib:windows-utilities', function() {
     if (os.platform() !== 'win32') {
         return;
     }
@@ -14,8 +14,8 @@ describe('lib:windows-utilities', function () {
     var EventLogger = require('node-windows').EventLogger;
     var log = new EventLogger(provider);
 
-    describe('#streamEventLog()', function () {
-        it('streams event logs to a socket', function () {
+    describe('#streamEventLog()', function() {
+        it('streams event logs to a socket', function() {
             this.timeout(100000);
             const MockWebSocket = require('mock-socket').WebSocket;
             const MockServer = require('mock-socket').Server;

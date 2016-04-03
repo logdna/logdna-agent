@@ -6,9 +6,8 @@ var fs = require('fs');
 var path = require('path');
 var rimraf = Promise.promisify(require('rimraf'));
 var tempDir = '.temp';
-describe('lib:file-utilities', function () {
-
-    beforeEach(function () {
+describe('lib:file-utilities', function() {
+    beforeEach(function() {
         debug('cleaning up test folder...' + tempDir);
         return rimraf(tempDir)
         .then(() => {

@@ -18,7 +18,7 @@ module.exports = {
                     type: 'number',
                     required: true
                 },
-                rss:{
+                rss: {
                     type: 'number',
                     required: true
                 }

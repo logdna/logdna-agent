@@ -12,20 +12,19 @@ var statsSchema = require('../helpers/message-schemas/stats');
 var logSchema = require('../helpers/message-schemas/log');
 var tempDir = '.temp';
 
-describe('lib:connection-manager', function () {
-
+describe('lib:connection-manager', function() {
     var spawnResolve;
     var cpMock = {
-        spawn: function (fileName, args) {
+        spawn: function(fileName, args) {
             assert.ok(fileName);
             assert(Array.isArray(args));
             debug(fileName);
             spawnResolve();
             return {
-                unref: function () {}
+                unref: function() {}
             };
         },
-        exec: function (fileName, args) {
+        exec: function(fileName, args) {
             debug('spawn called!');
             assert.ok(fileName);
             assert(typeof args, 'string');
@@ -34,7 +33,7 @@ describe('lib:connection-manager', function () {
         }
     };
 
-    before (function () {
+    before(function() {
         // setup spawn mock
         mockery.enable({
             warnOnUnregistered: false,
@@ -48,16 +47,16 @@ describe('lib:connection-manager', function () {
         });
     });
 
-    after (function () {
+    after(function() {
         mockery.deregisterAll();
         mockery.disable();
     });
 
-    describe('#connectLogServer', function () {
+    describe('#connectLogServer', function() {
         var port = 8080;
         // tests use live local web sockets so give plenty of timeout
         this.timeout(20000);
-        it('sends 5 stat messages at 0.05 sec fequency', function () {
+        it('sends 5 stat messages at 0.05 sec fequency', function() {
             port += 1;
             const testServer = new WebSocketServer({ port: port });
             var messageCount = 0;
@@ -99,7 +98,7 @@ describe('lib:connection-manager', function () {
             });
         });
 
-        it('sends logdna log messages', function () {
+        it('sends logdna log messages', function() {
             port += 1;
             const testServer = new WebSocketServer({ port: port });
             var config = {
@@ -137,7 +136,7 @@ describe('lib:connection-manager', function () {
                             }
                         }
                     });
-                    setTimeout(function () {
+                    setTimeout(function() {
                         // now simulate a program logging to a file
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), '\narbitraryData2');
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), '\narbitraryData3');
@@ -160,12 +159,11 @@ describe('lib:connection-manager', function () {
         });
         // doesn't validate if the script itself works!
         // only validates that the agent will call it
-        it('tries to update itself', function () {
+        it('tries to update itself', function() {
             port += 1;
             const testServer = new WebSocketServer({ port: port });
 
             return new Promise(resolve => {
-
                 spawnResolve = resolve;
                 testServer.on('connection', socket => {
                     debug('connected to socket');
@@ -190,7 +188,7 @@ describe('lib:connection-manager', function () {
         });
     });
 
-    after(function () {
+    after(function() {
         debug('cleaning up test folder...' + tempDir);
         return rimraf(tempDir);
     });

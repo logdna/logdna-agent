@@ -30,7 +30,7 @@ program
     .option('-k, --key <key>', 'sets LogDNA Agent Key in config')
     .option('-d, --logdir <dir>', 'adds custom log dir to config', fileUtils.appender(), [])
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
-    .on('--help', function () {
+    .on('--help', function() {
         console.log('  Examples:');
         console.log();
         console.log('    $ logdna-agent --key YOUR_AGENT_KEY');
@@ -47,18 +47,18 @@ program
 var isWinAdmin;
 
 if (os.platform() === 'linux') {
-    pkg.name += "-linux";
+    pkg.name += '-linux';
 } else if (os.platform() === 'win32') {
     isWinAdmin = require('is-administrator');
-    pkg.name += "-windows";
+    pkg.name += '-windows';
 } else if (os.platform() === 'darwin') {
-    pkg.name += "-mac";
+    pkg.name += '-mac';
 }
 
 var socket;
 
 function checkElevated() {
-    return new Promise ((resolve) => {
+    return new Promise((resolve) => {
         if (os.platform() === 'win32') {
             resolve(isWinAdmin());
         } else if (process.getuid() <= 0) {
@@ -178,11 +178,11 @@ checkElevated()
     debug('logdna agent successfully started');
 });
 
-Promise.onPossiblyUnhandledRejection(function (error) {
+Promise.onPossiblyUnhandledRejection(function(error) {
     throw error;
 });
 
-process.on('uncaughtException', function (err) {
+process.on('uncaughtException', function(err) {
     log('------------------------------------------------------------------');
     log('Uncaught Error: ' + (err.stack || '').split('\r\n'));
     log('------------------------------------------------------------------');

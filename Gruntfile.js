@@ -5,7 +5,7 @@ var os = require('os');
 
 require('load-grunt-tasks')(grunt);
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
     var files = ['./*.js', 'lib/**/*.js', 'test/**/*.js'];
     var buildOutputFile = os.platform() !== 'win32' ? 'logdna-agent' : 'logdna-agent.exe';
 
@@ -70,7 +70,8 @@ module.exports = function (grunt) {
             options: {
                 config: '.jscsrc',
                 esnext: true,
-                verbose: true
+                verbose: true,
+                fix: true
             }
         }
     });

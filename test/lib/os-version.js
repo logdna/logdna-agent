@@ -3,19 +3,19 @@ require('../helpers/before');
 var mockery = require('mockery');
 var assert = require('assert');
 var debug = require('debug')('logdna:test:lib:os-version');
-describe('lib:file-utilities', function () {
-    before (function () {
+describe('lib:file-utilities', function() {
+    before(function() {
         mockery.enable({
             warnOnUnregistered: false,
             useCleanCache: true
         });
         mockery.registerMock('fs', {
-            readFile: function (path, cb) {
+            readFile: function(path, cb) {
                 assert.equal(typeof path, 'string');
                 assert(path.length > 0);
                 debug('responding with fake os info');
                 /*jshint multistr: true */
-                cb (null,'\n\
+                cb(null, '\n\
 NAME="Ubuntu" \n\
 VERSION="14.04.4 LTS, Trusty Tahr"\n\
 ID=ubuntu\n\
@@ -31,7 +31,7 @@ BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"\n\
         });
     });
 
-    it('Gets the correct OS version', function () {
+    it('Gets the correct OS version', function() {
         var osVersion = Promise.promisify(require('../../lib/os-version'));
 
         return osVersion()
@@ -45,7 +45,7 @@ BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"\n\
         });
     });
 
-    after (function () {
+    after(function() {
         mockery.disable();
     });
 });
