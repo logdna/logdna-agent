@@ -37,8 +37,10 @@ program
         console.log('    $ logdna-agent --key YOUR_AGENT_KEY');
         console.log('    $ logdna-agent -d /home/ec2-user/logs');
         console.log('    $ logdna-agent -d /home/ec2-user/logs -d /path/to/another/log_dir  # multiple logdirs in 1 go');
+        console.log('    $ logdna-agent -d /var/log/*.txt                                   # supports glob patterns');
+        console.log('    $ logdna-agent -d /var/log/**/myapp.log                            # myapp.log in any subfolder');
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log');
-        console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log  # multiple');
+        console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log');
         console.log('    $ logdna-agent -t tag  # replaces config with this tag');
         console.log('    $ logdna-agent -t staging,2ndtag');
         console.log();

@@ -30,7 +30,10 @@ sudo node index.js -k <YOUR LOGDNA AGENT KEY>
 
 # On Linux, /var/log is monitored/added by default (recursively), optionally specify more folders
 # On Windows, C:\ProgramData\logs is monitored/added by default (recursively), optionally specify more folders
-sudo node index.js -d /path/to/log/folders
+sudo node index.js -d /path/to/log/folders -d /path/to/2nd/folder
+sudo node index.js -d /var/log/*.txt                    # supports glob patterns
+sudo node index.js -d /var/log/**/myapp.log             # myapp.log in any subfolder
+sudo node index.js -f /usr/local/nginx/logs/access.log  # specific file
 
 # start the agent
 sudo node index.js
@@ -52,7 +55,7 @@ key = <YOUR LOGDNA AGENT KEY>
 ```
 
 #### Options
-* `logdir`: sets the paths that the agent will monitor for new files (separate multiple paths using `,`)
+* `logdir`: sets the paths that the agent will monitor for new files (separate multiple paths using `,`), supports glob patterns + specific files
 * `key`: your LogDNA Agent Key. You can obtain one by creating an account on LogDNA and retrieve it using "Host install instructions" at the bottom left corner of the webapp.
 * `tags`: host tagging to create dynamic groups on the webapp
 * `windowseventlogprovider`: see section below
@@ -100,7 +103,7 @@ namespace LogDNATest
 }
 ```
 
-And you'll see your event log messages appear on the LogDNA dashboard.
+And you'll see your event log messages appear on the LogDNA webapp.
 
 ## How it Works
 
