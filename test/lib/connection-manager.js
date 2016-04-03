@@ -6,7 +6,7 @@ var path = require('path');
 var assert = require('assert');
 var debug = require('debug')('logdna:test:lib:connection-manager');
 var mockery = require('mockery');
-var rimraf = require('rimraf');
+var rimraf = Promise.promisify(require('rimraf'));
 var skeemas = require('skeemas');
 var statsSchema = require('../helpers/message-schemas/stats');
 var logSchema = require('../helpers/message-schemas/log');
@@ -33,7 +33,7 @@ describe('lib:connection-manager', function() {
         }
     };
 
-    before(function() {
+    before(function(done) {
         // setup spawn mock
         mockery.enable({
             warnOnUnregistered: false,
@@ -42,8 +42,11 @@ describe('lib:connection-manager', function() {
         mockery.registerMock('child_process', cpMock);
 
         debug('cleaning up test folder...' + tempDir);
-        rimraf.sync(tempDir);
-        fs.mkdirSync(tempDir);
+        return rimraf(tempDir)
+        .then(() => {
+            fs.mkdirSync(tempDir);
+            return done();
+        });
     });
 
     after(function() {

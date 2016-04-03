@@ -4,14 +4,18 @@ var assert = require('assert');
 var debug = require('debug')('logdna:test:lib:file-utilities');
 var fs = require('fs');
 var path = require('path');
-var rimraf = require('rimraf');
+var rimraf = Promise.promisify(require('rimraf'));
 var tempDir = '.temp';
+
 describe('lib:file-utilities', function() {
-    beforeEach(function() {
+    beforeEach(function(done) {
         debug('cleaning up test folder...' + tempDir);
-        rimraf.sync(tempDir);
-        fs.mkdirSync(tempDir);
-        fs.mkdirSync(path.join(tempDir, 'subdir'));
+        return rimraf(tempDir)
+        .then(() => {
+            fs.mkdirSync(tempDir);
+            fs.mkdirSync(path.join(tempDir, 'subdir'));
+            return done();
+        });
     });
 
     describe('#getFiles()', function() {
