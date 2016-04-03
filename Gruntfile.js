@@ -69,7 +69,8 @@ module.exports = function (grunt) {
             },
             options: {
                 config: '.jscsrc',
-                esnext: true
+                esnext: true,
+                verbose: true
             }
         }
     });

@@ -24,6 +24,7 @@
     "commander": "^2.8.1",
     "debug": "^2.2.0",
     "getos": "^2.4.0",
+    "glob": "^7.0.3",
     "got": "^6.2.0",
     "is-administrator": "^1.0.1",
     "lodash": "^3.10.1",
