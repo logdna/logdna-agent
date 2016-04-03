@@ -42,13 +42,13 @@ Normally a config file is automatically generated (e.g. when you set a key using
 
 ```conf
 logdir = /var/log/myapp,/path/to/2nd/dir
-key = <YOUR LOGDNA KEY>
+key = <YOUR LOGDNA AGENT KEY>
 ```
 On Windows, you can use Windows paths, just make sure to use `\\` as a separator:
 
 ```conf
 logdir = C:\\Users\\username\\AppData\\myapp
-key = <YOUR LOGDNA KEY>
+key = <YOUR LOGDNA AGENT KEY>
 ```
 
 #### Options
@@ -83,17 +83,15 @@ namespace LogDNATest
         {
             string source = "yourprovidername";
             string log = "application";
-            string eventMessage = "someevent";
 
             if (!EventLog.SourceExists(source))
             {
                 EventLog.CreateEventSource(source, log);
             }
 
-            while(true)
+            while (true)
             {
-                EventLog.WriteEntry(source, eventMessage);
-                Console.WriteLine("logged event message");
+                EventLog.WriteEntry(source, "logged event message");
                 System.Threading.Thread.Sleep(1000);
             }
                 
