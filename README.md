@@ -32,7 +32,9 @@ sudo node index.js -k <YOUR LOGDNA AGENT KEY>
 # On Windows, C:\ProgramData\logs is monitored/added by default (recursively), optionally specify more folders
 sudo node index.js -d /path/to/log/folders -d /path/to/2nd/folder
 sudo node index.js -d /var/log/*.txt                    # supports glob patterns
+sudo node index.js -d /var/log/**/*.txt                 # *.txt in any subfolder
 sudo node index.js -d /var/log/**/myapp.log             # myapp.log in any subfolder
+sudo node index.js -d /var/log                          # folder only assumes *.log + extensionless files
 sudo node index.js -f /usr/local/nginx/logs/access.log  # specific file
 
 # start the agent
@@ -60,6 +62,28 @@ key = <YOUR LOGDNA AGENT KEY>
 * `tags`: host tagging to create dynamic groups on the webapp
 * `windowseventlogprovider`: see section below
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
+
+### Features
+* Agent connects to LogDNA ingestion servers around the world (currently: US West California, US East Virginia & EU West Ireland)
+* Uses secure websockets (wss://) protocol
+* Uses websocket compression (perMessageDeflate) to minimize data transfer
+* Reconnects if disconnected and will queue up new log lines while disconnected
+* Rescans for new files in all `logdir` paths, every minute
+* Transparently handles log rotated files in most OS's (including "new file per day" date stamped files)
+* [Init script is available here](https://github.com/logdna/logdna-agent/blob/master/scripts/init-script)
+* Agent is self-updating, no need to maintain latest versions. This requires LogDNA YUM/APT repo to be installed
+```
+# YUM Repo
+echo "[logdna]
+name=LogDNA packages
+baseurl=http://repo.logdna.com/el6/
+enabled=1
+gpgcheck=0" | sudo tee /etc/yum.repos.d/logdna.repo
+
+# APT Repo
+echo "deb http://repo.logdna.com stable main" | sudo tee /etc/apt/sources.list.d/logdna.list
+sudo apt-get update
+```
 
 ## Windows Event Log
 
