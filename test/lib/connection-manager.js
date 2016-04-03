@@ -1,4 +1,4 @@
-/* globals describe, it, before, beforeEach, after */
+/* globals describe, it, before, after */
 require('../helpers/before');
 var WebSocketServer = require('ws').Server;
 var fs = require('fs');
@@ -40,9 +40,7 @@ describe('lib:connection-manager', function() {
             useCleanCache: true
         });
         mockery.registerMock('child_process', cpMock);
-    });
 
-    beforeEach(function() {
         debug('cleaning up test folder...' + tempDir);
         rimraf.sync(tempDir);
         fs.mkdirSync(tempDir);
