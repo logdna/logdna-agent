@@ -29,7 +29,7 @@ module.exports = function(grunt) {
         mochacli: {
             options: {
                 reporter: 'spec',
-                bail: false
+                bail: true
             },
             all: ['test/**/*.js']
         },
@@ -75,8 +75,8 @@ module.exports = function(grunt) {
             }
         }
     });
-    grunt.registerTask('test', ['mochacli', 'jshint', 'jscs']);
-    grunt.registerTask('validate', ['jshint', 'jscs']);
+    grunt.registerTask('test', ['mochacli', 'jscs', 'jshint']);
+    grunt.registerTask('validate', ['jscs', 'jshint']);
     grunt.registerTask('build', ['lineremover', 'exec:nexe']);
     grunt.registerTask('linux', ['build', 'exec:fpm_rpm', 'exec:fpm_deb']);
     grunt.registerTask('windows', [

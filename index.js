@@ -28,15 +28,18 @@ program
     .description('This agent collect and ship logs for processing. Defaults to /var/log if run without parameters.')
     .option('-c, --config <file>', 'uses alternate config file (default: ' + config.DEFAULT_CONF_FILE + ')')
     .option('-k, --key <key>', 'sets LogDNA Agent Key in config')
-    .option('-d, --logdir <dir>', 'adds custom log dir to config', fileUtils.appender(), [])
+    .option('-d, --logdir <dir>', 'adds log dir to config, supports glob patterns', fileUtils.appender(), [])
+    .option('-f, --logfile <dir>', 'adds log file to config', fileUtils.appender(), [])
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
         console.log('    $ logdna-agent --key YOUR_AGENT_KEY');
         console.log('    $ logdna-agent -d /home/ec2-user/logs');
-        console.log('    $ logdna-agent -d /home/ec2-user/logs -d /path/to/another/log_dir        # multiple logdirs in 1 go');
-        console.log('    $ logdna-agent -t tag');
+        console.log('    $ logdna-agent -d /home/ec2-user/logs -d /path/to/another/log_dir  # multiple logdirs in 1 go');
+        console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log');
+        console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log  # multiple');
+        console.log('    $ logdna-agent -t tag  # replaces config with this tag');
         console.log('    $ logdna-agent -t staging,2ndtag');
         console.log();
     })
@@ -111,6 +114,14 @@ checkElevated()
         });
     }
 
+    if (program.logfile && program.logfile.length > 0) {
+        parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logfile));
+        return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
+            console.log('Added ' + program.logfile.join(', ') + ' to config.');
+            process.exit(0);
+        });
+    }
+
     if (program.tags) {
         parsedConfig.tags = program.tags.replace(/\s*,\s*/g, ',').replace(/^,|,$/g, ''); // trim spaces around comma
         return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
@@ -155,7 +166,7 @@ checkElevated()
         'em0', 'em1', 'em2'];
 
     if (all) {
-        for (var i = 0; i < ifaces.length; i += 1) {
+        for (var i = 0; i < ifaces.length; i++) {
             if (all[ifaces[i]]) {
                 config.mac = all[ifaces[i]].mac;
                 config.ip = all[ifaces[i]].ipv4 || all[ifaces[i]].ipv6;
