@@ -112,7 +112,7 @@ describe('lib:file-utilities', function() {
         });
     });
 
-    describe('#streamDir()', function() {
+    describe('#streamAllLogs()', function() {
         this.timeout(10000);
         it('streams file changes to a socket', function() {
             const MockWebSocket = require('mock-socket').WebSocket;
@@ -155,11 +155,53 @@ describe('lib:file-utilities', function() {
             });
         });
 
-        it('streams new file rescan', function() {
+        it('streams file changes using unix tail to a socket', function() {
             const MockWebSocket = require('mock-socket').WebSocket;
             const MockServer = require('mock-socket').Server;
             var server = new MockServer('ws://localhost:3001');
             var socket = new MockWebSocket('ws://localhost:3001');
+            socket.connected = true;
+            var lineBuffer = require('../../lib/linebuffer');
+            lineBuffer.setSocket(socket);
+            var fileUtilities = require('../../lib/file-utilities');
+            fileUtilities.files = [];
+            var config = {
+                logdir: [tempDir],
+                TAIL_MODE: 'unix'
+            };
+
+            return new Promise((resolve) => {
+                var expectedCount = 2;
+                var count = 0;
+                server.on('message', data => {
+                    debug('received message!');
+                    debug(data);
+                    var message = JSON.parse(data);
+                    assert(message.ls[0].l, 'arbitraryData2');
+                    assert(message.ls[1].l, 'arbitraryData3');
+
+                    count += message.ls.length;
+
+                    if (count === expectedCount) {
+                        resolve(true);
+                    }
+                });
+
+                fs.writeFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData1\n');
+                fileUtilities.streamAllLogs(config, function() {
+                    // simulate a program writing to a log file
+                    fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData2\n');
+                    fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData3\n');
+                    debug(socket);
+                });
+            });
+        });
+
+        it('streams new file rescan', function() {
+            const MockWebSocket = require('mock-socket').WebSocket;
+            const MockServer = require('mock-socket').Server;
+            var server = new MockServer('ws://localhost:3002');
+            var socket = new MockWebSocket('ws://localhost:3002');
             socket.connected = true;
             var lineBuffer = require('../../lib/linebuffer');
             lineBuffer.setSocket(socket);
@@ -190,18 +232,18 @@ describe('lib:file-utilities', function() {
                     }
                 });
 
-                fs.writeFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData1\n');
+                fs.writeFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData1\n');
                 fileUtilities.streamAllLogs(config, function() {
                     // simulate a program writing to a log file
-                    fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData2\n');
-                    fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData3\n');
+                    fs.appendFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData2\n');
+                    fs.appendFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData3\n');
                     debug(socket);
 
                     // simulate new file after RESCAN_INTERVAL
-                    fs.writeFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData4\n'); // not sent due to file absent at start
+                    fs.writeFileSync(path.join(tempDir, 'streamtest6.log'), 'arbitraryData4\n'); // not sent due to file absent at start
 
                     setTimeout(function() {
-                        fs.appendFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData5\n'); // only this line makes it due to rescan
+                        fs.appendFileSync(path.join(tempDir, 'streamtest6.log'), 'arbitraryData5\n'); // only this line makes it due to rescan
                     }, config.RESCAN_INTERVAL + 500);
                 });
             });
