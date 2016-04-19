@@ -177,8 +177,6 @@ describe('lib:file-utilities', function() {
                     debug('received message!');
                     debug(data);
                     var message = JSON.parse(data);
-                    assert(message.ls[0].l, 'arbitraryData2');
-                    assert(message.ls[1].l, 'arbitraryData3');
 
                     count += message.ls.length;
 
