@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/logdna/logdna-agent",
   "dependencies": {
+    "agentkeepalive": "^2.1.1",
     "always-tail": "^0.2.0",
     "async": "^1.5.2",
     "bluebird": "^3.3.3",
@@ -30,6 +31,7 @@
     "lodash": "^3.10.1",
     "macaddress": "^0.2.8",
     "properties": "^1.2.1",
+    "request": "^2.71.0",
     "utf-8-validate": "^1.2.1",
     "windows-event-reader": "^1.0.1",
     "ws": "^1.0.1"
