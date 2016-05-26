@@ -133,6 +133,14 @@ And you'll see your event log messages appear on the LogDNA webapp.
 
 The LogDNA agent authenticates using your LogDNA agent key and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log files added to your specific logging directories, watching for file changes. Those changes are sent to to LogDNA via the secure web socket.
 
+## Contributors
+
+* Lee Liu (LogDNA)
+* Mike Hu (LogDNA)
+* [Steven Edouard] (https://github.com/sedouard) (Microsoft)
+* [Rita Zhang] (https://github.com/ritazh) (Microsoft)
+
+
 ## Contributing
 
 Contributions are always welcome. See the [contributing guide](/CONTRIBUTING.md) to learn how you can help.
