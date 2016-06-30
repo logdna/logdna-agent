@@ -24,6 +24,9 @@ module.exports = function(grunt) {
             nexe: { cmd: 'nexe -i index.js -o ' + buildOutputFile + ' -f -t ~/tmp -r 5.9.0', maxBuffer: 20000 * 1024 },
             fpm_rpm: 'fpm -s dir -t rpm -n logdna-agent -v ' + pkg.version + ' --license MIT --vendor \'Answerbook, Inc.\' --description \'LogDNA Agent for Linux\' --url http://logdna.com/ -m \'<help@logdna.com>\' --before-remove ./scripts/before-remove --after-upgrade ./scripts/after-upgrade -f ./logdna-agent=/usr/bin/logdna-agent ./scripts/init-script=/etc/init.d/logdna-agent ./scripts/logrotate=/etc/logrotate.d/logdna-agent',
             fpm_deb: 'fpm -s dir -t deb -n logdna-agent -v ' + pkg.version + ' --license MIT --vendor \'Answerbook, Inc.\' --description \'LogDNA Agent for Linux\' --url http://logdna.com/ -m \'<help@logdna.com>\' --before-remove ./scripts/before-remove --after-upgrade ./scripts/after-upgrade -f --deb-no-default-config-files ./logdna-agent=/usr/bin/logdna-agent ./scripts/init-script=/etc/init.d/logdna-agent ./scripts/logrotate=/etc/logrotate.d/logdna-agent',
+            fpm_pkg: 'fpm -s dir -t osxpkg -n logdna-agent -v ' + pkg.version + ' --license MIT --vendor \'Answerbook, Inc.\' --description \'LogDNA Agent for Mac\' --url http://logdna.com/ -m \'<help@logdna.com>\' --after-install ./scripts/mac-after-install --osxpkg-identifier-prefix com.logdna -f ./logdna-agent=/usr/local/bin/logdna-agent ./scripts/com.logdna.logdna-agent.plist=/Library/LaunchDaemons/com.logdna.logdna-agent.plist',
+            sign_pkg: 'productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-' + pkg.version + '.pkg logdna-agent.pkg',
+
             choco: 'pushd .\\.builds\\windows & cpack'
         },
         mochacli: {
@@ -79,6 +82,7 @@ module.exports = function(grunt) {
     grunt.registerTask('validate', ['jscs', 'jshint']);
     grunt.registerTask('build', ['lineremover', 'exec:nexe']);
     grunt.registerTask('linux', ['build', 'exec:fpm_rpm', 'exec:fpm_deb']);
+    grunt.registerTask('mac', ['build', 'exec:fpm_pkg', 'exec:sign_pkg']);
     grunt.registerTask('windows', [
         'build',
         'copy:nuspec',

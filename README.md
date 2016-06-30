@@ -137,6 +137,7 @@ The LogDNA agent authenticates using your LogDNA agent key and opens a secure we
 
 * Lee Liu (LogDNA)
 * Mike Hu (LogDNA)
+* Ryan Staatz (LogDNA)
 * [Steven Edouard] (https://github.com/sedouard) (Microsoft)
 * [Rita Zhang] (https://github.com/ritazh) (Microsoft)
 
