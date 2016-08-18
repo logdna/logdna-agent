@@ -17,6 +17,11 @@
         "close": false,
         "open": true
     },
+    "disallowQuotedKeysInObjects": {
+        "allExcept": [
+            "reserved"
+        ]
+    },
     "disallowSpaceAfterObjectKeys": {
         "allExcept": [
             "aligned"
@@ -37,20 +42,31 @@
         "beforeOpeningRoundBrace": true
     },
     "disallowSpacesInsideArrayBrackets": "nested",
+    "disallowSpacesInsideBrackets": {
+        "allExcept": [ "[", "]", "{", "}" ]
+    },
     "disallowSpacesInsideParentheses": true,
+    "disallowTrailingComma": true,
     "disallowTrailingWhitespace": true,
     "disallowYodaConditions": true,
-    "esnext": true,
     "requireBlocksOnNewline": 1,
-    "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
     "requireCapitalizedConstructors": true,
-    "requireCurlyBraces": [
-        "for",
-        "while",
-        "do",
-        "try",
-        "catch"
-    ],
+    "requireCurlyBraces": {
+        "keywords": [
+            "if",
+            "else",
+            "for",
+            "while",
+            "do",
+            "try",
+            "catch"
+        ],
+        "allExcept": [
+            "return",
+            "continue",
+            "break"
+        ]
+    },
     "requireDotNotation": true,
     "requireLineFeedAtFileEnd": true,
     "requireOperatorBeforeLineBreak": true,
@@ -70,7 +86,9 @@
         "catch",
         "typeof"
     ],
-    "requireSpaceAfterLineComment": "allowSlash",
+    "requireSpaceAfterLineComment": {
+        "allExcept": ["/"]
+    },
     "requireSpaceBeforeBinaryOperators": true,
     "requireSpaceBeforeBlockStatements": true,
     "requireSpaceBeforeKeywords": [
@@ -86,7 +104,7 @@
         "beforeOpeningCurlyBrace": true
     },
     "requireSpacesInsideObjectBrackets": {
-        "allExcept": ["}", ")"]
+        "allExcept": [ "}", ")" ]
     },
     "safeContextKeyword": [
         "self"
