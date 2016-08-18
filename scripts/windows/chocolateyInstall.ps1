@@ -2,8 +2,12 @@ $packageParameters = $env:chocolateyPackageParameters
 
 IF(!($packageParameters))
 {
-    if not exist $env:ALLUSERSPROFILE\logs mkdir $env:ALLUSERSPROFILE\logs
-    if not exist $env:ALLUSERSPROFILE\logdna mkdir $env:ALLUSERSPROFILE\logdna
+    if(!(Test-Path -Path $env:ALLUSERSPROFILE\logs)){
+        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\logs
+    }
+    if(!(Test-Path -Path $env:ALLUSERSPROFILE\logdna)){
+        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\logdna
+    }
     nssm.exe install logdna-agent $env:ChocolateyInstall\bin\logdna-agent.exe
     nssm.exe set logdna-agent AppStdout $env:ALLUSERSPROFILE\logs\logdna-agent.log
     nssm.exe start logdna-agent
