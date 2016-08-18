@@ -177,6 +177,8 @@ describe('lib:file-utilities', function() {
                     debug('received message!');
                     debug(data);
                     var message = JSON.parse(data);
+                    assert(message.ls[0].l, 'arbitraryData2');
+                    assert(message.ls[1].l, 'arbitraryData3');
 
                     count += message.ls.length;
 
@@ -188,9 +190,11 @@ describe('lib:file-utilities', function() {
                 fs.writeFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData1\n');
                 fileUtilities.streamAllLogs(config, function() {
                     // simulate a program writing to a log file
-                    fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData2\n');
-                    fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData3\n');
-                    debug(socket);
+                    setTimeout(function() {
+                        fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData2\n');
+                        fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData3\n');
+                        debug(socket);
+                    }, 500);
                 });
             });
         });
