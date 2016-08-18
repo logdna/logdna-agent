@@ -39,6 +39,8 @@ case "$1" in
             exit 1
         fi
 
+        chmod 0644 /etc/logrotate.d/logdna-agent > /dev/null 2>&1
+
         echo "Starting $name..."
         cd "$dir"
         $cmd >> "$stdout_log" 2>&1 &
