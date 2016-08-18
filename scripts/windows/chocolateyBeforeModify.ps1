@@ -1,6 +1,6 @@
 $packageParameters = $env:chocolateyPackageParameters
 
-IF(!($packageParameters) -or !($packageParameters.Contains("/NoServiceUninstall")))
+IF(!($packageParameters))
 {
     nssm.exe stop logdna-agent
     nssm.exe remove logdna-agent confirm

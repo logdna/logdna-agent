@@ -55,8 +55,8 @@ module.exports = function(grunt) {
                     dest: './.builds/windows/tools/chocolateyInstall.ps1'
                 },
                 {
-                    src: './scripts/windows/chocolateyUninstall.ps1',
-                    dest: './.builds/windows/tools/chocolateyUninstall.ps1'
+                    src: './scripts/windows/chocolateyBeforeModify.ps1',
+                    dest: './.builds/windows/tools/chocolateyBeforeModify.ps1'
                 }]
             }
         },

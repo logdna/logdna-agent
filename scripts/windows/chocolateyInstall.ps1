@@ -1,11 +1,12 @@
 $packageParameters = $env:chocolateyPackageParameters
 
-IF(!($packageParameters) -or !($packageParameters.Contains("/NoServiceInstall")))
+IF(!($packageParameters))
 {
-    mkdir $env:ALLUSERSPROFILE\logs
-    mkdir $env:ALLUSERSPROFILE\logdna
+    if not exist $env:ALLUSERSPROFILE\logs mkdir $env:ALLUSERSPROFILE\logs
+    if not exist $env:ALLUSERSPROFILE\logdna mkdir $env:ALLUSERSPROFILE\logdna
     nssm.exe install logdna-agent $env:ChocolateyInstall\bin\logdna-agent.exe
     nssm.exe set logdna-agent AppStdout $env:ALLUSERSPROFILE\logs\logdna-agent.log
+    nssm.exe start logdna-agent
 }
 
 $registryPath = "HKLM:\SYSTEM\CurrentControlSet\Services\logdna-agent\Parameters"
