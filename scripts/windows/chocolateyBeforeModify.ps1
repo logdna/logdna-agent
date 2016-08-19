@@ -2,8 +2,8 @@ $packageParameters = $env:chocolateyPackageParameters
 
 IF(!($packageParameters))
 {
-    nssm.exe stop logdna-agent
-    nssm.exe remove logdna-agent confirm
+    cmd.exe /c "nssm.exe stop logdna-agent & exit /b 0"
+    cmd.exe /c "nssm.exe remove logdna-agent confirm & exit /b 0"
 }
 
 $registryPath = "HKLM:\SYSTEM\CurrentControlSet\Services\logdna-agent"

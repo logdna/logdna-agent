@@ -8,8 +8,8 @@ IF(!($packageParameters))
     if(!(Test-Path -Path $env:ALLUSERSPROFILE\logdna)){
         New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\logdna
     }
-    nssm.exe install logdna-agent $env:ChocolateyInstall\bin\logdna-agent.exe
-    nssm.exe set logdna-agent AppStdout $env:ALLUSERSPROFILE\logs\logdna-agent.log
+    cmd.exe /c "nssm.exe install logdna-agent $env:ChocolateyInstall\bin\logdna-agent.exe & exit /b 0"
+    cmd.exe /c "nssm.exe set logdna-agent AppStdout $env:ALLUSERSPROFILE\logs\logdna-agent.log & exit /b 0"
     cmd.exe /c "nssm start logdna-agent & exit /b 0"
 }
 
