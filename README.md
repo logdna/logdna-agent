@@ -129,6 +129,8 @@ namespace LogDNATest
 
 And you'll see your event log messages appear on the LogDNA webapp.
 
+You can find a [more detailed write-up here] (http://partnercatalyst.azurewebsites.net/pulls/189/2016/03/22/Open-Sourcing-LogDNA-Client.html), courtesy of our friends at Microsoft.
+
 ## How it Works
 
 The LogDNA agent authenticates using your LogDNA agent key and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log files added to your specific logging directories, watching for file changes. Those changes are sent to to LogDNA via the secure web socket.
