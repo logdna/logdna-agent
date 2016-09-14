@@ -137,7 +137,7 @@ checkElevated()
 
     // debug(console.log(config));
 
-    config.hostname = os.hostname().replace('.ec2.internal', '');
+    config.hostname = parsedConfig.hostname || os.hostname().replace('.ec2.internal', '');
 
     return distro()
         .catch(() => {});
