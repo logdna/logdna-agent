@@ -27,14 +27,14 @@ program
     .version(pkg.version, '-v, --version')
     .description('This agent collect and ship logs for processing. Defaults to /var/log if run without parameters.')
     .option('-c, --config <file>', 'uses alternate config file (default: ' + config.DEFAULT_CONF_FILE + ')')
-    .option('-k, --key <key>', 'sets LogDNA Agent Key in config')
+    .option('-k, --key <key>', 'sets LogDNA API Key in config')
     .option('-d, --logdir <dir>', 'adds log dir to config, supports glob patterns', fileUtils.appender(), [])
     .option('-f, --logfile <dir>', 'adds log file to config', fileUtils.appender(), [])
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
-        console.log('    $ logdna-agent --key YOUR_AGENT_KEY');
+        console.log('    $ logdna-agent --key YOUR_API_KEY');
         console.log('    $ logdna-agent -d /home/ec2-user/logs');
         console.log('    $ logdna-agent -d /home/ec2-user/logs -d /path/to/another/log_dir  # multiple logdirs in 1 go');
         console.log('    $ logdna-agent -d /var/log/*.txt                                   # supports glob patterns');
@@ -89,7 +89,7 @@ checkElevated()
 .then(parsedConfig => {
     parsedConfig = parsedConfig || {};
     if (!program.key && !parsedConfig.key) {
-        console.error('LogDNA Agent Key not set! Use -k to set.');
+        console.error('LogDNA API Key not set! Use -k to set.');
         process.exit();
     }
 
@@ -103,7 +103,7 @@ checkElevated()
     if (program.key) {
         parsedConfig.key = program.key;
         return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
-            console.log('Your LogDNA Agent Key has been successfully saved!');
+            console.log('Your LogDNA API Key has been successfully saved!');
             process.exit(0);
         });
     }

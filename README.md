@@ -24,7 +24,7 @@ npm install
 sudo node index.js --help
 
 # configure
-sudo node index.js -k <YOUR LOGDNA AGENT KEY>
+sudo node index.js -k <YOUR LOGDNA API KEY>
 # On Linux, this will generate a config file: /etc/logdna.conf
 # On Windows, this will generate a config file: C:\ProgramData\logdna\logdna.conf
 
@@ -47,19 +47,20 @@ Normally a config file is automatically generated (e.g. when you set a key using
 
 ```conf
 logdir = /var/log/myapp,/path/to/2nd/dir
-key = <YOUR LOGDNA AGENT KEY>
+key = <YOUR LOGDNA API KEY>
 ```
 On Windows, you can use Windows paths, just make sure to use `\\` as a separator:
 
 ```conf
 logdir = C:\\Users\\username\\AppData\\myapp
-key = <YOUR LOGDNA AGENT KEY>
+key = <YOUR LOGDNA API KEY>
 ```
 
 #### Options
 * `logdir`: sets the paths that the agent will monitor for new files (separate multiple paths using `,`), supports glob patterns + specific files
-* `key`: your LogDNA Agent Key. You can obtain one by creating an account on LogDNA and retrieve it using "Host install instructions" at the bottom left corner of the webapp.
+* `key`: your LogDNA API Key. You can obtain one by creating an account on LogDNA.com and once logged in to the webapp, click the Gear icon, then Account Profile.
 * `tags`: host tagging to create dynamic groups on the webapp
+* `hostname`: override os hostname
 * `windowseventlogprovider`: see section below
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
 
@@ -133,7 +134,7 @@ You can find a [more detailed write-up here] (http://partnercatalyst.azurewebsit
 
 ## How it Works
 
-The LogDNA agent authenticates using your LogDNA agent key and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log files added to your specific logging directories, watching for file changes. Those changes are sent to to LogDNA via the secure web socket.
+The LogDNA agent authenticates using your LogDNA API key and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log files added to your specific logging directories, watching for file changes. Those changes are sent to to LogDNA via the secure web socket.
 
 ## Contributors
 
