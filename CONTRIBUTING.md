@@ -70,7 +70,7 @@ You can use this to control which parts of the agent logs it's debug output.
 
 To build the agent, ensure you have [nexe](https://www.npmjs.com/package/nexe) installed. This packages the LogDNA agent as a native executable with the node.js runtime bundled. This will automatically build the runtime from source.
 
-### Linux/OS X
+### Linux
 
 Ensure you have a native C++ compiler installed.
 
@@ -78,23 +78,28 @@ Ensure you have a native C++ compiler installed.
 
 Ensure you have Visual Studio 2015 or newer installed.
 
-### Creating the Executable
+### macOS
 
-To start the build do:
+Ensure you have Xcode 7 or newer installed.
+
+### Creating the binary
+
+To start the build,:
 
 ```
 grunt build
 ```
 
-This takes a bit of time and will output a binary at `./logdna-agent` (or `.\logdna-agent.exe` if on Windows).
+This takes a bit of time and will output a binary at `./logdna-agent` (or `.\logdna-agent.exe` if on Windows). For the initial build, majority of time will be spent building node.js. Subsequent builds will be much faster as node.js would've already been built.
 
 ## Packaging
 
 ### Linux
 
-Install [fpm](https://github.com/jordansissel/fpm) using `gem`. Then do:
-
 ```
+sudo gem install fpm
+sudo yum install rpm-build createrepo
+sudo yum --enablerepo=epel install dpkg-devel dpkg-dev
 grunt linux
 ```
 
@@ -109,3 +114,12 @@ grunt windows
 ```
 
 This will output the chocolatey package under `.\.builds\windows`.
+
+### macOS
+
+```
+gem install fpm
+grunt mac
+```
+
+This will output the `pkg` file to the root of the repo. Signing will likely fail since we typically sign it with our Apple Developer key, but the package should still be usable, just unsigned.
