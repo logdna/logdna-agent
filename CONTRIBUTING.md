@@ -44,7 +44,7 @@ Each file has a `debug` variable defined such as:
 var debug = require('debug')('logdna:index');
 ```
 
-To enable logs for the [index.js](https://github.com/sedouard/logdna-agent/blob/master/index.js) file just set the environment variable `DEBUG`:
+To enable logs for the [index.js](https://github.com/logdna/logdna-agent/blob/master/index.js) file just set the environment variable `DEBUG`:
 
 ```bash
 # Unix/Linux
@@ -53,22 +53,22 @@ export DEBUG=logdna:index
 set DEBUG=logdna:index
 ```
 
-This enables `debug` log messages for the [index.js](https://github.com/sedouard/logdna-agent/blob/master/index.js) file.
+This enables `debug` log messages for the [index.js](https://github.com/logdna/logdna-agent/blob/master/index.js) file.
 
 You can also enable one or more modules to log by using `*`:
 
 ```bash
 # Unix/Linux
-export DEBUG=logdna:*
+export DEBUG=*
 # windows
-set DEBUG=logdna:lib:lib:api-client,logdna:index
+set DEBUG=*
 ```
 
 You can use this to control which parts of the agent logs it's debug output.
 
 ## Building
 
-To build the agent, ensure you have [nexe](https://www.npmjs.com/package/nexe) installed. This packages the logdna agent as a native executable with the node.js runtime bundled. This will automatically build the runtime from source.
+To build the agent, ensure you have [nexe](https://www.npmjs.com/package/nexe) installed. This packages the LogDNA agent as a native executable with the node.js runtime bundled. This will automatically build the runtime from source.
 
 ### Linux/OS X
 
@@ -108,4 +108,4 @@ Install [chocolatey](https://chocolatey.org). Then do:
 grunt windows
 ```
 
-This will output the chocolatey package under `./.builds/windows`.
+This will output the chocolatey package under `.\.builds\windows`.
