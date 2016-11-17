@@ -29,7 +29,7 @@ program
     .option('-c, --config <file>', 'uses alternate config file (default: ' + config.DEFAULT_CONF_FILE + ')')
     .option('-k, --key <key>', 'sets LogDNA API Key in config')
     .option('-d, --logdir <dir>', 'adds log dir to config, supports glob patterns', fileUtils.appender(), [])
-    .option('-f, --logfile <dir>', 'adds log file to config', fileUtils.appender(), [])
+    .option('-f, --logfile <file>', 'adds log file to config', fileUtils.appender(), [])
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
     .on('--help', function() {
         console.log('  Examples:');
