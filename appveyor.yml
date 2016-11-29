@@ -4,8 +4,6 @@ environment:
 
 cache:
   - node_modules
-  # the nexe temp folder
-  - ~
 
 # Install scripts. (runs after repo cloning)
 install:
