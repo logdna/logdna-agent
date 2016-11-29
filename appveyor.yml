@@ -11,6 +11,7 @@ cache:
 install:
   - ps: Install-Product node $env:nodejs_version
   # install modules
+  - npm install -g npm@^2
   - npm install
   - npm install grunt-cli -g
   - npm install nexe -g
