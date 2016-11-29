@@ -21,7 +21,7 @@
     "always-tail": "^0.2.0",
     "async": "^1.5.2",
     "bluebird": "^3.3.3",
-    "bufferutil": "^1.2.1",
+    "bufferutil": "1.2.1",
     "commander": "^2.8.1",
     "debug": "^2.2.0",
     "getos": "^2.4.0",
