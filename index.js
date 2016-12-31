@@ -95,7 +95,7 @@ checkElevated()
     }
 
     if (!program.key && !parsedConfig.key) {
-        console.error('LogDNA API Key not set! Use -k to set.');
+        console.error('LogDNA API Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
         process.exit();
     }
 
