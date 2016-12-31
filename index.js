@@ -88,6 +88,12 @@ checkElevated()
 })
 .then(parsedConfig => {
     parsedConfig = parsedConfig || {};
+
+    // allow key to be passed via env
+    if (process.env.LOGDNA_AGENT_KEY) {
+        parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
+    }
+
     if (!program.key && !parsedConfig.key) {
         console.error('LogDNA API Key not set! Use -k to set.');
         process.exit();
