@@ -139,7 +139,7 @@ checkElevated()
     }
 
     // merge into single var after all potential saveConfigs finished
-    _.defaults(config, parsedConfig);
+    _.extend(config, parsedConfig);
 
     // debug(console.log(config));
 
