@@ -1,0 +1,52 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: logdna-agent
+  namespace: kube-system
+spec:
+  template:
+    metadata:
+      labels:
+        app: logdna-agent
+    spec:
+      containers:
+      - name: logdna-agent
+        image: logdna/logdna-agent
+        env:
+          - name: LOGDNA_AGENT_KEY
+            valueFrom:
+              secretKeyRef:
+                name: logdna-agent-key
+                key: logdna-agent-key
+          - name: LOGDNA_HOSTNAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: LOGDNA_PLATFORM
+            value: k8s
+        resources:
+          limits:
+            memory: 500Mi
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: docker
+          mountPath: /var/run/docker.sock
+        - name: osrelease
+          mountPath: /etc/os-release
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock
+      - name: osrelease
+        hostPath:
+          path: /etc/os-release
