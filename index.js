@@ -143,7 +143,13 @@ checkElevated()
 
     // debug(console.log(config));
 
-    config.hostname = parsedConfig.hostname || os.hostname().replace('.ec2.internal', '');
+    config.hostname = process.env.LOGDNA_HOSTNAME || config.hostname || os.hostname().replace('.ec2.internal', '');
+    config.tags = process.env.LOGDNA_TAGS || config.tags;
+
+    if (process.env.LOGDNA_PLATFORM) {
+        config.platform = process.env.LOGDNA_PLATFORM;
+        config.tags = config.tags ? config.tags + ',' + config.platform : config.platform;
+    }
 
     return distro()
         .catch(() => {});
