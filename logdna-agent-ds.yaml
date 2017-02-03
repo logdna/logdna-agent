@@ -2,7 +2,6 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: logdna-agent
-  namespace: kube-system
 spec:
   template:
     metadata:

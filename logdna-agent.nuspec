@@ -14,7 +14,7 @@
     <packageSourceUrl>https://github.com/logdna/logdna-agent</packageSourceUrl>
     <docsUrl>https://github.com/logdna/logdna-agent</docsUrl>
     <bugTrackerUrl>https://github.com/logdna/logdna-agent/issues</bugTrackerUrl>
-    <tags>logdna-agent logging devops logdna</tags>
+    <tags>logdna-agent logdna-cli cli tail logging devops logdna</tags>
     <copyright>Copyright 2016 Answerbook, Inc., portions by Microsoft and Contributors</copyright>
     <licenseUrl>https://github.com/logdna/logdna-agent/blob/master/LICENSE.md</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
