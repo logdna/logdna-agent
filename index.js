@@ -107,41 +107,38 @@ checkElevated()
         parsedConfig.logdir = parsedConfig.logdir.split(','); // force array
     }
 
+    var saveMessages = [];
+
     if (program.key) {
         parsedConfig.key = program.key;
-        return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
-            console.log('Your LogDNA API Key has been successfully saved!');
-            process.exit(0);
-        });
+        saveMessages.push('Your LogDNA API Key has been successfully saved!');
     }
 
     if (program.logdir && program.logdir.length > 0) {
         parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logdir));
-        return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
-            console.log('Added ' + program.logdir.join(', ') + ' to config.');
-            process.exit(0);
-        });
+        saveMessages.push('Added ' + program.logdir.join(', ') + ' to config.');
     }
 
     if (program.logfile && program.logfile.length > 0) {
         parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logfile));
-        return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
-            console.log('Added ' + program.logfile.join(', ') + ' to config.');
-            process.exit(0);
-        });
+        saveMessages.push('Added ' + program.logfile.join(', ') + ' to config.');
     }
 
     if (program.hostname) {
         parsedConfig.hostname = program.hostname;
-        return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
-            console.log('Hostname ' + parsedConfig.hostname + ' saved to config.');
-        });
+        saveMessages.push('Hostname ' + parsedConfig.hostname + ' saved to config.');
     }
 
     if (program.tags) {
         parsedConfig.tags = program.tags.replace(/\s*,\s*/g, ',').replace(/^,|,$/g, ''); // trim spaces around comma
+        saveMessages.push('Tags ' + parsedConfig.tags + ' saved to config.');
+    }
+
+    if (saveMessages.length) {
         return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
-            console.log('Tags ' + parsedConfig.tags + ' saved to config.');
+            for (var i = 0; i < saveMessages.length; i++) {
+                console.log(saveMessages[i]);
+            }
             process.exit(0);
         });
     }
