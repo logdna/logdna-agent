@@ -30,6 +30,7 @@ program
     .option('-k, --key <key>', 'sets LogDNA API Key in config')
     .option('-d, --logdir <dir>', 'adds log dir to config, supports glob patterns', fileUtils.appender(), [])
     .option('-f, --logfile <file>', 'adds log file to config', fileUtils.appender(), [])
+    .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
     .on('--help', function() {
         console.log('  Examples:');
@@ -127,6 +128,13 @@ checkElevated()
         return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
             console.log('Added ' + program.logfile.join(', ') + ' to config.');
             process.exit(0);
+        });
+    }
+
+    if (program.hostname) {
+        parsedConfig.hostname = program.hostname;
+        return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
+            console.log('Hostname ' + parsedConfig.hostname + ' saved to config.');
         });
     }
 
