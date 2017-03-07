@@ -31,11 +31,12 @@ sudo node index.js -k <YOUR LOGDNA API KEY>
 # On Linux, /var/log is monitored/added by default (recursively), optionally specify more folders
 # On Windows, C:\ProgramData\logs is monitored/added by default (recursively), optionally specify more folders
 sudo node index.js -d "/path/to/log/folders" -d "/path/to/2nd/folder"
-sudo node index.js -d "/var/log/*.txt"                    # supports glob patterns
-sudo node index.js -d "/var/log/**/*.txt"                 # *.txt in any subfolder
-sudo node index.js -d "/var/log/**/myapp.log"             # myapp.log in any subfolder
-sudo node index.js -d "/var/log"                          # folder only assumes *.log + extensionless files
-sudo node index.js -f "/usr/local/nginx/logs/access.log"  # specific file
+sudo node index.js -d "/var/log"                              # folder only assumes *.log + extensionless files
+sudo node index.js -d "/var/log/*.txt"                        # supports glob patterns
+sudo node index.js -d "/var/log/**/*.txt"                     # *.txt in any subfolder
+sudo node index.js -d "/var/log/**/myapp.log"                 # myapp.log in any subfolder
+sudo node index.js -d "logdir = /var/log/+(name1|name2).log"  # supports extended glob patterns
+sudo node index.js -f "/usr/local/nginx/logs/access.log"      # specific file
 
 # start the agent
 sudo node index.js
