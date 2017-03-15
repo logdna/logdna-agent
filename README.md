@@ -131,20 +131,41 @@ namespace LogDNATest
 
 And you'll see your event log messages appear on the LogDNA webapp.
 
-You can find a [more detailed write-up here] (http://partnercatalyst.azurewebsites.net/pulls/189/2016/03/22/Open-Sourcing-LogDNA-Client.html), courtesy of our friends at Microsoft.
+You can find a [more detailed write-up here](http://partnercatalyst.azurewebsites.net/pulls/189/2016/03/22/Open-Sourcing-LogDNA-Client.html), courtesy of our friends at Microsoft.
 
 ## How it Works
 
 The LogDNA agent authenticates using your LogDNA API key and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log files added to your specific logging directories, watching for file changes. Those changes are sent to to LogDNA via the secure web socket.
+
+## Kubernetes Logging
+
+Set up Kubernetes logging with 2 `kubectl` commands with the LogDNA agent! We extract pertinent Kubernetes metadata: pod name, container name, container id, namespace, etc:
+
+```
+kubectl create secret generic logdna-agent-key --from-literal=logdna-agent-key=<YOUR LOGDNA API KEY>
+kubectl create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds.yaml
+```
+
+This automatically installs a logdna-agent pod into each node in your cluster and ships stdout/stderr from all containers, both application logs and node logs. View your logs at https://app.logdna.com
+
+If you don't have a LogDNA account, you can create one on https://logdna.com or if you're on macOS w/[Homebrew](https://brew.sh) installed:
+
+```
+brew cask install logdna-cli
+logdna register <email>
+# now paste the api key into the kubectl commands above
+```
+
+Our paid plans start at $1.25/GB per month, pay for what you use / no fixed data buckets / all paid plans include all features.
 
 ## Contributors
 
 * Lee Liu (LogDNA)
 * Mike Hu (LogDNA)
 * Ryan Staatz (LogDNA)
-* [Steven Edouard] (https://github.com/sedouard) (Microsoft)
-* [Rita Zhang] (https://github.com/ritazh) (Microsoft)
-* [Lauren Tran] (https://github.com/laurentran) (Microsoft)
+* [Steven Edouard](https://github.com/sedouard) (Microsoft)
+* [Rita Zhang](https://github.com/ritazh) (Microsoft)
+* [Lauren Tran](https://github.com/laurentran) (Microsoft)
 
 ## Contributing
 
