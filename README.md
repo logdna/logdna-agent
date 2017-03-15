@@ -156,7 +156,11 @@ logdna register <email>
 # now paste the api key into the kubectl commands above
 ```
 
-Our paid plans start at $1.25/GB per month, pay for what you use / no fixed data buckets / all paid plans include all features.
+We created this integration mainly based on customer feedback and that [logging with Kubernetes should not be this painful](https://blog.logdna.com/2017/03/14/logging-with-kubernetes-should-not-be-this-painful/).
+
+### LogDNA Pay-per-gig Pricing
+
+Our [paid plans](https://logdna.com/#pricing) start at $1.25/GB per month, pay for what you use / no fixed data buckets / all paid plans include all features.
 
 ## Contributors
 
