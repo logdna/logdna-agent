@@ -146,7 +146,7 @@ kubectl create secret generic logdna-agent-key --from-literal=logdna-agent-key=<
 kubectl create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds.yaml
 ```
 
-This automatically installs a logdna-agent pod into each node in your cluster and ships stdout/stderr from all containers, both application logs and node logs. View your logs at https://app.logdna.com
+This automatically installs a logdna-agent pod into each node in your cluster and ships stdout/stderr from all containers, both application logs and node logs. Note: By default, the agent pod will collect logs from all namespaces on each node, including `kube-system`. View your logs at https://app.logdna.com
 
 If you don't have a LogDNA account, you can create one on https://logdna.com or if you're on macOS w/[Homebrew](https://brew.sh) installed:
 
