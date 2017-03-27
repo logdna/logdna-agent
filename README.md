@@ -36,7 +36,8 @@ sudo node index.js -d "/var/log/*.txt"                    # supports glob patter
 sudo node index.js -d "/var/log/**/*.txt"                 # *.txt in any subfolder
 sudo node index.js -d "/var/log/**/myapp.log"             # myapp.log in any subfolder
 sudo node index.js -d "/var/log/+(name1|name2).log"       # supports extended glob patterns
-sudo node index.js -f "/usr/local/nginx/logs/access.log"  # specific file
+sudo node index.js -e "/var/log/nginx/error.log"          # exclude specific files from -d
+sudo node index.js -f "/usr/local/nginx/logs/access.log"  # add specific files
 
 # start the agent
 sudo node index.js
@@ -58,7 +59,8 @@ key = <YOUR LOGDNA API KEY>
 ```
 
 #### Options
-* `logdir`: sets the paths that the agent will monitor for new files (separate multiple paths using `,`), supports glob patterns + specific files
+* `logdir`: sets the paths that the agent will monitor for new files, separate multiple paths using `,`, supports glob patterns + specific files
+* `exclude`: excludes files that otherwise would've matched `logdir`, separate multiple excludes using `,`, supports glob patterns + specific files
 * `key`: your LogDNA API Key. You can obtain one by creating an account on LogDNA.com and once logged in to the webapp, click the Gear icon, then Account Profile.
 * `tags`: host tagging to create dynamic groups on the webapp
 * `hostname`: override os hostname

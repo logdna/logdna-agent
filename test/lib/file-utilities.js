@@ -35,7 +35,7 @@ describe('lib:file-utilities', function() {
             }
 
             return new Promise(resolve => {
-                fileUtilities.getFiles(tempDir, function(err, array) {
+                fileUtilities.getFiles({}, tempDir, function(err, array) {
                     debug(array);
                     assert.equal(array.length, testFiles.length, 'Expected to find all log files');
                     resolve(true);
@@ -59,7 +59,7 @@ describe('lib:file-utilities', function() {
             }
 
             return new Promise(resolve => {
-                fileUtilities.getFiles(tempDir, function(err, array) {
+                fileUtilities.getFiles({}, tempDir, function(err, array) {
                     debug(array);
                     assert.equal(array.length, 0, 'Expected to find no log files');
                     resolve(true);
@@ -80,7 +80,7 @@ describe('lib:file-utilities', function() {
             }
 
             return new Promise(resolve => {
-                fileUtilities.getFiles(path.join(tempDir, '*.txt'), function(err, array) {
+                fileUtilities.getFiles({}, path.join(tempDir, '*.txt'), function(err, array) {
                     debug(array);
                     assert.equal(array.length, 1, 'Expected to find only 1 log file, not recursive');
                     resolve(true);
@@ -103,7 +103,7 @@ describe('lib:file-utilities', function() {
             }
 
             return new Promise(resolve => {
-                fileUtilities.getFiles(path.join(tempDir, '**', '*.txt'), function(err, array) {
+                fileUtilities.getFiles({}, path.join(tempDir, '**', '*.txt'), function(err, array) {
                     debug(array);
                     assert.equal(array.length, 2, 'Expected to find 2 log files, recursive');
                     resolve(true);

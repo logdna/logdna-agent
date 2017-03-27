@@ -30,6 +30,7 @@ program
     .option('-k, --key <key>', 'sets LogDNA API Key in config')
     .option('-d, --logdir <dir>', 'adds log dir to config, supports glob patterns', fileUtils.appender(), [])
     .option('-f, --logfile <file>', 'adds log file to config', fileUtils.appender(), [])
+    .option('-e, --exclude <file>', 'exclude files from logdir', fileUtils.appender(), [])
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
     .on('--help', function() {
@@ -107,6 +108,10 @@ checkElevated()
         parsedConfig.logdir = parsedConfig.logdir.split(','); // force array
     }
 
+    if (parsedConfig.exclude && !Array.isArray(parsedConfig.exclude)) {
+        parsedConfig.exclude = parsedConfig.exclude.split(',');
+    }
+
     var saveMessages = [];
 
     if (program.key) {
@@ -122,6 +127,11 @@ checkElevated()
     if (program.logfile && program.logfile.length > 0) {
         parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logfile));
         saveMessages.push('Added ' + program.logfile.join(', ') + ' to config.');
+    }
+
+    if (program.exclude && program.exclude.length > 0) {
+        parsedConfig.exclude = _.uniq((parsedConfig.exclude || []).concat(program.exclude));
+        saveMessages.push('Added exclusion ' + program.exclude.join(', ') + ' to config.');
     }
 
     if (program.hostname) {
@@ -155,7 +165,7 @@ checkElevated()
         config.platform = process.env.LOGDNA_PLATFORM;
         config.tags = config.tags ? config.tags + ',' + config.platform : config.platform;
 
-        if (~config.platform.indexOf('k8s')) {
+        if (config.platform.indexOf('k8s') === 0) {
             config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
         }
     }
