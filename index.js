@@ -154,6 +154,10 @@ checkElevated()
     if (process.env.LOGDNA_PLATFORM) {
         config.platform = process.env.LOGDNA_PLATFORM;
         config.tags = config.tags ? config.tags + ',' + config.platform : config.platform;
+
+        if (~config.platform.indexOf('k8s')) {
+            config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
+        }
     }
 
     return distro()
