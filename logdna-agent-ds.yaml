@@ -10,7 +10,8 @@ spec:
     spec:
       containers:
       - name: logdna-agent
-        image: logdna/logdna-agent
+        image: logdna/logdna-agent:latest
+        imagePullPolicy: Always
         env:
           - name: LOGDNA_AGENT_KEY
             valueFrom:

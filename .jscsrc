@@ -107,7 +107,8 @@
         "allExcept": [ "}", ")" ]
     },
     "safeContextKeyword": [
-        "self"
+        "self",
+        "that"
     ],
     "validateIndentation": 4,
     "validateQuoteMarks": "'"
