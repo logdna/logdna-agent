@@ -248,7 +248,7 @@ describe('lib:connection-manager', function() {
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData8\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData9\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData10\n');
-                    }, 400);
+                    }, 1400);
                 });
             });
         });
