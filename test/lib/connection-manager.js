@@ -70,6 +70,8 @@ describe('lib:connection-manager', function() {
                 LOGDNA_LOGHOST: 'localhost',
                 LOGDNA_LOGPORT: port.toString(),
                 LOGDNA_RECONNECT: false,
+                TRANSPORT: 'websocket',
+                SOCKET_KEEPALIVE: -1,
                 STATS_INTERVAL: 50
             };
             return new Promise(resolve => {
@@ -95,6 +97,9 @@ describe('lib:connection-manager', function() {
                     });
                 });
 
+                var linebuffer = require('../../lib/linebuffer');
+                linebuffer.setConfig(config);
+
                 var connectionManager = require('../../lib/connection-manager');
                 connectionManager.connectLogServer(config, 'unitTestProgram');
             });
@@ -112,6 +117,8 @@ describe('lib:connection-manager', function() {
                 LOGDNA_LOGHOST: 'localhost',
                 LOGDNA_LOGPORT: port.toString(),
                 LOGDNA_RECONNECT: false,
+                TRANSPORT: 'websocket',
+                SOCKET_KEEPALIVE: -1,
                 STATS_INTERVAL: -1
             };
             return new Promise(resolve => {
@@ -139,14 +146,18 @@ describe('lib:connection-manager', function() {
                     });
                 });
 
+                var linebuffer = require('../../lib/linebuffer');
+                linebuffer.setConfig(config);
+
                 var connectionManager = require('../../lib/connection-manager');
                 // create test log file
-                fs.writeFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData1\n');
+                fs.writeFileSync(path.join(tempDir, 'streamtest1.log'), '');
                 connectionManager.connectLogServer(config, 'unitTestProgram')
                 .then(() => {
                     setTimeout(function() {
                         // now simulate a program logging to a file
                         debug('simulating logging streamtest1.log');
+                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData1\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData2\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData3\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData4\n');
@@ -156,7 +167,6 @@ describe('lib:connection-manager', function() {
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData8\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData9\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData10\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData11\n');
                     }, 200);
                 });
             });
@@ -176,6 +186,8 @@ describe('lib:connection-manager', function() {
                 LOGDNA_LOGHOST: 'localhost',
                 LOGDNA_LOGPORT: port.toString(),
                 LOGDNA_RECONNECT: true,
+                TRANSPORT: 'websocket',
+                SOCKET_KEEPALIVE: -1,
                 STATS_INTERVAL: -1
             };
             return new Promise(resolve => {
@@ -209,9 +221,12 @@ describe('lib:connection-manager', function() {
                     });
                 });
 
+                var linebuffer = require('../../lib/linebuffer');
+                linebuffer.setConfig(config);
+
                 var connectionManager = require('../../lib/connection-manager');
                 // create test log file
-                fs.writeFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData1\n');
+                fs.writeFileSync(path.join(tempDir, 'streamtest2.log'), '');
                 connectionManager.connectLogServer(config, 'unitTestProgram')
                 .then(sock => {
                     clientsocket = sock;
@@ -219,20 +234,20 @@ describe('lib:connection-manager', function() {
                     setTimeout(function() {
                         // now simulate a program logging to a file
                         debug('simulating logging streamtest2.log');
+                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData1\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData2\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData3\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData4\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData5\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData6\n');
                     }, 200);
 
                     setTimeout(function() {
                         debug('simulating disconnected logging streamtest2.log');
+                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData6\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData7\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData8\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData9\n');
                         fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData10\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData11\n');
                     }, 400);
                 });
             });
@@ -261,6 +276,8 @@ describe('lib:connection-manager', function() {
                     LOGDNA_LOGHOST: 'localhost',
                     LOGDNA_LOGPORT: port.toString(),
                     LOGDNA_RECONNECT: false,
+                    TRANSPORT: 'websocket',
+                    SOCKET_KEEPALIVE: -1,
                     STATS_INTERVAL: -1
                 };
                 var connectionManager = require('../../lib/connection-manager');
