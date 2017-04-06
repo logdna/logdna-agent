@@ -4,7 +4,7 @@
   <metadata>
     <id>logdna-agent</id>
     <title>LogDNA Agent for Windows</title>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <authors>sedouard,leeliu</authors>
     <owners>leeliu</owners>
     <summary>LogDNA Collector Agent for Windows</summary>
