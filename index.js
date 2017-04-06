@@ -10,6 +10,7 @@ var program = require('commander');
 var pkg = require('./package.json');
 var _ = require('lodash');
 var os = require('os');
+var fs = require('fs');
 
 var properties = Promise.promisifyAll(require('properties'));
 var macaddress = Promise.promisifyAll(require('macaddress'));
@@ -63,6 +64,7 @@ if (os.platform() === 'linux') {
 }
 
 var socket;
+var HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-\.]/g;
 
 function checkElevated() {
     return new Promise((resolve) => {
@@ -158,7 +160,7 @@ checkElevated()
 
     // debug(console.log(config));
 
-    config.hostname = process.env.LOGDNA_HOSTNAME || config.hostname || os.hostname().replace('.ec2.internal', '');
+    config.hostname = process.env.LOGDNA_HOSTNAME || fs.existsSync('/etc/logdna-hostname') && fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') || config.hostname || os.hostname().replace('.ec2.internal', '');
     config.tags = process.env.LOGDNA_TAGS || config.tags;
 
     if (process.env.LOGDNA_PLATFORM) {

@@ -18,10 +18,6 @@ spec:
               secretKeyRef:
                 name: logdna-agent-key
                 key: logdna-agent-key
-          - name: LOGDNA_HOSTNAME
-            valueFrom:
-              fieldRef:
-                fieldPath: spec.nodeName
           - name: LOGDNA_PLATFORM
             value: k8s
         resources:
@@ -37,6 +33,8 @@ spec:
           mountPath: /var/run/docker.sock
         - name: osrelease
           mountPath: /etc/os-release
+        - name: logdnahostname
+          mountPath: /etc/logdna-hostname
       volumes:
       - name: varlog
         hostPath:
@@ -50,3 +48,6 @@ spec:
       - name: osrelease
         hostPath:
           path: /etc/os-release
+      - name: logdnahostname
+        hostPath:
+          path: /etc/hostname
