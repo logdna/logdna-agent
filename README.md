@@ -49,19 +49,19 @@ Normally a config file is automatically generated (e.g. when you set a key using
 
 ```conf
 logdir = /var/log/myapp,/path/to/2nd/dir
-key = <YOUR LOGDNA API KEY>
+key = <YOUR LOGDNA INGESTION KEY>
 ```
 On Windows, you can use Windows paths, just make sure to use `\\` as a separator:
 
 ```conf
 logdir = C:\\Users\\username\\AppData\\myapp
-key = <YOUR LOGDNA API KEY>
+key = <YOUR LOGDNA INGESTION KEY>
 ```
 
 #### Options
 * `logdir`: sets the paths that the agent will monitor for new files, separate multiple paths using `,`, supports glob patterns + specific files
 * `exclude`: excludes files that otherwise would've matched `logdir`, separate multiple excludes using `,`, supports glob patterns + specific files
-* `key`: your LogDNA API Key. You can obtain one by creating an account on LogDNA.com and once logged in to the webapp, click the Gear icon, then Account Profile.
+* `key`: your LogDNA Ingestion Key. You can obtain one by creating an account on LogDNA.com and once logged in to the webapp, click the Gear icon, then Account Profile.
 * `tags`: host tagging to create dynamic groups on the webapp
 * `hostname`: override os hostname
 * `windowseventlogprovider`: see section below
