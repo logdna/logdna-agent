@@ -24,7 +24,7 @@ npm install
 sudo node index.js --help
 
 # configure
-sudo node index.js -k <YOUR LOGDNA API KEY>
+sudo node index.js -k <YOUR LOGDNA INGESTION KEY>
 # On Linux, this will generate a config file: /etc/logdna.conf
 # On Windows, this will generate a config file: C:\ProgramData\logdna\logdna.conf
 
@@ -137,14 +137,14 @@ You can find a [more detailed write-up here](http://partnercatalyst.azurewebsite
 
 ## How it Works
 
-The LogDNA agent authenticates using your LogDNA API key and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log files added to your specific logging directories, watching for file changes. Those changes are sent to to LogDNA via the secure web socket.
+The LogDNA agent authenticates using your [LogDNA Ingestion Key](https://app.logdna.com/manage/profile) and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log files added to your specific logging directories, watching for file changes. Those changes are sent to to LogDNA via the secure web socket.
 
 ## Kubernetes Logging
 
 Set up Kubernetes logging with 2 `kubectl` commands with the LogDNA agent! We extract pertinent Kubernetes metadata: pod name, container name, container id, namespace, etc:
 
 ```
-kubectl create secret generic logdna-agent-key --from-literal=logdna-agent-key=<YOUR LOGDNA API KEY>
+kubectl create secret generic logdna-agent-key --from-literal=logdna-agent-key=<YOUR LOGDNA INGESTION KEY>
 kubectl create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds.yaml
 ```
 
@@ -155,7 +155,7 @@ If you don't have a LogDNA account, you can create one on https://logdna.com or 
 ```
 brew cask install logdna-cli
 logdna register <email>
-# now paste the api key into the kubectl commands above
+# now paste the Ingestion Key into the kubectl commands above
 ```
 
 We created this integration mainly based on customer feedback and that [logging with Kubernetes should not be this painful](https://blog.logdna.com/2017/03/14/logging-with-kubernetes-should-not-be-this-painful/).
