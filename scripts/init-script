@@ -34,7 +34,7 @@ case "$1" in
         echo "Already started"
     else
         if [ ! -f "$conf_file" ]; then
-            echo "Error: LogDNA API Key not set! Use $name -k to set or $name -h for help."
+            echo "Error: LogDNA Ingestion Key not set! Use $name -k to set or $name -h for help."
             exit 1
         fi
 
