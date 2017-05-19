@@ -160,7 +160,7 @@ checkElevated()
 
     // debug(console.log(config));
 
-    config.hostname = process.env.LOGDNA_HOSTNAME || fs.existsSync('/etc/logdna-hostname') && fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') || config.hostname || os.hostname().replace('.ec2.internal', '');
+    config.hostname = process.env.LOGDNA_HOSTNAME || fs.existsSync('/etc/logdna-hostname') && fs.statSync('/etc/logdna-hostname').isFile() && fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') || config.hostname || os.hostname().replace('.ec2.internal', '');
     config.tags = process.env.LOGDNA_TAGS || config.tags;
 
     if (process.env.LOGDNA_PLATFORM) {
