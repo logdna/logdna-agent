@@ -29,6 +29,12 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
+        - name: varlogpods
+          mountPath: /var/log/pods
+          readOnly: true
+        - name: mnt
+          mountPath: /mnt
+          readOnly: true
         - name: docker
           mountPath: /var/run/docker.sock
         - name: osrelease
@@ -42,6 +48,12 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
+      - name: varlogpods
+        hostPath:
+          path: /var/log/pods
+      - name: mnt
+        hostPath:
+          path: /mnt
       - name: docker
         hostPath:
           path: /var/run/docker.sock
