@@ -34,7 +34,9 @@
     "request": "^2.71.0",
     "utf-8-validate": "^1.2.1",
     "windows-event-reader": "^1.0.1",
-    "ws": "^1.0.1"
+    "ws": "^1.0.1",
+    "https-proxy-agent": "^1.0.0",
+    "tunnel": "^0.0.5"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.11"
