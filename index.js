@@ -14,7 +14,7 @@ var fs = require('fs');
 
 var properties = Promise.promisifyAll(require('properties'));
 var macaddress = Promise.promisifyAll(require('macaddress'));
-var got = require('got');
+var request = require('request');
 var distro = Promise.promisify(require('./lib/os-version'));
 var config = require('./lib/config');
 var fileUtils = require('./lib/file-utilities');
@@ -184,19 +184,17 @@ checkElevated()
     if (dist && dist.os) {
         config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
     }
-    return got('http://169.254.169.254/latest/dynamic/instance-identity/document/', { timeout: 1000, retries: 0, json: true, headers: { 'user-agent': config.UA } })
-        .catch(() => {});
-})
-.then(res => {
-    if (res && res.body) {
-        config.awsid = res.body.instanceId;
-        config.awsregion = res.body.region;
-        config.awsaz = res.body.availabilityZone;
-        config.awsami = res.body.imageId;
-        config.awstype = res.body.instanceType;
-    }
-    return macaddress.allAsync()
-        .catch(() => {});
+    request('http://169.254.169.254/latest/dynamic/instance-identity/document/', { timeout: 1000, json: true }, function(err, res, body) {
+        if (res && res.statusCode) {
+            config.awsid = body.instanceId;
+            config.awsregion = body.region;
+            config.awsaz = body.availabilityZone;
+            config.awsami = body.imageId;
+            config.awstype = body.instanceType;
+        }
+        return macaddress.allAsync()
+           .catch(() => {});
+    });
 })
 .then(all => {
     if (all) {
