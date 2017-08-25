@@ -22,7 +22,7 @@ To run various tasks you'll need to have [grunt-cli](https://npmjs.com/grunt-cli
 
 All tests are written in the [`./test`](./test) folder.
 
-To run all the tests & validations (including `jshint` and `jscs` for code style) do:
+To run all the tests & validations (including `eslint` for code style) do:
 
 ```
 grunt test

@@ -23,8 +23,7 @@ describe('lib:connection-manager', function() {
             return {
                 unref: function() {}
             };
-        },
-        exec: function(fileName, args) {
+        }, exec: function(fileName, args) {
             debug('spawn called!');
             assert.ok(fileName);
             assert(typeof args, 'string');
@@ -36,17 +35,17 @@ describe('lib:connection-manager', function() {
     before(function(done) {
         // setup spawn mock
         mockery.enable({
-            warnOnUnregistered: false,
-            useCleanCache: true
+            warnOnUnregistered: false
+            , useCleanCache: true
         });
         mockery.registerMock('child_process', cpMock);
 
         debug('cleaning up test folder...' + tempDir);
         return rimraf(tempDir)
-        .then(() => {
-            fs.mkdirSync(tempDir);
-            return done();
-        });
+            .then(() => {
+                fs.mkdirSync(tempDir);
+                return done();
+            });
     });
 
     after(function() {
@@ -63,16 +62,16 @@ describe('lib:connection-manager', function() {
             const testServer = new WebSocketServer({ port: port });
             var messageCount = 0;
             var config = {
-                autoupdate: 0,
-                key: 'SOME_FAKE_KEY',
-                logdir: [tempDir],
-                LOGDNA_LOGSSL: false,
-                LOGDNA_LOGHOST: 'localhost',
-                LOGDNA_LOGPORT: port.toString(),
-                LOGDNA_RECONNECT: false,
-                TRANSPORT: 'websocket',
-                SOCKET_KEEPALIVE: -1,
-                STATS_INTERVAL: 50
+                autoupdate: 0
+                , key: 'SOME_FAKE_KEY'
+                , logdir: [tempDir]
+                , LOGDNA_LOGSSL: false
+                , LOGDNA_LOGHOST: 'localhost'
+                , LOGDNA_LOGPORT: port.toString()
+                , LOGDNA_RECONNECT: false
+                , TRANSPORT: 'websocket'
+                , SOCKET_KEEPALIVE: -1
+                , STATS_INTERVAL: 50
             };
             return new Promise(resolve => {
                 testServer.on('connection', socket => {
@@ -109,17 +108,17 @@ describe('lib:connection-manager', function() {
             port++;
             const testServer = new WebSocketServer({ port: port });
             var config = {
-                autoupdate: 0,
-                auth_token: 'abcxyz',
-                key: 'SOME_FAKE_KEY',
-                logdir: [tempDir],
-                LOGDNA_LOGSSL: false,
-                LOGDNA_LOGHOST: 'localhost',
-                LOGDNA_LOGPORT: port.toString(),
-                LOGDNA_RECONNECT: false,
-                TRANSPORT: 'websocket',
-                SOCKET_KEEPALIVE: -1,
-                STATS_INTERVAL: -1
+                autoupdate: 0
+                , auth_token: 'abcxyz'
+                , key: 'SOME_FAKE_KEY'
+                , logdir: [tempDir]
+                , LOGDNA_LOGSSL: false
+                , LOGDNA_LOGHOST: 'localhost'
+                , LOGDNA_LOGPORT: port.toString()
+                , LOGDNA_RECONNECT: false
+                , TRANSPORT: 'websocket'
+                , SOCKET_KEEPALIVE: -1
+                , STATS_INTERVAL: -1
             };
             return new Promise(resolve => {
                 testServer.on('connection', socket => {
@@ -153,22 +152,22 @@ describe('lib:connection-manager', function() {
                 // create test log file
                 fs.writeFileSync(path.join(tempDir, 'streamtest1.log'), '');
                 connectionManager.connectLogServer(config, 'unitTestProgram')
-                .then(() => {
-                    setTimeout(function() {
+                    .then(() => {
+                        setTimeout(function() {
                         // now simulate a program logging to a file
-                        debug('simulating logging streamtest1.log');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData1\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData2\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData3\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData4\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData5\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData6\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData7\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData8\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData9\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData10\n');
-                    }, 200);
-                });
+                            debug('simulating logging streamtest1.log');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData1\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData2\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData3\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData4\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData5\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData6\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData7\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData8\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData9\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest1.log'), 'arbitraryData10\n');
+                        }, 200);
+                    });
             });
         });
 
@@ -178,17 +177,17 @@ describe('lib:connection-manager', function() {
             var messageCount = 0;
             var clientsocket;
             var config = {
-                autoupdate: 0,
-                auth_token: 'abcxyz',
-                key: 'SOME_FAKE_KEY',
-                logdir: [tempDir],
-                LOGDNA_LOGSSL: false,
-                LOGDNA_LOGHOST: 'localhost',
-                LOGDNA_LOGPORT: port.toString(),
-                LOGDNA_RECONNECT: true,
-                TRANSPORT: 'websocket',
-                SOCKET_KEEPALIVE: -1,
-                STATS_INTERVAL: -1
+                autoupdate: 0
+                , auth_token: 'abcxyz'
+                , key: 'SOME_FAKE_KEY'
+                , logdir: [tempDir]
+                , LOGDNA_LOGSSL: false
+                , LOGDNA_LOGHOST: 'localhost'
+                , LOGDNA_LOGPORT: port.toString()
+                , LOGDNA_RECONNECT: true
+                , TRANSPORT: 'websocket'
+                , SOCKET_KEEPALIVE: -1
+                , STATS_INTERVAL: -1
             };
             return new Promise(resolve => {
                 testServer.on('connection', socket => {
@@ -228,28 +227,28 @@ describe('lib:connection-manager', function() {
                 // create test log file
                 fs.writeFileSync(path.join(tempDir, 'streamtest2.log'), '');
                 connectionManager.connectLogServer(config, 'unitTestProgram')
-                .then(sock => {
-                    clientsocket = sock;
+                    .then(sock => {
+                        clientsocket = sock;
 
-                    setTimeout(function() {
+                        setTimeout(function() {
                         // now simulate a program logging to a file
-                        debug('simulating logging streamtest2.log');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData1\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData2\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData3\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData4\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData5\n');
-                    }, 200);
+                            debug('simulating logging streamtest2.log');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData1\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData2\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData3\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData4\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData5\n');
+                        }, 200);
 
-                    setTimeout(function() {
-                        debug('simulating disconnected logging streamtest2.log');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData6\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData7\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData8\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData9\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData10\n');
-                    }, 1400);
-                });
+                        setTimeout(function() {
+                            debug('simulating disconnected logging streamtest2.log');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData6\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData7\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData8\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData9\n');
+                            fs.appendFileSync(path.join(tempDir, 'streamtest2.log'), 'arbitraryData10\n');
+                        }, 1400);
+                    });
             });
         });
 
@@ -269,16 +268,16 @@ describe('lib:connection-manager', function() {
                 });
 
                 var config = {
-                    autoupdate: 1,
-                    key: 'SOME_FAKE_KEY',
-                    logdir: [tempDir],
-                    LOGDNA_LOGSSL: false,
-                    LOGDNA_LOGHOST: 'localhost',
-                    LOGDNA_LOGPORT: port.toString(),
-                    LOGDNA_RECONNECT: false,
-                    TRANSPORT: 'websocket',
-                    SOCKET_KEEPALIVE: -1,
-                    STATS_INTERVAL: -1
+                    autoupdate: 1
+                    , key: 'SOME_FAKE_KEY'
+                    , logdir: [tempDir]
+                    , LOGDNA_LOGSSL: false
+                    , LOGDNA_LOGHOST: 'localhost'
+                    , LOGDNA_LOGPORT: port.toString()
+                    , LOGDNA_RECONNECT: false
+                    , TRANSPORT: 'websocket'
+                    , SOCKET_KEEPALIVE: -1
+                    , STATS_INTERVAL: -1
                 };
                 var connectionManager = require('../../lib/connection-manager');
                 connectionManager.connectLogServer(config, 'unitTestProgram');

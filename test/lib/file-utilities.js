@@ -11,11 +11,11 @@ describe('lib:file-utilities', function() {
     beforeEach(function(done) {
         debug('cleaning up test folder...' + tempDir);
         return rimraf(tempDir)
-        .then(() => {
-            fs.mkdirSync(tempDir);
-            fs.mkdirSync(path.join(tempDir, 'subdir'));
-            return done();
-        });
+            .then(() => {
+                fs.mkdirSync(tempDir);
+                fs.mkdirSync(path.join(tempDir, 'subdir'));
+                return done();
+            });
     });
 
     describe('#getFiles()', function() {
@@ -23,11 +23,11 @@ describe('lib:file-utilities', function() {
             var fileUtilities = require('../../lib/file-utilities');
             fileUtilities.files = [];
             var testFiles = [
-                path.join(tempDir, 'somelog1.log'),
-                path.join(tempDir, 'somelog2'),
-                path.join(tempDir, 'somelog3-file'),
+                path.join(tempDir, 'somelog1.log')
+                , path.join(tempDir, 'somelog2')
+                , path.join(tempDir, 'somelog3-file')
                 // path.join(tempDir, 'somelog4-202f'),       // 3 digit number shouldn't match date stamp
-                path.join(tempDir, 'wtmp')                    // /var/log/wtmp shouldn't match cuz diff folder
+                , path.join(tempDir, 'wtmp') // /var/log/wtmp shouldn't match cuz diff folder
             ];
 
             for (var i = 0; i < testFiles.length; i++) {
@@ -47,11 +47,11 @@ describe('lib:file-utilities', function() {
             var fileUtilities = require('../../lib/file-utilities');
             fileUtilities.files = [];
             var testFiles = [
-                path.join(tempDir, 'somelog1.log.1'),
-                path.join(tempDir, 'somelog2.txt'),
+                path.join(tempDir, 'somelog1.log.1')
+                , path.join(tempDir, 'somelog2.txt')
                 // path.join(tempDir, 'somelog3-20150928'),   // exception (we dont tail extensionless with date stamps)
                 // path.join(tempDir, 'somelog4_20250928'),   // exception (we dont tail extensionless with date stamps)
-                path.join(tempDir, 'testexclude')             // in globalExclude
+                , path.join(tempDir, 'testexclude') // in globalExclude
             ];
 
             for (var i = 0; i < testFiles.length; i++) {
@@ -71,8 +71,8 @@ describe('lib:file-utilities', function() {
             var fileUtilities = require('../../lib/file-utilities');
             fileUtilities.files = [];
             var testFiles = [
-                path.join(tempDir, 'somelog1.txt'),
-                path.join(tempDir, 'subdir', 'somelog2.txt')
+                path.join(tempDir, 'somelog1.txt')
+                , path.join(tempDir, 'subdir', 'somelog2.txt')
             ];
 
             for (var i = 0; i < testFiles.length; i++) {
@@ -92,10 +92,10 @@ describe('lib:file-utilities', function() {
             var fileUtilities = require('../../lib/file-utilities');
             fileUtilities.files = [];
             var testFiles = [
-                path.join(tempDir, 'somelog1.txt'),
-                path.join(tempDir, 'subdir', 'somelog2.txt'),
-                path.join(tempDir, 'subdir', 'somelog3.log'), // should fail since this dir doesn't define *.log
-                path.join(tempDir, 'subdir', 'somelog4')      // should fail since this dir doesn't define extensionless
+                path.join(tempDir, 'somelog1.txt')
+                , path.join(tempDir, 'subdir', 'somelog2.txt')
+                , path.join(tempDir, 'subdir', 'somelog3.log') // should fail since this dir doesn't define *.log
+                , path.join(tempDir, 'subdir', 'somelog4') // should fail since this dir doesn't define extensionless
             ];
 
             for (var i = 0; i < testFiles.length; i++) {
@@ -121,9 +121,9 @@ describe('lib:file-utilities', function() {
             var socket = new MockWebSocket('ws://localhost:3000');
             socket.connected = true;
             var config = {
-                logdir: [tempDir],
-                TRANSPORT: 'websocket',
-                TAIL_MODE: 'trs'
+                logdir: [tempDir]
+                , TRANSPORT: 'websocket'
+                , TAIL_MODE: 'trs'
             };
             var lineBuffer = require('../../lib/linebuffer');
             lineBuffer.setSocket(socket);
@@ -164,9 +164,9 @@ describe('lib:file-utilities', function() {
             var socket = new MockWebSocket('ws://localhost:3001');
             socket.connected = true;
             var config = {
-                logdir: [tempDir],
-                TRANSPORT: 'websocket',
-                TAIL_MODE: 'lib'
+                logdir: [tempDir]
+                , TRANSPORT: 'websocket'
+                , TAIL_MODE: 'lib'
             };
             var lineBuffer = require('../../lib/linebuffer');
             lineBuffer.setSocket(socket);
@@ -207,9 +207,9 @@ describe('lib:file-utilities', function() {
             var socket = new MockWebSocket('ws://localhost:3002');
             socket.connected = true;
             var config = {
-                logdir: [tempDir],
-                TRANSPORT: 'websocket',
-                TAIL_MODE: 'unix'
+                logdir: [tempDir]
+                , TRANSPORT: 'websocket'
+                , TAIL_MODE: 'unix'
             };
             var lineBuffer = require('../../lib/linebuffer');
             lineBuffer.setSocket(socket);
@@ -252,10 +252,10 @@ describe('lib:file-utilities', function() {
             var socket = new MockWebSocket('ws://localhost:3010');
             socket.connected = true;
             var config = {
-                logdir: [tempDir],
-                TRANSPORT: 'websocket',
-                TAIL_MODE: 'trs',
-                RESCAN_INTERVAL: 1000
+                logdir: [tempDir]
+                , TRANSPORT: 'websocket'
+                , TAIL_MODE: 'trs'
+                , RESCAN_INTERVAL: 1000
             };
             var lineBuffer = require('../../lib/linebuffer');
             lineBuffer.setSocket(socket);
@@ -321,21 +321,21 @@ describe('lib:file-utilities', function() {
             var properties = Promise.promisifyAll(require('properties'));
             var configPath = './test/assets/testconfig.config';
             return properties.parseAsync(configPath, { path: true })
-            .then(config => {
-                debug('saving configuration:');
-                debug(config);
-                return fileUtilities.saveConfig(config, path.join(tempDir, 'test.config'));
-            })
-            .then(() => {
-                return properties.parseAsync(configPath, { path: true });
-            })
-            .then(config => {
-                debug('retrieved saved configuration:');
-                debug(config);
-                assert.ok(config.logdir);
-                assert.ok(config.key);
-                assert.equal(config.autoupdate, 0);
-            });
+                .then(config => {
+                    debug('saving configuration:');
+                    debug(config);
+                    return fileUtilities.saveConfig(config, path.join(tempDir, 'test.config'));
+                })
+                .then(() => {
+                    return properties.parseAsync(configPath, { path: true });
+                })
+                .then(config => {
+                    debug('retrieved saved configuration:');
+                    debug(config);
+                    assert.ok(config.logdir);
+                    assert.ok(config.key);
+                    assert.equal(config.autoupdate, 0);
+                });
         });
     });
 });

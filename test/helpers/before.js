@@ -1,3 +1,1 @@
-/* jshint ignore:start */
-Promise = require('bluebird');
-/* jshint ignore:end */
+Promise = require('bluebird'); // eslint-disable-line

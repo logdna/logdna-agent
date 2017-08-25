@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 /* globals process */
 // override es6 promise with bluebird
-/* jshint ignore:start */
-Promise = require('bluebird');
-/* jshint ignore:end */
+Promise = require('bluebird'); // eslint-disable-line
 var debug = require('debug')('logdna:index');
 var log = require('./lib/log');
 var program = require('commander');
@@ -20,7 +18,6 @@ var config = require('./lib/config');
 var fileUtils = require('./lib/file-utilities');
 var apiClient = require('./lib/api-client');
 var connectionManager = require('./lib/connection-manager');
-
 
 process.title = 'logdna-agent';
 program._name = 'logdna-agent';
@@ -64,7 +61,7 @@ if (os.platform() === 'linux') {
 }
 
 var socket;
-var HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-\.]/g;
+var HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
 
 function checkElevated() {
     return new Promise(resolve => {
@@ -81,155 +78,155 @@ function checkElevated() {
 config.UA = pkg.name + '/' + pkg.version;
 
 checkElevated()
-.then(isElevated => {
-    if (!isElevated) {
-        console.log('You must be an Administrator (root, sudo) run this agent! See -h or --help for more info.');
-        process.exit();
-    }
-
-    return properties.parseAsync(program.config || config.DEFAULT_CONF_FILE, { path: true })
-        .catch(() => {});
-})
-.then(parsedConfig => {
-    parsedConfig = parsedConfig || {};
-
-    // allow key to be passed via env
-    if (process.env.LOGDNA_AGENT_KEY) {
-        parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
-    }
-
-    // allow exclude to be passed via env
-    if (process.env.LOGDNA_EXCLUDE) {
-        parsedConfig.exclude = process.env.LOGDNA_EXCLUDE;
-    }
-
-    if (!program.key && !parsedConfig.key) {
-        console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
-        process.exit();
-    }
-
-    // sanitize
-    if (!parsedConfig.logdir) {
-        parsedConfig.logdir = [config.DEFAULT_LOG_PATH]; // default entry
-    } else if (!Array.isArray(parsedConfig.logdir)) {
-        parsedConfig.logdir = parsedConfig.logdir.split(','); // force array
-    }
-
-    if (parsedConfig.exclude && !Array.isArray(parsedConfig.exclude)) {
-        parsedConfig.exclude = parsedConfig.exclude.split(',');
-    }
-
-    var saveMessages = [];
-
-    if (program.key) {
-        parsedConfig.key = program.key;
-        saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
-    }
-
-    if (program.logdir && program.logdir.length > 0) {
-        parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logdir));
-        saveMessages.push('Added ' + program.logdir.join(', ') + ' to config.');
-    }
-
-    if (program.logfile && program.logfile.length > 0) {
-        parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logfile));
-        saveMessages.push('Added ' + program.logfile.join(', ') + ' to config.');
-    }
-
-    if (program.exclude && program.exclude.length > 0) {
-        parsedConfig.exclude = _.uniq((parsedConfig.exclude || []).concat(program.exclude));
-        saveMessages.push('Added exclusion ' + program.exclude.join(', ') + ' to config.');
-    }
-
-    if (program.hostname) {
-        parsedConfig.hostname = program.hostname;
-        saveMessages.push('Hostname ' + parsedConfig.hostname + ' saved to config.');
-    }
-
-    if (program.tags) {
-        parsedConfig.tags = program.tags.replace(/\s*,\s*/g, ',').replace(/^,|,$/g, ''); // trim spaces around comma
-        saveMessages.push('Tags ' + parsedConfig.tags + ' saved to config.');
-    }
-
-    if (saveMessages.length) {
-        return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
-            for (var i = 0; i < saveMessages.length; i++) {
-                console.log(saveMessages[i]);
-            }
-            process.exit(0);
-        });
-    }
-
-    // merge into single var after all potential saveConfigs finished
-    _.extend(config, parsedConfig);
-
-    // debug(console.log(config));
-
-    config.hostname = process.env.LOGDNA_HOSTNAME || fs.existsSync('/etc/logdna-hostname') && fs.statSync('/etc/logdna-hostname').isFile() && fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') || config.hostname || os.hostname().replace('.ec2.internal', '');
-    config.tags = process.env.LOGDNA_TAGS || config.tags;
-
-    if (process.env.LOGDNA_PLATFORM) {
-        config.platform = process.env.LOGDNA_PLATFORM;
-        config.tags = config.tags ? config.tags + ',' + config.platform : config.platform;
-
-        if (config.platform.indexOf('k8s') === 0) {
-            config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
+    .then(isElevated => {
+        if (!isElevated) {
+            console.log('You must be an Administrator (root, sudo) run this agent! See -h or --help for more info.');
+            process.exit();
         }
-    }
 
-    return distro()
-        .catch(() => {});
-})
-.then(dist => {
-    if (dist && dist.os) {
-        config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
-    }
-    return new Promise(resolve => {
-        request('http://169.254.169.254/latest/dynamic/instance-identity/document/', { timeout: 1000, json: true }, function(err, res, body) {
-            if (res && res.statusCode) {
-                config.awsid = body.instanceId;
-                config.awsregion = body.region;
-                config.awsaz = body.availabilityZone;
-                config.awsami = body.imageId;
-                config.awstype = body.instanceType;
+        return properties.parseAsync(program.config || config.DEFAULT_CONF_FILE, { path: true })
+            .catch(() => {});
+    })
+    .then(parsedConfig => {
+        parsedConfig = parsedConfig || {};
+
+        // allow key to be passed via env
+        if (process.env.LOGDNA_AGENT_KEY) {
+            parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
+        }
+
+        // allow exclude to be passed via env
+        if (process.env.LOGDNA_EXCLUDE) {
+            parsedConfig.exclude = process.env.LOGDNA_EXCLUDE;
+        }
+
+        if (!program.key && !parsedConfig.key) {
+            console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
+            process.exit();
+        }
+
+        // sanitize
+        if (!parsedConfig.logdir) {
+            parsedConfig.logdir = [config.DEFAULT_LOG_PATH]; // default entry
+        } else if (!Array.isArray(parsedConfig.logdir)) {
+            parsedConfig.logdir = parsedConfig.logdir.split(','); // force array
+        }
+
+        if (parsedConfig.exclude && !Array.isArray(parsedConfig.exclude)) {
+            parsedConfig.exclude = parsedConfig.exclude.split(',');
+        }
+
+        var saveMessages = [];
+
+        if (program.key) {
+            parsedConfig.key = program.key;
+            saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
+        }
+
+        if (program.logdir && program.logdir.length > 0) {
+            parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logdir));
+            saveMessages.push('Added ' + program.logdir.join(', ') + ' to config.');
+        }
+
+        if (program.logfile && program.logfile.length > 0) {
+            parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logfile));
+            saveMessages.push('Added ' + program.logfile.join(', ') + ' to config.');
+        }
+
+        if (program.exclude && program.exclude.length > 0) {
+            parsedConfig.exclude = _.uniq((parsedConfig.exclude || []).concat(program.exclude));
+            saveMessages.push('Added exclusion ' + program.exclude.join(', ') + ' to config.');
+        }
+
+        if (program.hostname) {
+            parsedConfig.hostname = program.hostname;
+            saveMessages.push('Hostname ' + parsedConfig.hostname + ' saved to config.');
+        }
+
+        if (program.tags) {
+            parsedConfig.tags = program.tags.replace(/\s*,\s*/g, ',').replace(/^,|,$/g, ''); // trim spaces around comma
+            saveMessages.push('Tags ' + parsedConfig.tags + ' saved to config.');
+        }
+
+        if (saveMessages.length) {
+            return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
+                for (var i = 0; i < saveMessages.length; i++) {
+                    console.log(saveMessages[i]);
+                }
+                process.exit(0);
+            });
+        }
+
+        // merge into single var after all potential saveConfigs finished
+        _.extend(config, parsedConfig);
+
+        // debug(console.log(config));
+
+        config.hostname = process.env.LOGDNA_HOSTNAME || fs.existsSync('/etc/logdna-hostname') && fs.statSync('/etc/logdna-hostname').isFile() && fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') || config.hostname || os.hostname().replace('.ec2.internal', '');
+        config.tags = process.env.LOGDNA_TAGS || config.tags;
+
+        if (process.env.LOGDNA_PLATFORM) {
+            config.platform = process.env.LOGDNA_PLATFORM;
+            config.tags = config.tags ? config.tags + ',' + config.platform : config.platform;
+
+            if (config.platform.indexOf('k8s') === 0) {
+                config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
             }
-            resolve(macaddress.allAsync()
-                .catch(() => {})
-            );
+        }
+
+        return distro()
+            .catch(() => {});
+    })
+    .then(dist => {
+        if (dist && dist.os) {
+            config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
+        }
+        return new Promise(resolve => {
+            request('http://169.254.169.254/latest/dynamic/instance-identity/document/', { timeout: 1000, json: true }, function(err, res, body) {
+                if (res && res.statusCode) {
+                    config.awsid = body.instanceId;
+                    config.awsregion = body.region;
+                    config.awsaz = body.availabilityZone;
+                    config.awsami = body.imageId;
+                    config.awstype = body.instanceType;
+                }
+                resolve(macaddress.allAsync()
+                    .catch(() => {})
+                );
+            });
         });
-    });
-})
-.then(all => {
-    if (all) {
-        var ifaces = Object.keys(all);
-        for (var i = 0; i < ifaces.length; i++) {
-            if (all[ifaces[i]].ipv4 && (
-                all[ifaces[i]].ipv4.indexOf('10.') === 0 ||
+    })
+    .then(all => {
+        if (all) {
+            var ifaces = Object.keys(all);
+            for (var i = 0; i < ifaces.length; i++) {
+                if (all[ifaces[i]].ipv4 && (
+                    all[ifaces[i]].ipv4.indexOf('10.') === 0 ||
                 all[ifaces[i]].ipv4.indexOf('172.1') === 0 ||
                 all[ifaces[i]].ipv4.indexOf('172.2') === 0 ||
                 all[ifaces[i]].ipv4.indexOf('172.3') === 0 ||
                 all[ifaces[i]].ipv4.indexOf('192.168.') === 0)
-            ) {
-                config.mac = all[ifaces[i]].mac;
-                config.ip = all[ifaces[i]].ipv4 || all[ifaces[i]].ipv6;
-                break;
+                ) {
+                    config.mac = all[ifaces[i]].mac;
+                    config.ip = all[ifaces[i]].ipv4 || all[ifaces[i]].ipv6;
+                    break;
+                }
             }
         }
-    }
-    log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
+        log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
 
-    return apiClient.getAuthToken(config, pkg.name, socket);
-})
-.then(() => {
-    debug('got auth token:');
-    debug(config.auth_token);
-    debug('connecting to log server');
-    return connectionManager.connectLogServer(config, pkg.name);
-})
-.then(sock => {
-    socket = sock;
-    debug('logdna agent successfully started');
-});
+        return apiClient.getAuthToken(config, pkg.name, socket);
+    })
+    .then(() => {
+        debug('got auth token:');
+        debug(config.auth_token);
+        debug('connecting to log server');
+        return connectionManager.connectLogServer(config, pkg.name);
+    })
+    .then(sock => {
+        socket = sock;
+        debug('logdna agent successfully started');
+    });
 
 Promise.onPossiblyUnhandledRejection(function(error) {
     throw error;
