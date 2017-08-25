@@ -67,7 +67,7 @@ var socket;
 var HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-\.]/g;
 
 function checkElevated() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         if (os.platform() === 'win32') {
             resolve(isWinAdmin());
         } else if (process.getuid() <= 0) {
@@ -184,16 +184,19 @@ checkElevated()
     if (dist && dist.os) {
         config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
     }
-    request('http://169.254.169.254/latest/dynamic/instance-identity/document/', { timeout: 1000, json: true }, function(err, res, body) {
-        if (res && res.statusCode) {
-            config.awsid = body.instanceId;
-            config.awsregion = body.region;
-            config.awsaz = body.availabilityZone;
-            config.awsami = body.imageId;
-            config.awstype = body.instanceType;
-        }
-        return macaddress.allAsync()
-           .catch(() => {});
+    return new Promise(resolve => {
+        request('http://169.254.169.254/latest/dynamic/instance-identity/document/', { timeout: 1000, json: true }, function(err, res, body) {
+            if (res && res.statusCode) {
+                config.awsid = body.instanceId;
+                config.awsregion = body.region;
+                config.awsaz = body.availabilityZone;
+                config.awsami = body.imageId;
+                config.awstype = body.instanceType;
+            }
+            resolve(macaddress.allAsync()
+                .catch(() => {})
+            );
+        });
     });
 })
 .then(all => {
