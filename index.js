@@ -29,6 +29,7 @@ program
     .option('-d, --logdir <dir>', 'adds log dir to config, supports glob patterns', fileUtils.appender(), [])
     .option('-f, --logfile <file>', 'adds log file to config', fileUtils.appender(), [])
     .option('-e, --exclude <file>', 'exclude files from logdir', fileUtils.appender(), [])
+    .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
     .on('--help', function() {
@@ -136,6 +137,15 @@ checkElevated()
         if (program.exclude && program.exclude.length > 0) {
             parsedConfig.exclude = _.uniq((parsedConfig.exclude || []).concat(program.exclude));
             saveMessages.push('Added exclusion ' + program.exclude.join(', ') + ' to config.');
+        }
+
+        if (program.excludeRegex) {
+            parsedConfig.exclude_regex = program.excludeRegex;
+            // strip leading and trailing / if exists
+            if (parsedConfig.exclude_regex.substring(0, 1) === '/' && parsedConfig.exclude_regex.substring(parsedConfig.exclude_regex.length - 1) === '/') {
+                parsedConfig.exclude_regex = parsedConfig.exclude_regex.substring(1, parsedConfig.exclude_regex.length - 1);
+            }
+            saveMessages.push('Added exclude pattern /' + parsedConfig.exclude_regex + '/ to config.');
         }
 
         if (program.hostname) {

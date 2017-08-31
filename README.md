@@ -61,6 +61,7 @@ key = <YOUR LOGDNA INGESTION KEY>
 #### Options
 * `logdir`: sets the paths that the agent will monitor for new files, separate multiple paths using `,`, supports glob patterns + specific files. By default this option is set to monitor .log and extensionless files under /var/log/.
 * `exclude`: excludes files that otherwise would've matched `logdir`, separate multiple excludes using `,`, supports glob patterns + specific files
+* `exclude_regex`: filters out any lines matching pattern in any file. Don't include leading and trailing /.
 * `key`: your LogDNA Ingestion Key. You can obtain one by creating an account on LogDNA.com and once logged in to the webapp, click the Gear icon, then Account Profile.
 * `tags`: host tagging to create dynamic groups on the webapp
 * `hostname`: override os hostname
