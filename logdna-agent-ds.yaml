@@ -21,6 +21,8 @@ spec:
           - name: LOGDNA_PLATFORM
             value: k8s
         resources:
+          requests:
+            cpu: 20m
           limits:
             memory: 500Mi
         volumeMounts:
