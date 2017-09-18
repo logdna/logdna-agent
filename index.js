@@ -198,7 +198,7 @@ checkElevated()
         }
         return new Promise(resolve => {
             request('http://169.254.169.254/latest/dynamic/instance-identity/document/', { timeout: 1000, json: true }, function(err, res, body) {
-                if (res && res.statusCode) {
+                if (res && res.statusCode && body) {
                     config.awsid = body.instanceId;
                     config.awsregion = body.region;
                     config.awsaz = body.availabilityZone;
