@@ -20,6 +20,8 @@ spec:
                 key: logdna-agent-key
           - name: LOGDNA_PLATFORM
             value: k8s
+        #  - name: LOGDNA_TAGS
+        #    value: production,cluster1,othertags
         resources:
           limits:
             memory: 500Mi
