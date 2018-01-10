@@ -1,0 +1,30 @@
+#!/sbin/openrc-run
+
+name="logdna-agent"
+command="/usr/bin/${name}"
+pid_file="/var/run/${name}.pid"
+log_file="/var/log/${name}.log"
+conf_file="/etc/logdna.conf"
+
+check_config() {
+	if [ ! -f "${conf_file}" ]; then
+		eerror "Error: LogDNA Ingestion Key is not set! use ${name} -k to set or ${name} -h for help."
+		return 1
+	fi
+	return 0
+}
+
+start() {
+	ebegin "Starting ${name}"
+	check_config || return 1
+	chmod 0644 /etc/logrotate.d/"${name}" > /dev/null 2>&1
+	start-stop-daemon --background --start --exec "${command}" \
+	--make-pidfile --pidfile "${pid_file}" >> "${log_file}" 2>&1
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping ${name}"
+	start-stop-daemon --stop --name "logdna-agent" --exec "${command}"
+	eend $?
+}
