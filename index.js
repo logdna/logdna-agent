@@ -232,7 +232,7 @@ checkElevated()
 
         log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
 
-        if (config.platform.indexOf('k8s') === 0) {
+        if (config.platform && config.platform.indexOf('k8s') === 0) {
             k8s.init();
         }
 
