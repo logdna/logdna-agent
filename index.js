@@ -18,6 +18,7 @@ var config = require('./lib/config');
 var fileUtils = require('./lib/file-utilities');
 var apiClient = require('./lib/api-client');
 var connectionManager = require('./lib/connection-manager');
+var k8s = require('./lib/k8s');
 
 process.title = 'logdna-agent';
 program._name = 'logdna-agent';
@@ -228,7 +229,12 @@ checkElevated()
                 }
             }
         }
+
         log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
+
+        if (config.platform.indexOf('k8s') === 0) {
+            k8s.init();
+        }
 
         return apiClient.getAuthToken(config, pkg.name, socket);
     })
