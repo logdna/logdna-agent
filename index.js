@@ -107,6 +107,10 @@ checkElevated()
             parsedConfig.exclude_regex = process.env.LOGDNA_EXCLUDE_REGEX;
         }
 
+        if (process.env.USEJOURNALD) {
+            parsedConfig.usejournald = process.env.USEJOURNALD;
+        }
+
         if (!program.key && !parsedConfig.key) {
             console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
             process.exit();
