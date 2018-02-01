@@ -68,7 +68,7 @@ You can use this to control which parts of the agent logs it's debug output.
 
 ## Building
 
-To build the agent, ensure you have [nexe](https://www.npmjs.com/package/nexe) installed. This packages the LogDNA agent as a native executable with the node.js runtime bundled. This will automatically build the runtime from source.
+To build the agent, ensure you have [nexe](https://www.npmjs.com/package/nexe) installed (`npm install -g nexe@1.1.2). This packages the LogDNA agent as a native executable with the node.js runtime bundled. This will automatically build the runtime from source.
 
 ### Linux
 
