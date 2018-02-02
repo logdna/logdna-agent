@@ -1,6 +1,6 @@
 {
   "name": "logdna-agent",
-  "version": "1.4.15",
+  "version": "1.5.0",
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "bufferutil": "^1.2.1",
     "commander": "^2.8.1",
     "debug": "^2.2.0",
+    "file-queue": "^0.2.1",
     "getos": "^2.4.0",
     "glob": "^7.0.3",
     "https-proxy-agent": "^2.1.0",
