@@ -84,6 +84,7 @@ gpgcheck=0" | sudo tee /etc/yum.repos.d/logdna.repo
 
 # APT Repo
 echo "deb http://repo.logdna.com stable main" | sudo tee /etc/apt/sources.list.d/logdna.list
+wget -O- https://s3.amazonaws.com/repo.logdna.com/logdna.gpg | sudo apt-key add -
 sudo apt-get update
 ```
 
