@@ -78,6 +78,7 @@ function checkElevated() {
 }
 
 config.UA = pkg.name + '/' + pkg.version;
+config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
 
 checkElevated()
     .then(isElevated => {
@@ -86,7 +87,7 @@ checkElevated()
             process.exit();
         }
 
-        return properties.parseAsync(program.config || config.DEFAULT_CONF_FILE, { path: true })
+        return properties.parseAsync(config.CONF_FILE, { path: true })
             .catch(() => {});
     })
     .then(parsedConfig => {
