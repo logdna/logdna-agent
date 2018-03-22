@@ -19,6 +19,7 @@ var fileUtils = require('./lib/file-utilities');
 var apiClient = require('./lib/api-client');
 var connectionManager = require('./lib/connection-manager');
 var k8s = require('./lib/k8s');
+var utils = require('./lib/utils');
 
 process.title = 'logdna-agent';
 program._name = 'logdna-agent';
@@ -33,6 +34,7 @@ program
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
+    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)')
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -45,6 +47,8 @@ program
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log');
         console.log('    $ logdna-agent -t tag  # replaces config with this tag');
         console.log('    $ logdna-agent -t staging,2ndtag');
+        console.log('    $ logdna-agent --list');
+        console.log('    $ logdna-agent -l tags,key,logfile                                 # custom configuration fields');
         console.log();
     })
     .parse(process.argv);
@@ -133,6 +137,17 @@ checkElevated()
         if (program.key) {
             parsedConfig.key = program.key;
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
+        }
+
+        if (program.list) {
+            var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
+            if (_.isString(program.list)) conf = _.pick(conf, utils.split(program.list));
+            var msg = utils.stringify(conf, {
+                delimiter: ' -->'
+                , indent: ' '
+                , aligned: true
+            });
+            saveMessages.push(config.CONF_FILE+':\n'+msg);
         }
 
         if (program.logdir && program.logdir.length > 0) {
