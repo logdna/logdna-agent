@@ -39,7 +39,7 @@ describe('lib:windows-utilities', function() {
                     log.info('arbitraryData');
                 }, 1000);
 
-                windowsUtilities.streamEventLog(provider, socket);
+                windowsUtilities.streamEventLog([provider], socket);
                 debug(socket);
             });
         });
