@@ -50,7 +50,7 @@ program
         console.log('    $ logdna-agent -t tag                                              # replaces config with this tag');
         console.log('    $ logdna-agent -t staging,2ndtag');
         console.log('    $ logdna-agent -l tags,key,logfile                                 # custom configuration fields');
-        console.log('    $ logdna-agent -w Application,System,\'DNS Server\'                # multiple event providers');
+        console.log('    $ logdna-agent -w Application,System,\'DNS Server\'                  # multiple event providers');
         console.log();
     })
     .parse(process.argv);
@@ -145,18 +145,20 @@ checkElevated()
             if (os.platform() === 'win32') {
                 parsedConfig.windowseventlogproviders = utils.processOption(program.windowseventlogproviders, parsedConfig.windowseventlogproviders);
                 saveMessages.push('Added ' + program.windowseventlogproviders.join(', ') + ' to config.');
-            } else saveMessages.push('Option is working only in Windows.');
+            } else {
+                saveMessages.push('-w is only available for Windows.');
+            }
         }
 
         if (program.list) {
             var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
             if (_.isArray(program.list)) conf = _.pick(conf, program.list);
             var msg = utils.stringify(conf, {
-                delimiter: ' -->'
+                delimiter: ' ='
                 , indent: ' '
                 , aligned: true
             });
-            saveMessages.push(config.CONF_FILE+':\n'+msg);
+            saveMessages.push(config.CONF_FILE + ':\n' + msg);
         }
 
         if (program.clear) {
