@@ -33,8 +33,9 @@ program
     .option('-e, --exclude <file>', 'exclude files from logdir', fileUtils.appender(), [])
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
-    .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
-    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)')
+    .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', fileUtils.appender(), [])
+    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
+    .option('-w, --windowseventlogproviders <providers>', 'set Windows Event Log Providers (on Windows)', fileUtils.appender())
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -45,10 +46,10 @@ program
         console.log('    $ logdna-agent -d /var/log/**/myapp.log                            # myapp.log in any subfolder');
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log');
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log');
-        console.log('    $ logdna-agent -t tag  # replaces config with this tag');
+        console.log('    $ logdna-agent -t tag                                              # replaces config with this tag');
         console.log('    $ logdna-agent -t staging,2ndtag');
-        console.log('    $ logdna-agent --list');
         console.log('    $ logdna-agent -l tags,key,logfile                                 # custom configuration fields');
+        console.log('    $ logdna-agent -w Application,System,\'DNS Server\'                # multiple event providers');
         console.log();
     })
     .parse(process.argv);
@@ -139,9 +140,16 @@ checkElevated()
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
         }
 
+        if (program.windowseventlogproviders) {
+            if (os.platform() === 'win32') {
+                parsedConfig.windowseventlogproviders = utils.processOption(program.windowseventlogproviders, parsedConfig.windowseventlogproviders);
+                saveMessages.push('Added ' + program.windowseventlogproviders.join(', ') + ' to config.');
+            } else saveMessages.push('Option is working only in Windows.');
+        }
+
         if (program.list) {
             var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
-            if (_.isString(program.list)) conf = _.pick(conf, utils.split(program.list));
+            if (_.isArray(program.list)) conf = _.pick(conf, program.list);
             var msg = utils.stringify(conf, {
                 delimiter: ' -->'
                 , indent: ' '
@@ -180,12 +188,12 @@ checkElevated()
         }
 
         if (program.tags) {
-            parsedConfig.tags = program.tags.replace(/\s*,\s*/g, ',').replace(/^,|,$/g, ''); // trim spaces around comma
-            saveMessages.push('Tags ' + parsedConfig.tags + ' saved to config.');
+            parsedConfig.tags = utils.processOption(program.tags, parsedConfig.tags);
+            saveMessages.push('Tags ' + parsedConfig.tags.join(', ') + ' saved to config.');
         }
 
         if (saveMessages.length) {
-            return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
+            return fileUtils.saveConfig(parsedConfig, config.CONF_FILE).then(() => {
                 for (var i = 0; i < saveMessages.length; i++) {
                     console.log(saveMessages[i]);
                 }

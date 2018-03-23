@@ -66,6 +66,7 @@ key = <YOUR LOGDNA INGESTION KEY>
 * `tags`: use tags to separate data for production, staging, or autoscaling use cases
 * `hostname`: override os hostname
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
+* `list`: list all saved configuration details.
 
 ### Features
 * Agent maintains persistent connections to LogDNA ingestion servers with HTTPS encryption
