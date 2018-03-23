@@ -36,7 +36,7 @@ program
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', fileUtils.appender(), [])
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
     .option('-C, --clear [params]', 'clear some saved configurations (all unless params specified)', utils.split)
-    .option('-w, --windowseventlogproviders <providers>', 'set Windows Event Log Providers (on Windows)', fileUtils.appender())
+    .option('-w, --windowseventlogproviders <providers>', 'set Windows Event Log Providers (only on Windows)', fileUtils.appender(), [])
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
