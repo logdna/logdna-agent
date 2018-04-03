@@ -50,7 +50,7 @@ program
         console.log('    $ logdna-agent -t tag                                              # replaces config with this tag');
         console.log('    $ logdna-agent -t staging,2ndtag');
         console.log('    $ logdna-agent -l tags,key,logfile                                 # custom configuration fields');
-        console.log('    $ logdna-agent -w Application,System,\'DNS Server\'                  # multiple event providers');
+        console.log('    $ logdna-agent -w Application,System,\'DNS Server\'                # multiple event providers');
         console.log();
     })
     .parse(process.argv);
@@ -168,6 +168,9 @@ checkElevated()
                 };
                 saveMessages.push('All configurations except LogDNA Ingestion Key have been deleted!');
             } else {
+                _.remove(program.clear, (key) => {
+                    return key === 'key';
+                });
                 parsedConfig = _.omit(parsedConfig, program.clear);
                 saveMessages.push('Configurations ' + program.clear.join(', ') + ' have been deleted!');
             }
