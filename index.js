@@ -19,6 +19,7 @@ var fileUtils = require('./lib/file-utilities');
 var apiClient = require('./lib/api-client');
 var connectionManager = require('./lib/connection-manager');
 var k8s = require('./lib/k8s');
+var utils = require('./lib/utils');
 
 process.title = 'logdna-agent';
 program._name = 'logdna-agent';
@@ -27,12 +28,15 @@ program
     .description('This agent collect and ship logs for processing. Defaults to /var/log if run without parameters.')
     .option('-c, --config <file>', 'uses alternate config file (default: ' + config.DEFAULT_CONF_FILE + ')')
     .option('-k, --key <key>', 'sets your LogDNA Ingestion Key in the config')
-    .option('-d, --logdir <dir>', 'adds log dir to config, supports glob patterns', fileUtils.appender(), [])
-    .option('-f, --logfile <file>', 'adds log file to config', fileUtils.appender(), [])
+    .option('-d, --logdir <dir>', 'adds log directories to config, supports glob patterns', fileUtils.appender(), [])
+    .option('-f, --logfile <file>', 'adds log files to config', fileUtils.appender(), [])
     .option('-e, --exclude <file>', 'exclude files from logdir', fileUtils.appender(), [])
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
-    .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma')
+    .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', fileUtils.appender(), [])
+    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
+    .option('-C, --clear [params]', 'clear some saved configurations (all unless params specified)', utils.split)
+    .option('-w, --windowseventlogproviders <providers>', 'set Windows Event Log Providers (only on Windows)', fileUtils.appender(), [])
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -43,8 +47,10 @@ program
         console.log('    $ logdna-agent -d /var/log/**/myapp.log                            # myapp.log in any subfolder');
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log');
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log');
-        console.log('    $ logdna-agent -t tag  # replaces config with this tag');
+        console.log('    $ logdna-agent -t tag                                              # replaces config with this tag');
         console.log('    $ logdna-agent -t staging,2ndtag');
+        console.log('    $ logdna-agent -l tags,key,logfile                                 # custom configuration fields');
+        console.log('    $ logdna-agent -w Application,System,\'DNS Server\'                # multiple event providers');
         console.log();
     })
     .parse(process.argv);
@@ -135,18 +141,53 @@ checkElevated()
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
         }
 
+        if (program.windowseventlogproviders && program.windowseventlogproviders.length > 0) {
+            if (os.platform() === 'win32') {
+                parsedConfig.windowseventlogproviders = utils.processOption(program.windowseventlogproviders, parsedConfig.windowseventlogproviders);
+                saveMessages.push('Added ' + program.windowseventlogproviders.join(', ') + ' to config.');
+            } else {
+                saveMessages.push('-w is only available for Windows.');
+            }
+        }
+
+        if (program.list) {
+            var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
+            if (_.isArray(program.list)) conf = _.pick(conf, program.list);
+            var msg = utils.stringify(conf, {
+                delimiter: ' ='
+                , indent: ' '
+                , aligned: true
+            });
+            saveMessages.push(config.CONF_FILE + ':\n' + msg);
+        }
+
+        if (program.clear) {
+            if (!_.isArray(program.clear)) {
+                parsedConfig = {
+                    key: parsedConfig.key
+                };
+                saveMessages.push('All configurations except LogDNA Ingestion Key have been deleted!');
+            } else {
+                _.remove(program.clear, (key) => {
+                    return key === 'key';
+                });
+                parsedConfig = _.omit(parsedConfig, program.clear);
+                saveMessages.push('Configurations ' + program.clear.join(', ') + ' have been deleted!');
+            }
+        }
+
         if (program.logdir && program.logdir.length > 0) {
-            parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logdir));
+            parsedConfig.logdir = utils.processOption(program.logdir, parsedConfig.logdir);
             saveMessages.push('Added ' + program.logdir.join(', ') + ' to config.');
         }
 
         if (program.logfile && program.logfile.length > 0) {
-            parsedConfig.logdir = _.uniq(parsedConfig.logdir.concat(program.logfile));
+            parsedConfig.logdir = utils.processOption(program.logfile, parsedConfig.logdir);
             saveMessages.push('Added ' + program.logfile.join(', ') + ' to config.');
         }
 
         if (program.exclude && program.exclude.length > 0) {
-            parsedConfig.exclude = _.uniq((parsedConfig.exclude || []).concat(program.exclude));
+            parsedConfig.exclude = utils.processOption(program.exclude, parsedConfig.exclude);
             saveMessages.push('Added exclusion ' + program.exclude.join(', ') + ' to config.');
         }
 
@@ -164,13 +205,13 @@ checkElevated()
             saveMessages.push('Hostname ' + parsedConfig.hostname + ' saved to config.');
         }
 
-        if (program.tags) {
-            parsedConfig.tags = program.tags.replace(/\s*,\s*/g, ',').replace(/^,|,$/g, ''); // trim spaces around comma
-            saveMessages.push('Tags ' + parsedConfig.tags + ' saved to config.');
+        if (program.tags && program.tags.length > 0) {
+            parsedConfig.tags = utils.processOption(program.tags, parsedConfig.tags);
+            saveMessages.push('Tags ' + program.tags.join(', ') + ' saved to config.');
         }
 
         if (saveMessages.length) {
-            return fileUtils.saveConfig(parsedConfig, program.config || config.DEFAULT_CONF_FILE).then(() => {
+            return fileUtils.saveConfig(parsedConfig, config.CONF_FILE).then(() => {
                 for (var i = 0; i < saveMessages.length; i++) {
                     console.log(saveMessages[i]);
                 }
