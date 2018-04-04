@@ -36,7 +36,7 @@ program
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', utils.appender(), [])
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
     .option('-u, --unset [params]', 'clear some saved configurations (all unless params specified)', utils.complexSplit)
-    .option('-w, --win <providers>', 'set Windows Event Log Providers (only on Windows)', utils.appender(), [])
+    .option('-w, --winevent <providers>', 'set Windows Event Log Providers (only on Windows)', utils.complexSplit)
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -141,10 +141,11 @@ checkElevated()
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
         }
 
-        if (program.win && program.win.length > 0) {
+        // TBD:
+        if (program.winevent && program.winevent.length > 0) {
             if (os.platform() === 'win32') {
-                processed = utils.processOption(program.win, parsedConfig.win);
-                parsedConfig.win = processed.values;
+                processed = utils.processOption(program.winevent, parsedConfig.winevent);
+                parsedConfig.winevent = processed.values;
                 saveMessages.push('Added ' + processed.diff.join(', ') + ' to config.');
             } else {
                 saveMessages.push('-w is only available for Windows.');
