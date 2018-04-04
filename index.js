@@ -36,7 +36,7 @@ program
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', fileUtils.appender(), [])
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
     .option('-u, --unset [params]', 'clear some saved configurations (all unless params specified)', utils.complexSplit)
-    .option('-w, --winevent <providers>', 'set Windows Event Log Providers (only on Windows)', utils.complexSplit)
+    .option('-w, --winevent <winevent>', 'set Windows Event Log Providers (only on Windows)', utils.complexSplit)
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -49,8 +49,11 @@ program
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log');
         console.log('    $ logdna-agent -t tag                                              # replaces config with this tag');
         console.log('    $ logdna-agent -t staging,2ndtag');
-        console.log('    $ logdna-agent -l tags,key,logfile                                 # custom configuration fields');
-        console.log('    $ logdna-agent -w Application,System,\'DNS Server\'                # multiple event providers');
+        console.log('    $ logdna-agent -l tags,key,logdir                                  # custom configuration fields');
+        console.log('    $ logdna-agent -u tags,logdir                                      # remove selected fields');
+        console.log('    $ logdna-agent -u tags:1,3,4ANDlogdir                              # remove #1, #3, #4 of tags and all logdir');
+        console.log('    $ logdna-agent -w p:WinEventANDl:System,Applications               # having both Provider Names and Log Names for Windows Event Logs');
+        console.log('    $ logdna-agent -w l:System,Applications                            # having only Log Names for Windows Event Logs');
         console.log();
     })
     .parse(process.argv);
@@ -141,12 +144,10 @@ checkElevated()
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
         }
 
-        // TBD:
-        if (program.winevent && program.winevent.length > 0) {
+        if (program.winevent && utils.isJSON(program.winevent)) {
             if (os.platform() === 'win32') {
-                processed = utils.processOption(program.winevent, parsedConfig.winevent);
-                parsedConfig.winevent = processed.values;
-                saveMessages.push('Added ' + processed.diff.join(', ') + ' to config.');
+                parsedConfig.winevent = utils.processWinEventOption(program.winevent, parsedConfig.winevent);
+                saveMessages.push('Windows Event Log Configurations have been updated.');
             } else {
                 saveMessages.push('-w is only available for Windows.');
             }
@@ -179,7 +180,7 @@ checkElevated()
                 parsedConfig = _.omit(parsedConfig, program.unset);
                 saveMessages.push('Configurations: ' + program.unset.join(', ') + ' have been deleted!');
             } else {
-                _.omit(program.unset, 'key');
+                program.unset = _.omit(program.unset, 'key');
                 var result = utils.omitByIndices(parsedConfig, program.unset);
                 parsedConfig = result.parsedConfig;
                 saveMessages.push('Configurations: ' + result.messages.join(', ') + ' have been deleted!');
