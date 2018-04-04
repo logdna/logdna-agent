@@ -35,8 +35,8 @@ program
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', utils.appender(), [])
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
-    .option('-u, --unset [params]', 'clear some saved configurations (all unless params specified)', utils.split)
-    .option('-w, --windowseventlogproviders <providers>', 'set Windows Event Log Providers (only on Windows)', utils.appender(), [])
+    .option('-u, --unset [params]', 'clear some saved configurations (all unless params specified)', utils.complexSplit)
+    .option('-w, --win <providers>', 'set Windows Event Log Providers (only on Windows)', utils.appender(), [])
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -68,7 +68,7 @@ if (os.platform() === 'linux') {
     pkg.name += '-mac';
 }
 
-var socket;
+var socket, processed;
 var HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
 
 function checkElevated() {
@@ -141,10 +141,11 @@ checkElevated()
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
         }
 
-        if (program.windowseventlogproviders && program.windowseventlogproviders.length > 0) {
+        if (program.win && program.win.length > 0) {
             if (os.platform() === 'win32') {
-                parsedConfig.windowseventlogproviders = utils.processOption(program.windowseventlogproviders, parsedConfig.windowseventlogproviders);
-                saveMessages.push('Added ' + program.windowseventlogproviders.join(', ') + ' to config.');
+                processed = utils.processOption(program.win, parsedConfig.win);
+                parsedConfig.win = processed.values;
+                saveMessages.push('Added ' + processed.diff.join(', ') + ' to config.');
             } else {
                 saveMessages.push('-w is only available for Windows.');
             }
@@ -164,33 +165,42 @@ checkElevated()
         }
 
         if (program.unset) {
-            if (!_.isArray(program.unset)) {
+
+            if (!(_.isArray(program.unset) || utils.isJSON(program.unset))) {
                 parsedConfig = {
                     key: parsedConfig.key
                 };
                 saveMessages.push('All configurations except LogDNA Ingestion Key have been deleted!');
-            } else {
+            } else if (_.isArray(program.unset)) {
                 _.remove(program.unset, (key) => {
                     return key === 'key';
                 });
                 parsedConfig = _.omit(parsedConfig, program.unset);
-                saveMessages.push('Configurations ' + program.unset.join(', ') + ' have been deleted!');
+                saveMessages.push('Configurations: ' + program.unset.join(', ') + ' have been deleted!');
+            } else {
+                _.omit(program.unset, 'key');
+                var result = utils.omitByIndices(parsedConfig, program.unset);
+                parsedConfig = result.parsedConfig;
+                saveMessages.push('Configurations: ' + result.messages.join(', ') + ' have been deleted!');
             }
         }
 
         if (program.logdir && program.logdir.length > 0) {
-            parsedConfig.logdir = utils.processOption(program.logdir, parsedConfig.logdir);
-            saveMessages.push('Added ' + program.logdir.join(', ') + ' to config.');
+            processed = utils.processOption(program.logdir, parsedConfig.logdir);
+            parsedConfig.logdir = processed.values;
+            saveMessages.push('Log Directories: ' + processed.diff.join(', ') + ' saved to config.');
         }
 
         if (program.logfile && program.logfile.length > 0) {
-            parsedConfig.logdir = utils.processOption(program.logfile, parsedConfig.logdir);
-            saveMessages.push('Added ' + program.logfile.join(', ') + ' to config.');
+            processed = utils.processOption(program.logfile, parsedConfig.logdir);
+            parsedConfig.logdir = processed.values;
+            saveMessages.push('Log Files: ' + processed.diff.join(', ') + ' saved to config.');
         }
 
         if (program.exclude && program.exclude.length > 0) {
-            parsedConfig.exclude = utils.processOption(program.exclude, parsedConfig.exclude);
-            saveMessages.push('Added exclusion ' + program.exclude.join(', ') + ' to config.');
+            processed = utils.processOption(program.exclude, parsedConfig.exclude);
+            parsedConfig.exclude = processed.values;
+            saveMessages.push('Exclusions: ' + processed.diff.join(', ') + ' saved to config.');
         }
 
         if (program.excludeRegex) {
@@ -204,12 +214,13 @@ checkElevated()
 
         if (program.hostname) {
             parsedConfig.hostname = program.hostname;
-            saveMessages.push('Hostname ' + parsedConfig.hostname + ' saved to config.');
+            saveMessages.push('Hostname: ' + parsedConfig.hostname + ' saved to config.');
         }
 
         if (program.tags && program.tags.length > 0) {
-            parsedConfig.tags = utils.processOption(program.tags, parsedConfig.tags);
-            saveMessages.push('Tags ' + program.tags.join(', ') + ' saved to config.');
+            processed = utils.processOption(program.tags, parsedConfig.tags);
+            parsedConfig.tags = processed.values;
+            saveMessages.push('Tags: ' + processed.diff.join(', ') + ' saved to config.');
         }
 
         if (saveMessages.length) {
