@@ -28,15 +28,15 @@ program
     .description('This agent collect and ship logs for processing. Defaults to /var/log if run without parameters.')
     .option('-c, --config <file>', 'uses alternate config file (default: ' + config.DEFAULT_CONF_FILE + ')')
     .option('-k, --key <key>', 'sets your LogDNA Ingestion Key in the config')
-    .option('-d, --logdir <dir>', 'adds log directories to config, supports glob patterns', fileUtils.appender(), [])
-    .option('-f, --logfile <file>', 'adds log files to config', fileUtils.appender(), [])
-    .option('-e, --exclude <file>', 'exclude files from logdir', fileUtils.appender(), [])
+    .option('-d, --logdir <dir>', 'adds log directories to config, supports glob patterns', utils.appender(), [])
+    .option('-f, --logfile <file>', 'adds log files to config', utils.appender(), [])
+    .option('-e, --exclude <file>', 'exclude files from logdir', utils.appender(), [])
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
-    .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', fileUtils.appender(), [])
+    .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', utils.appender(), [])
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
-    .option('-C, --clear [params]', 'clear some saved configurations (all unless params specified)', utils.split)
-    .option('-w, --windowseventlogproviders <providers>', 'set Windows Event Log Providers (only on Windows)', fileUtils.appender(), [])
+    .option('-u, --unset [params]', 'clear some saved configurations (all unless params specified)', utils.split)
+    .option('-w, --windowseventlogproviders <providers>', 'set Windows Event Log Providers (only on Windows)', utils.appender(), [])
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -157,22 +157,24 @@ checkElevated()
                 delimiter: ' ='
                 , indent: ' '
                 , aligned: true
+                , broken: true
+                , numbered: true
             });
             saveMessages.push(config.CONF_FILE + ':\n' + msg);
         }
 
-        if (program.clear) {
-            if (!_.isArray(program.clear)) {
+        if (program.unset) {
+            if (!_.isArray(program.unset)) {
                 parsedConfig = {
                     key: parsedConfig.key
                 };
                 saveMessages.push('All configurations except LogDNA Ingestion Key have been deleted!');
             } else {
-                _.remove(program.clear, (key) => {
+                _.remove(program.unset, (key) => {
                     return key === 'key';
                 });
-                parsedConfig = _.omit(parsedConfig, program.clear);
-                saveMessages.push('Configurations ' + program.clear.join(', ') + ' have been deleted!');
+                parsedConfig = _.omit(parsedConfig, program.unset);
+                saveMessages.push('Configurations ' + program.unset.join(', ') + ' have been deleted!');
             }
         }
 
