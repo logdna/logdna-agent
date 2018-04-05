@@ -40,7 +40,7 @@ describe('lib:windows-utilities', function() {
                 }, 1000);
 
                 windowsUtilities.streamEventLog({
-                    providerNames: [provider]
+                    logNames: ['APPLICATION']
                 }, socket);
                 debug(socket);
             });
