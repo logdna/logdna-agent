@@ -31,7 +31,8 @@ describe('lib:windows-utilities', function() {
                     debug('received message!');
                     debug(data);
                     var message = JSON.parse(data);
-                    assert.equal(message.ls[0].l, 'arbitraryData');
+                    var line = message.ls[0].l;
+                    assert.equal(JSON.parse(line).message, 'arbitraryData');
                     resolve(true);
                 });
 
