@@ -38,6 +38,13 @@ sudo node index.js -d "/var/log/**/myapp.log"             # myapp.log in any sub
 sudo node index.js -d "/var/log/+(name1|name2).log"       # supports extended glob patterns
 sudo node index.js -e "/var/log/nginx/error.log"          # exclude specific files from -d
 sudo node index.js -f "/usr/local/nginx/logs/access.log"  # add specific files
+sudo node index.js -l                                     # listing all configurations
+sudo node index.js -l tags,logdir                         # listing only tags and logdir configurations
+sudo node index.js -u                                     # deleting all saved configurations except key
+sudo node index.js -u tags:0,4,1ANDlogdir                 # deleting some tags and all logdir configurations
+sudo node index.js -w p:WinEvent,EventLog                 # adding WinEvent and EventLog log providers
+sudo node index.js -w l:System,Application                # adding System and Application log names
+sudo node index.js -w l:System,ApplicationANDp:WinEvent   # adding combined log details
 
 # start the agent
 sudo node index.js
@@ -66,6 +73,18 @@ key = <YOUR LOGDNA INGESTION KEY>
 * `tags`: use tags to separate data for production, staging, or autoscaling use cases
 * `hostname`: override os hostname
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
+* `list`: list the configuration details in detailed way
+* `unset`: deletes the configuration options in the following way:
+    * all except key: `--unset` or `-u`
+    * only tags: `--unset tags` or `-u tags`
+    * tags and logdir: `--unset tags,logdir` or `-u tags,logdir`
+    * some tags and some logdir: `--unset tags:0,4,3ANDlogdir:3,2,4` or `-u tags:0,4,3ANDlogdir:3,2,4`
+* `winevent`: sets Windows Event Log Configurations. It works only on Windows and parameters should be in `<key>:<values>` format, where:
+    * key can be:
+        * ProviderName: `p` or `provider` or `providerName` or `providers` or `providerNames`
+        * LogName: `l` or `log` or `logName` or `logs` or `logNames`
+    * values can be either `value` or `value1,value2,value3`
+    * combination should in following way: `<key>:<values>AND<key>:<values>`
 
 ### Features
 * Agent maintains persistent connections to LogDNA ingestion servers with HTTPS encryption
