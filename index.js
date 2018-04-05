@@ -145,7 +145,7 @@ checkElevated()
         }
 
         if (program.winevent && utils.isJSON(program.winevent)) {
-            if (os.platform() !== 'win32') {
+            if (os.platform() === 'win32') {
                 parsedConfig.winevent = utils.processWinEventOption(program.winevent, parsedConfig.winevent);
                 saveMessages.push('Windows Event Log Configurations have been updated.');
             } else {
