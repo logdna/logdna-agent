@@ -145,7 +145,7 @@ checkElevated()
         }
 
         if (program.winevent && program.winevent.length > 0) {
-            if (os.platform() !== 'win32') {
+            if (os.platform() === 'win32') {
                 const weoResult = utils.processWinEventOption(program.winevent, parsedConfig.winevent);
                 if (weoResult.valid) {
                     parsedConfig.winevent = weoResult.values;
