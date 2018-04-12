@@ -38,13 +38,6 @@ sudo node index.js -d "/var/log/**/myapp.log"             # myapp.log in any sub
 sudo node index.js -d "/var/log/+(name1|name2).log"       # supports extended glob patterns
 sudo node index.js -e "/var/log/nginx/error.log"          # exclude specific files from -d
 sudo node index.js -f "/usr/local/nginx/logs/access.log"  # add specific files
-sudo node index.js -l                                     # listing all configurations
-sudo node index.js -l tags,logdir                         # listing only tags and logdir configurations
-sudo node index.js -u                                     # deleting all saved configurations except key
-sudo node index.js -u tags:0,4,1ANDlogdir                 # deleting some tags and all logdir configurations
-sudo node index.js -w p:WinEvent,EventLog                 # adding WinEvent and EventLog log providers
-sudo node index.js -w l:System,Application                # adding System and Application log names
-sudo node index.js -w l:System,ApplicationANDp:WinEvent   # adding combined log details
 
 # start the agent
 sudo node index.js
@@ -73,18 +66,47 @@ key = <YOUR LOGDNA INGESTION KEY>
 * `tags`: use tags to separate data for production, staging, or autoscaling use cases
 * `hostname`: override os hostname
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
-* `list`: list the configuration details in detailed way
-* `unset`: deletes the configuration options in the following way:
-    * all except key: `--unset` or `-u`
-    * only tags: `--unset tags` or `-u tags`
-    * tags and logdir: `--unset tags,logdir` or `-u tags,logdir`
-    * some tags and some logdir: `--unset tags:0,4,3ANDlogdir:3,2,4` or `-u tags:0,4,3ANDlogdir:3,2,4`
-* `winevent`: sets Windows Event Log Configurations. It works only on Windows and parameters should be in `<key>:<values>` format, where:
-    * key can be:
-        * ProviderName: `p` or `provider` or `providerName` or `providers` or `providerNames`
-        * LogName: `l` or `log` or `logName` or `logs` or `logNames`
-    * values can be either `value` or `value1,value2,value3`
-    * combination should in following way: `<key>:<values>AND<key>:<values>`
+* `list`: list the configuration details in detailed way; e.g.
+```bash
+# List All Configurations:
+sudo node index.js --list all
+# or
+sudo node index.js -l all
+
+# List Some Configurations:
+sudo node index.js -l winevent
+sudo node index.js --list tags,logdir,winevent
+```
+* `unset`: deletes the configuration options in detailed way; e.g.
+```bash
+# Delete All Configurations (except LogDNA API Key):
+sudo node index.js --unset all
+# or
+sudo node index.js -u all
+
+# Delete Some Configurations:
+sudo node index.js -u tags
+sudo node index.js --unset tags,logdir
+# or
+sudo node index.js -u tags -u logdir --unset winevent
+
+# Delete Some Configurations By Indices:
+sudo node index.js --unset tags:0,4,2
+sudo node index.js -u logdir -u winevent:1 -u tags
+```
+* `winevent`: sets Windows Event Log Configurations. It works only on Windows and parameters should be in `<provider>/<event>` format, where each of them can be `*`, `all`, empty, just one value or values separated by `,`; e.g.
+```bash
+# Getting only System event logs:
+sudo node index.js --winevent */System
+# or
+sudo node index.js -w /System
+
+# Getting System, Application and Security event logs having ESENT as a provider:
+sudo node index.js -w ESENT/System,Application,Security
+
+# Configuring multiple Windows Event options:
+sudo node index.js -w ESENT/System --winevent /Application --winevent WinEvent,EventLog/Security -w WinEvent/*
+```
 
 ### Features
 * Agent maintains persistent connections to LogDNA ingestion servers with HTTPS encryption

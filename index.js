@@ -34,9 +34,9 @@ program
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', fileUtils.appender(), [])
-    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
-    .option('-u, --unset [params]', 'clear some saved configurations (all unless params specified)', utils.complexSplit)
-    .option('-w, --winevent <winevent>', 'set Windows Event Log Providers (only on Windows)', utils.complexSplit)
+    .option('-l, --list <params>', 'show the saved configuration (all unless params specified)', utils.split)
+    .option('-u, --unset <params>', 'clear some saved configurations (all unless params specified)', fileUtils.appender(), [])
+    .option('-w, --winevent <winevent>', 'set Windows Event Log Providers (only on Windows)', fileUtils.appender(), [])
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -51,9 +51,9 @@ program
         console.log('    $ logdna-agent -t staging,2ndtag');
         console.log('    $ logdna-agent -l tags,key,logdir                                  # custom configuration fields');
         console.log('    $ logdna-agent -u tags,logdir                                      # remove selected fields');
-        console.log('    $ logdna-agent -u tags:1,3,4ANDlogdir                              # remove #1, #3, #4 of tags and all logdir');
-        console.log('    $ logdna-agent -w p:WinEventANDl:System,Applications               # having both Provider Names and Log Names for Windows Event Logs');
-        console.log('    $ logdna-agent -w l:System,Applications                            # having only Log Names for Windows Event Logs');
+        console.log('    $ logdna-agent -u tags:1,3,4 --unset logdir                        # remove #1, #3, #4 of tags and all logdir');
+        console.log('    $ logdna-agent -w WinEvent/System,Applications                     # having both Provider Names and Log Names for Windows Event Logs');
+        console.log('    $ logdna-agent -w */System,Applications                            # having only Log Names for Windows Event Logs');
         console.log();
     })
     .parse(process.argv);
@@ -144,47 +144,43 @@ checkElevated()
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
         }
 
-        if (program.winevent && utils.isJSON(program.winevent)) {
-            if (os.platform() === 'win32') {
-                parsedConfig.winevent = utils.processWinEventOption(program.winevent, parsedConfig.winevent);
-                saveMessages.push('Windows Event Log Configurations have been updated.');
+        if (program.winevent && program.winevent.length > 0) {
+            if (os.platform() !== 'win32') {
+                const weoResult = utils.processWinEventOption(program.winevent, parsedConfig.winevent);
+                if (weoResult.valid) {
+                    parsedConfig.winevent = weoResult.values;
+                    saveMessages.push('Windows Events: ' + weoResult.diff.join(', ') + ' saved to config.');
+                } else {
+                    saveMessages.push('Windows Events: Nothing new saved to config.');
+                }
             } else {
                 saveMessages.push('-w is only available for Windows.');
             }
         }
 
-        if (program.list) {
+        if (program.list && program.list.length > 0) {
             var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
-            if (_.isArray(program.list)) conf = _.pick(conf, program.list);
-            var msg = utils.stringify(conf, {
-                delimiter: ' ='
-                , indent: ' '
-                , aligned: true
-                , broken: true
-                , numbered: true
-            });
-            saveMessages.push(config.CONF_FILE + ':\n' + msg);
+            const listResult = utils.pick2list(program.list, conf);
+            if (listResult.valid) {
+                var msg = utils.stringify(listResult.cfg, {
+                    delimiter: ' ='
+                    , indent: ' '
+                    , aligned: true
+                    , broken: true
+                    , numbered: true
+                });
+                saveMessages.push(config.CONF_FILE + ':\n' + msg);
+            } else {
+                saveMessages.push(listResult.msg);
+            }
         }
 
-        if (program.unset) {
+        if (program.unset && program.unset.length > 0) {
 
-            if (!(_.isArray(program.unset) || utils.isJSON(program.unset))) {
-                parsedConfig = {
-                    key: parsedConfig.key
-                };
-                saveMessages.push('All configurations except LogDNA Ingestion Key have been deleted!');
-            } else if (_.isArray(program.unset)) {
-                _.remove(program.unset, (key) => {
-                    return key === 'key';
-                });
-                parsedConfig = _.omit(parsedConfig, program.unset);
-                saveMessages.push('Configurations: ' + program.unset.join(', ') + ' have been deleted!');
-            } else {
-                program.unset = _.omit(program.unset, 'key');
-                var result = utils.omitByIndices(parsedConfig, program.unset);
-                parsedConfig = result.parsedConfig;
-                saveMessages.push('Configurations: ' + result.messages.join(', ') + ' have been deleted!');
-            }
+            const unsetResult = utils.unsetConfig(program.unset, parsedConfig);
+            parsedConfig = unsetResult.cfg;
+            saveMessages.push(unsetResult.msg);
+
         }
 
         if (program.logdir && program.logdir.length > 0) {
