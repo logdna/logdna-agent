@@ -38,6 +38,7 @@ sudo node index.js -d "/var/log/**/myapp.log"             # myapp.log in any sub
 sudo node index.js -d "/var/log/+(name1|name2).log"       # supports extended glob patterns
 sudo node index.js -e "/var/log/nginx/error.log"          # exclude specific files from -d
 sudo node index.js -f "/usr/local/nginx/logs/access.log"  # add specific files
+sudo node index.js -w */System                            # only System event logs
 
 # start the agent
 sudo node index.js
