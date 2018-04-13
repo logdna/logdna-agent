@@ -43,17 +43,16 @@ program
         console.log('    $ logdna-agent --key YOUR_INGESTION_KEY');
         console.log('    $ logdna-agent -d /home/ec2-user/logs');
         console.log('    $ logdna-agent -d /home/ec2-user/logs -d /path/to/another/log_dir  # multiple logdirs in 1 go');
-        console.log('    $ logdna-agent -d /var/log/*.txt                                   # supports glob patterns');
-        console.log('    $ logdna-agent -d /var/log/**/myapp.log                            # myapp.log in any subfolder');
+        console.log('    $ logdna-agent -d "/var/log/*.txt"                                 # supports glob patterns');
+        console.log('    $ logdna-agent -d "/var/log/**/myapp.log"                          # myapp.log in any subfolder');
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log');
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log');
-        console.log('    $ logdna-agent -t tag                                              # replaces config with this tag');
+        console.log('    $ logdna-agent -t production                                       # tags');
         console.log('    $ logdna-agent -t staging,2ndtag');
-        console.log('    $ logdna-agent -l tags,key,logdir                                  # custom configuration fields');
-        console.log('    $ logdna-agent -u tags,logdir                                      # remove selected fields');
-        console.log('    $ logdna-agent -u tags:1,3,4 --unset logdir                        # remove #1, #3, #4 of tags and all logdir');
-        console.log('    $ logdna-agent -w WinEvent/System,Applications                     # having both Provider Names and Log Names for Windows Event Logs');
-        console.log('    $ logdna-agent -w */System,Applications                            # having only Log Names for Windows Event Logs');
+        console.log('    $ logdna-agent -w System                                           # Windows System event logs (all providers)');
+        console.log('    $ logdna-agent -w "WinEvent/*,EventLog/System"                     # all WinEvent, just System from EventLog');
+        console.log('    $ logdna-agent -l tags,key,logdir                                  # show saved config');
+        console.log('    $ logdna-agent -u tags,logdir                                      # unset specific entries from config');
         console.log();
     })
     .parse(process.argv);
