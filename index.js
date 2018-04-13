@@ -33,9 +33,9 @@ program
     .option('-e, --exclude <file>', 'exclude files from logdir', fileUtils.appender(), [])
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
-    .option('-t, --tags <tags>', 'set tags for this host (for auto grouping), separate multiple tags by comma', fileUtils.appender(), [])
+    .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', fileUtils.appender(), [])
     .option('-l, --list <params>', 'show the saved configuration (all unless params specified)', utils.split)
-    .option('-u, --unset <params>', 'clear some saved configurations (all unless params specified)', fileUtils.appender(), [])
+    .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', fileUtils.appender(), [])
     .option('-w, --winevent <winevent>', 'set Windows Event Log Providers (only on Windows)', fileUtils.appender(), [])
     .on('--help', function() {
         console.log('  Examples:');
