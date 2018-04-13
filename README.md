@@ -28,8 +28,8 @@ sudo node index.js -k <YOUR LOGDNA INGESTION KEY>
 # On Linux, this will generate a config file: /etc/logdna.conf
 # On Windows, this will generate a config file: C:\ProgramData\logdna\logdna.conf
 
-# On Linux, /var/log is monitored/added by default (recursively), optionally specify more folders
-# On Windows, C:\ProgramData\logs is monitored/added by default (recursively), optionally specify more folders
+# on Linux, /var/log is monitored/added by default (recursively), optionally specify more folders
+# on Windows, C:\ProgramData\logs is monitored/added by default (recursively), optionally specify more folders
 sudo node index.js -d "/path/to/log/folders" -d "/path/to/2nd/folder"
 sudo node index.js -d "/var/log"                          # folder only assumes *.log + extensionless files
 sudo node index.js -d "/var/log/*.txt"                    # supports glob patterns
@@ -38,7 +38,18 @@ sudo node index.js -d "/var/log/**/myapp.log"             # myapp.log in any sub
 sudo node index.js -d "/var/log/+(name1|name2).log"       # supports extended glob patterns
 sudo node index.js -e "/var/log/nginx/error.log"          # exclude specific files from -d
 sudo node index.js -f "/usr/local/nginx/logs/access.log"  # add specific files
-sudo node index.js -w */System                            # only System event logs
+sudo node index.js -t production                          # tags
+sudo node index.js -t production,app1=/opt/app1           # tags for specific paths
+sudo node index.js -w System                              # Windows System event logs (all providers)
+sudo node index.js -w EventLog/Security                   # EventLog provider's Security logs
+sudo node index.js -w "EventLog/*"                        # all logs from EventLog provider
+sudo node index.js -w "WinEvent/*,EventLog/System"        # all WinEvent, just System from EventLog
+
+# other commands
+sudo node index.js -l                                     # show all saved options from config
+sudo node index.js -l tags,key,logdir                     # show specific entries from config
+sudo node index.js -u tags                                # unset tags
+sudo node index.js -u all                                 # unset everything except ingestion key
 
 # start the agent
 sudo node index.js
@@ -67,47 +78,8 @@ key = <YOUR LOGDNA INGESTION KEY>
 * `tags`: use tags to separate data for production, staging, or autoscaling use cases
 * `hostname`: override os hostname
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
-* `list`: list the configuration details in detailed way; e.g.
-```bash
-# List All Configurations:
-sudo node index.js --list all
-# or
-sudo node index.js -l all
+* `winevent`: sets Windows Event Log Configurations in `[provider]/<log>` format, provider being optional. See examples above.
 
-# List Some Configurations:
-sudo node index.js -l winevent
-sudo node index.js --list tags,logdir,winevent
-```
-* `unset`: deletes the configuration options in detailed way; e.g.
-```bash
-# Delete All Configurations (except LogDNA API Key):
-sudo node index.js --unset all
-# or
-sudo node index.js -u all
-
-# Delete Some Configurations:
-sudo node index.js -u tags
-sudo node index.js --unset tags,logdir
-# or
-sudo node index.js -u tags -u logdir --unset winevent
-
-# Delete Some Configurations By Indices:
-sudo node index.js --unset tags:0,4,2
-sudo node index.js -u logdir -u winevent:1 -u tags
-```
-* `winevent`: sets Windows Event Log Configurations. It works only on Windows and parameters should be in `<provider>/<event>` format, where each of them can be `*`, `all`, empty, just one value or values separated by `,`; e.g.
-```bash
-# Getting only System event logs:
-sudo node index.js --winevent */System
-# or
-sudo node index.js -w /System
-
-# Getting System, Application and Security event logs having ESENT as a provider:
-sudo node index.js -w ESENT/System,Application,Security
-
-# Configuring multiple Windows Event options:
-sudo node index.js -w ESENT/System --winevent /Application --winevent WinEvent,EventLog/Security -w WinEvent/*
-```
 
 ### Features
 * Agent maintains persistent connections to LogDNA ingestion servers with HTTPS encryption
