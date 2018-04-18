@@ -34,7 +34,7 @@ program
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', fileUtils.appender(), [])
-    .option('-l, --list <params>', 'show the saved configuration (all unless params specified)', utils.split)
+    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
     .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', fileUtils.appender(), [])
     .option('-w, --winevent <winevent>', 'set Windows Event Log Providers (only on Windows)', fileUtils.appender(), [])
     .on('--help', function() {
@@ -157,7 +157,10 @@ checkElevated()
             }
         }
 
-        if (program.list && program.list.length > 0) {
+        if (program.list) {
+            if (typeof program.list === 'boolean') {
+                program.list = ['all'];
+            }
             var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
             const listResult = utils.pick2list(program.list, conf);
             if (listResult.valid) {

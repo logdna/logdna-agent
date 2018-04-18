@@ -30,25 +30,28 @@ sudo node index.js -k <YOUR LOGDNA INGESTION KEY>
 
 # on Linux, /var/log is monitored/added by default (recursively), optionally specify more folders
 # on Windows, C:\ProgramData\logs is monitored/added by default (recursively), optionally specify more folders
-sudo node index.js -d "/path/to/log/folders" -d "/path/to/2nd/folder"
-sudo node index.js -d "/var/log"                          # folder only assumes *.log + extensionless files
-sudo node index.js -d "/var/log/*.txt"                    # supports glob patterns
-sudo node index.js -d "/var/log/**/*.txt"                 # *.txt in any subfolder
-sudo node index.js -d "/var/log/**/myapp.log"             # myapp.log in any subfolder
-sudo node index.js -d "/var/log/+(name1|name2).log"       # supports extended glob patterns
-sudo node index.js -e "/var/log/nginx/error.log"          # exclude specific files from -d
-sudo node index.js -f "/usr/local/nginx/logs/access.log"  # add specific files
+sudo node index.js -d /path/to/log/folders -d /path/to/2nd/folder
+sudo node index.js -d /var/log                            # folder only assumes *.log + extensionless files
+sudo node index.js -d /var/log/*.txt                      # supports glob patterns
+sudo node index.js -d /var/log/**/*.txt                   # *.txt in any subfolder
+sudo node index.js -d /var/log/**/myapp.log               # myapp.log in any subfolder
+sudo node index.js -d /var/log/+(name1|name2).log         # supports extended glob patterns
+sudo node index.js -e /var/log/nginx/error.log            # exclude specific files from -d
+sudo node index.js -f /usr/local/nginx/logs/access.log    # add specific files
 sudo node index.js -t production                          # tags
 sudo node index.js -t production,app1=/opt/app1           # tags for specific paths
 sudo node index.js -w System                              # Windows System event logs (all providers)
 sudo node index.js -w EventLog/Security                   # EventLog provider's Security logs
-sudo node index.js -w "EventLog/*"                        # all logs from EventLog provider
-sudo node index.js -w "WinEvent/*,EventLog/System"        # all WinEvent, just System from EventLog
+sudo node index.js -w EventLog/*                          # all logs from EventLog provider
+sudo node index.js -w WinEvent/* -w EventLog/System       # all WinEvent, just System from EventLog
+sudo node index.js -w ESENT/System,Security               # System, Security logs (from ESENT provider)
+sudo node index.js -w EventLog,ESENT/System               # System logs (from ESENT or EventLog provider)
 
 # other commands
 sudo node index.js -l                                     # show all saved options from config
 sudo node index.js -l tags,key,logdir                     # show specific entries from config
 sudo node index.js -u tags                                # unset tags
+sudo node index.js -u tags:1,3,4 -u logdir                # unset #1, #3, #4 of tags and all logdir
 sudo node index.js -u all                                 # unset everything except ingestion key
 
 # start the agent
@@ -78,7 +81,10 @@ key = <YOUR LOGDNA INGESTION KEY>
 * `tags`: use tags to separate data for production, staging, or autoscaling use cases
 * `hostname`: override os hostname
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
-* `winevent`: sets Windows Event Log Configurations in `[provider]/<log>` format, provider being optional. See examples above.
+* `winevent`: sets Windows Event Log Configurations in `[providers]/<events>` format, provider being optional. See examples above. The format is divided into the following subformats:
+  * `*/<events>` or `/<events>` or `<events>`: `events` logs from all providers;
+  * `<providers>/*`:                           any kind of event log from only these `providers`;
+  * `<providers>/<events>`:                    `events` logs from only these `providers`.
 
 
 ### Features
