@@ -32,10 +32,10 @@ sudo node index.js -k <YOUR LOGDNA INGESTION KEY>
 # on Windows, C:\ProgramData\logs is monitored/added by default (recursively), optionally specify more folders
 sudo node index.js -d /path/to/log/folders -d /path/to/2nd/folder
 sudo node index.js -d /var/log                            # folder only assumes *.log + extensionless files
-sudo node index.js -d /var/log/*.txt                      # supports glob patterns
-sudo node index.js -d /var/log/**/*.txt                   # *.txt in any subfolder
-sudo node index.js -d /var/log/**/myapp.log               # myapp.log in any subfolder
-sudo node index.js -d /var/log/+(name1|name2).log         # supports extended glob patterns
+sudo node index.js -d "/var/log/*.txt"                    # supports glob patterns
+sudo node index.js -d "/var/log/**/*.txt"                 # *.txt in any subfolder
+sudo node index.js -d "/var/log/**/myapp.log"             # myapp.log in any subfolder
+sudo node index.js -d "/var/log/+(name1|name2).log"       # supports extended glob patterns
 sudo node index.js -e /var/log/nginx/error.log            # exclude specific files from -d
 sudo node index.js -f /usr/local/nginx/logs/access.log    # add specific files
 sudo node index.js -t production                          # tags
@@ -44,14 +44,14 @@ sudo node index.js -w System                              # Windows System event
 sudo node index.js -w EventLog/Security                   # EventLog provider's Security logs
 sudo node index.js -w EventLog/*                          # all logs from EventLog provider
 sudo node index.js -w WinEvent/* -w EventLog/System       # all WinEvent, just System from EventLog
-sudo node index.js -w ESENT/System,Security               # System, Security logs (from ESENT provider)
-sudo node index.js -w EventLog,ESENT/System               # System logs (from ESENT or EventLog provider)
+sudo node index.js -w EventLog/System,ESENT/System        # System logs (from ESENT or EventLog provider)
+sudo node index.js -w System,ESENT/*                      # All Systems logs and logs from ESENT provider
 
 # other commands
 sudo node index.js -l                                     # show all saved options from config
 sudo node index.js -l tags,key,logdir                     # show specific entries from config
 sudo node index.js -u tags                                # unset tags
-sudo node index.js -u tags:1,3,4 -u logdir                # unset #1, #3, #4 of tags and all logdir
+sudo node index.js -u tags,logdir                         # unset tags and logdir
 sudo node index.js -u all                                 # unset everything except ingestion key
 
 # start the agent
@@ -74,17 +74,17 @@ key = <YOUR LOGDNA INGESTION KEY>
 ```
 
 #### Options
-* `logdir`: sets the paths that the agent will monitor for new files, separate multiple paths using `,`, supports glob patterns + specific files. By default this option is set to monitor .log and extensionless files under /var/log/.
+* `logdir`: sets the paths that the agent will monitor for new files, separate multiple paths using `,`, supports glob patterns + specific files. By default this option is set to monitor .log and extensionless files under `/var/log/`. Glob patterns should be given in double-quotes.
 * `exclude`: excludes files that otherwise would've matched `logdir`, separate multiple excludes using `,`, supports glob patterns + specific files
 * `exclude_regex`: filters out any lines matching pattern in any file. Don't include leading and trailing /.
 * `key`: your LogDNA Ingestion Key. You can obtain one by creating an account on [LogDNA site](https://logdna.com/) and once logged in to the webapp, click the Gear icon, then Account Profile.
 * `tags`: use tags to separate data for production, staging, or autoscaling use cases
 * `hostname`: override os hostname
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
-* `winevent`: sets Windows Event Log Configurations in `[providers]/<events>` format, provider being optional. See examples above. The format is divided into the following subformats:
-  * `*/<events>` or `/<events>` or `<events>`: `events` logs from all providers;
-  * `<providers>/*`:                           any kind of event log from only these `providers`;
-  * `<providers>/<events>`:                    `events` logs from only these `providers`.
+* `winevent`: sets Windows Event Log Configurations in `[provider]/[event]` format, provider being optional. See examples above. The format is divided into the following subformats:
+  * `*/<event>` or `/<event>` or `<event>`: `event` logs from all providers;
+  * `<provider>/*` or `<provider>/`: any kind of event log from only these `provider`;
+  * `<provider>/<event>`: `event` logs from only these `provider`.
 
 
 ### Features

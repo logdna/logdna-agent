@@ -50,9 +50,12 @@ program
         console.log('    $ logdna-agent -t production                                       # tags');
         console.log('    $ logdna-agent -t staging,2ndtag');
         console.log('    $ logdna-agent -w System                                           # Windows System event logs (all providers)');
-        console.log('    $ logdna-agent -w "WinEvent/*,EventLog/System"                     # all WinEvent, just System from EventLog');
-        console.log('    $ logdna-agent -l tags,key,logdir                                  # show saved config');
+        console.log('    $ logdna-agent -w WinEvent/*,EventLog/System                       # all WinEvent, just System from EventLog');
+        console.log('    $ logdna-agent -w WinEvent/* -w EventLog/System                    # all WinEvent, just System from EventLog');
+        console.log('    $ logdna-agent -l tags,key,logdir                                  # show specific config parameters');
+        console.log('    $ logdna-agent -l                                                  # show all');
         console.log('    $ logdna-agent -u tags,logdir                                      # unset specific entries from config');
+        console.log('    $ logdna-agent -u all                                              # unset all except LogDNA API Key');
         console.log();
     })
     .parse(process.argv);
@@ -148,9 +151,9 @@ checkElevated()
                 const weoResult = utils.processWinEventOption(program.winevent, parsedConfig.winevent);
                 if (weoResult.valid) {
                     parsedConfig.winevent = weoResult.values;
-                    saveMessages.push('Windows Events: ' + weoResult.diff.join(', ') + ' saved to config.');
+                    saveMessages.push('Windows Events: ' + weoResult.diff + ' been saved to config.');
                 } else {
-                    saveMessages.push('Windows Events: Nothing new saved to config.');
+                    saveMessages.push('Windows Events: Nothing new has been saved to config.');
                 }
             } else {
                 saveMessages.push('-w is only available for Windows.');
@@ -164,13 +167,7 @@ checkElevated()
             var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
             const listResult = utils.pick2list(program.list, conf);
             if (listResult.valid) {
-                var msg = utils.stringify(listResult.cfg, {
-                    delimiter: ' ='
-                    , indent: ' '
-                    , aligned: true
-                    , broken: true
-                    , numbered: true
-                });
+                var msg = utils.stringify(listResult.cfg);
                 saveMessages.push(config.CONF_FILE + ':\n' + msg);
             } else {
                 saveMessages.push(listResult.msg);
@@ -188,19 +185,19 @@ checkElevated()
         if (program.logdir && program.logdir.length > 0) {
             processed = utils.processOption(program.logdir, parsedConfig.logdir);
             parsedConfig.logdir = processed.values;
-            saveMessages.push('Log Directories: ' + processed.diff.join(', ') + ' saved to config.');
+            saveMessages.push('Log Directories: ' + processed.diff + ' been saved to config.');
         }
 
         if (program.logfile && program.logfile.length > 0) {
             processed = utils.processOption(program.logfile, parsedConfig.logdir);
             parsedConfig.logdir = processed.values;
-            saveMessages.push('Log Files: ' + processed.diff.join(', ') + ' saved to config.');
+            saveMessages.push('Log Files: ' + processed.diff + ' been saved to config.');
         }
 
         if (program.exclude && program.exclude.length > 0) {
             processed = utils.processOption(program.exclude, parsedConfig.exclude);
             parsedConfig.exclude = processed.values;
-            saveMessages.push('Exclusions: ' + processed.diff.join(', ') + ' saved to config.');
+            saveMessages.push('Exclusions: ' + processed.diff + ' been saved to config.');
         }
 
         if (program.excludeRegex) {
@@ -220,7 +217,7 @@ checkElevated()
         if (program.tags && program.tags.length > 0) {
             processed = utils.processOption(program.tags, parsedConfig.tags);
             parsedConfig.tags = processed.values;
-            saveMessages.push('Tags: ' + processed.diff.join(', ') + ' saved to config.');
+            saveMessages.push('Tags: ' + processed.diff + ' been saved to config.');
         }
 
         if (saveMessages.length) {
