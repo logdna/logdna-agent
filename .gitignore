@@ -36,3 +36,7 @@ node_modules
 ./logdna-agent
 *.pkg
 *.tgz
+
+# Some extra data
+package-lock.json
+*~
