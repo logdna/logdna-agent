@@ -81,15 +81,16 @@ key = <YOUR LOGDNA INGESTION KEY>
 * `tags`: use tags to separate data for production, staging, or autoscaling use cases
 * `hostname`: override os hostname
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
-* `winevent`: sets Windows Event Log Configurations in `[provider]/[event]` format, provider being optional. See examples above. The format is divided into the following subformats:
-  * `*/<event>` or `/<event>` or `<event>`: `event` logs from all providers;
-  * `<provider>/*` or `<provider>/`: any kind of event log from only these `provider`;
-  * `<provider>/<event>`: `event` logs from only these `provider`.
+* `winevent`: sets Windows Event Log Configurations in `[provider]/logname` format, `provider` being optional:
+  * `*/<logname>` or `<logname>`: logname from all providers (ie: `System`, `Application`)
+  * `<provider>/*`: all lognames from this `provider`
+  * `<provider>/<logname>`: just this logname from this `provider`
 
 
 ### Features
 * Agent maintains persistent connections to LogDNA ingestion servers with HTTPS encryption
 * Reconnects if disconnected and will queue up new log lines while disconnected
+* Compression on upload (currently gzip)
 * Rescans for new files in all `logdir` paths, every minute
 * Transparently handles log rotated files in most OS's (supports: renamed, truncated & "new file per day" log rotation methods)
 * [Init script is available here](https://github.com/logdna/logdna-agent/blob/master/scripts/init-script) (rpm/deb packages already include this)
