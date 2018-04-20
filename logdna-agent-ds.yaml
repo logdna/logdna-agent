@@ -8,6 +8,10 @@ spec:
       labels:
         app: logdna-agent
     spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
       containers:
       - name: logdna-agent
         image: logdna/logdna-agent:latest
