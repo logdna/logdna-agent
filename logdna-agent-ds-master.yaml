@@ -9,9 +9,7 @@ spec:
         app: logdna-agent
     spec:
       tolerations:
-      - key: "node-role.kubernetes.io/master"
-        operator: "Exists"
-        effect: "NoSchedule"
+      - operator: Exists
       containers:
       - name: logdna-agent
         image: logdna/logdna-agent:latest
@@ -24,7 +22,11 @@ spec:
                 key: logdna-agent-key
           - name: LOGDNA_PLATFORM
             value: k8s
+        #  - name: LOGDNA_TAGS
+        #    value: production,cluster1,othertags
         resources:
+          requests:
+            cpu: 20m
           limits:
             memory: 500Mi
         volumeMounts:
@@ -32,6 +34,9 @@ spec:
           mountPath: /var/log
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: mnt
+          mountPath: /mnt
           readOnly: true
         - name: docker
           mountPath: /var/run/docker.sock
@@ -46,6 +51,9 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
+      - name: mnt
+        hostPath:
+          path: /mnt
       - name: docker
         hostPath:
           path: /var/run/docker.sock
