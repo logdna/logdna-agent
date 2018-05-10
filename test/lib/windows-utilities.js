@@ -30,6 +30,7 @@ describe('lib:windows-utilities', function() {
                 server.on('message', data => {
                     debug('received message!');
                     debug(data);
+                    console.log(data);
                     var message = JSON.parse(data);
                     var line = message.ls[0].l;
                     assert.equal(JSON.parse(line).message, 'arbitraryData');
