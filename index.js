@@ -148,7 +148,7 @@ checkElevated()
             if (os.platform() === 'win32') {
                 processed = utils.processOption(program.winevent, parsedConfig.winevent);
                 parsedConfig.winevent = processed.values;
-                saveMessages.push('Log Directories: ' + processed.diff + ' been saved to config.');
+                saveMessages.push('Windows Events: ' + processed.diff + ' been saved to config.');
             } else {
                 saveMessages.push('-w is only available for Windows.');
             }
