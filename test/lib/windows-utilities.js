@@ -41,7 +41,7 @@ describe('lib:windows-utilities', function() {
                 }, 1000);
 
                 windowsUtilities.streamEventLog({
-                    event: 'APPLICATION'
+                    events: ['APPLICATION']
                 }, socket);
                 debug(socket);
             });
