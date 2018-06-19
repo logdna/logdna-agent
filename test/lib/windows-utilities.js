@@ -30,7 +30,6 @@ describe('lib:windows-utilities', function() {
                 server.on('message', data => {
                     debug('received message!');
                     debug(data);
-                    console.log(data);
                     var message = JSON.parse(data);
                     var line = message.ls[0].l;
                     assert.equal(JSON.parse(line).Message, 'arbitraryData');
@@ -42,7 +41,7 @@ describe('lib:windows-utilities', function() {
                 }, 1000);
 
                 windowsUtilities.streamEventLog({
-                    event: 'APPLICATION'
+                    events: 'Application'
                 }, socket);
                 debug(socket);
             });
