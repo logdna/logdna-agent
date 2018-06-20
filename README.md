@@ -41,11 +41,6 @@ sudo node index.js -f /usr/local/nginx/logs/access.log    # add specific files
 sudo node index.js -t production                          # tags
 sudo node index.js -t production,app1=/opt/app1           # tags for specific paths
 sudo node index.js -w System                              # Windows System event logs (all providers)
-sudo node index.js -w EventLog/Security                   # EventLog provider's Security logs
-sudo node index.js -w EventLog/*                          # all logs from EventLog provider
-sudo node index.js -w WinEvent/* -w EventLog/System       # all WinEvent, just System from EventLog
-sudo node index.js -w EventLog/System,ESENT/System        # System logs (from ESENT or EventLog provider)
-sudo node index.js -w System,ESENT/*                      # All Systems logs and logs from ESENT provider
 
 # other commands
 sudo node index.js -l                                     # show all saved options from config
@@ -81,10 +76,7 @@ key = <YOUR LOGDNA INGESTION KEY>
 * `tags`: use tags to separate data for production, staging, or autoscaling use cases
 * `hostname`: override os hostname
 * `autoupdate`: sets whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
-* `winevent`: sets Windows Event Log Configurations in `[provider]/logname` format, `provider` being optional:
-  * `*/<logname>` or `<logname>`: logname from all providers (ie: `System`, `Application`)
-  * `<provider>/*`: all lognames from this `provider`
-  * `<provider>/<logname>`: just this logname from this `provider`
+* `winevent`: sets Windows Event Log Configurations in `logname` format
 
 
 ### Features

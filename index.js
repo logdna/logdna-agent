@@ -50,8 +50,6 @@ program
         console.log('    $ logdna-agent -t production                                       # tags');
         console.log('    $ logdna-agent -t staging,2ndtag');
         console.log('    $ logdna-agent -w System                                           # Windows System event logs (all providers)');
-        console.log('    $ logdna-agent -w WinEvent/*,EventLog/System                       # all WinEvent, just System from EventLog');
-        console.log('    $ logdna-agent -w WinEvent/* -w EventLog/System                    # all WinEvent, just System from EventLog');
         console.log('    $ logdna-agent -l tags,key,logdir                                  # show specific config parameters');
         console.log('    $ logdna-agent -l                                                  # show all');
         console.log('    $ logdna-agent -u tags,logdir                                      # unset specific entries from config');
@@ -148,13 +146,9 @@ checkElevated()
 
         if (program.winevent && program.winevent.length > 0) {
             if (os.platform() === 'win32') {
-                const weoResult = utils.processWinEventOption(program.winevent, parsedConfig.winevent);
-                if (weoResult.valid) {
-                    parsedConfig.winevent = weoResult.values;
-                    saveMessages.push('Windows Events: ' + weoResult.diff + ' been saved to config.');
-                } else {
-                    saveMessages.push('Windows Events: Nothing new has been saved to config.');
-                }
+                processed = utils.processOption(program.winevent, parsedConfig.winevent);
+                parsedConfig.winevent = processed.values;
+                saveMessages.push('Windows Events: ' + processed.diff + ' been saved to config.');
             } else {
                 saveMessages.push('-w is only available for Windows.');
             }
