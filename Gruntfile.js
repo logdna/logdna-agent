@@ -49,6 +49,9 @@ module.exports = function(grunt) {
                     src: './scripts/windows/chocolateyInstall.ps1'
                     , dest: './.builds/windows/tools/chocolateyInstall.ps1'
                 }, {
+                    src: './scripts/windows/winTail.ps1'
+                    , dest: './.builds/windows/tools/winTail.ps1'
+                }, {
                     src: './license.txt'
                     , dest: './.builds/windows/tools/license.txt'
                 }, {
