@@ -1,23 +1,24 @@
 $packageParameters = $env:chocolateyPackageParameters
-$winTailURL = 'https://raw.githubusercontent.com/logdna/logdna-agent/master/scripts/windows/winTail.ps1'
 
 IF(!($packageParameters))
 {
     if(!(Test-Path -Path $env:ALLUSERSPROFILE\tmp)){
-        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\tmp
+        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\tmp -Force
     }
     if(Test-Path -Path $env:ALLUSERSPROFILE\tmp\winTail.ps1){
-        Remove-Item $env:ALLUSERSPROFILE\tmp\winTail.ps1
+        Remove-Item $env:ALLUSERSPROFILE\tmp\winTail.ps1 -Force
     }
-    Invoke-WebRequest -Uri $winTailURL -OutFile $env:ALLUSERSPROFILE\tmp\winTail.ps1
+    Copy-Item $PSScriptRoot\winTail.ps1 -Destination $env:ALLUSERSPROFILE\tmp\winTail.ps1 -Force
     if(!(Test-Path -Path $env:ALLUSERSPROFILE\logs)){
-        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\logs
+        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\logs -Force
+    }
+    if(!(Test-Path -Path $env:ALLUSERSPROFILE\logs\logdna-agent.log)){
+        New-Item -ItemType file -Path $env:ALLUSERSPROFILE\logs\logdna-agent.log -Force
     }
     if(!(Test-Path -Path $env:ALLUSERSPROFILE\logdna)){
-        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\logdna
+        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\logdna -Force
     }
     cmd.exe /c "nssm.exe install logdna-agent $env:ChocolateyInstall\bin\logdna-agent.exe & exit /b 0"
-    fsutil file createnew $env:ALLUSERSPROFILE\logs\logdna-agent.log 0
     cmd.exe /c "nssm.exe set logdna-agent AppStdout $env:ALLUSERSPROFILE\logs\logdna-agent.log & exit /b 0"
     cmd.exe /c "nssm.exe set logdna-agent AppStderr $env:ALLUSERSPROFILE\logs\logdna-agent.log & exit /b 0"
 }
