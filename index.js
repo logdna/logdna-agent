@@ -150,9 +150,9 @@ checkElevated()
                 var kvPair = utils.split(program.set[i], '=');
                 if (kvPair.length === 2) {
                     parsedConfig[kvPair[0]] = kvPair[1];
-                    saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' has been successfully save!');
+                    saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' been saved to config.');
                 } else {
-                    saveMessages.push('[Error]: Unknown Setting Input: ' + program.set[i] + '. Usage: -s [key=value]');
+                    saveMessages.push('Unknown setting: ' + program.set[i] + '. Usage: -s [key=value]');
                 }
             }
         }
@@ -213,7 +213,7 @@ checkElevated()
             if (parsedConfig.exclude_regex.substring(0, 1) === '/' && parsedConfig.exclude_regex.substring(parsedConfig.exclude_regex.length - 1) === '/') {
                 parsedConfig.exclude_regex = parsedConfig.exclude_regex.substring(1, parsedConfig.exclude_regex.length - 1);
             }
-            saveMessages.push('Added exclude pattern /' + parsedConfig.exclude_regex + '/ to config.');
+            saveMessages.push('Exclude pattern: /' + parsedConfig.exclude_regex + '/ been saved to config.');
         }
 
         if (program.hostname) {
