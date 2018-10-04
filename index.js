@@ -37,7 +37,7 @@ program
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
     .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', fileUtils.appender(), [])
     .option('-w, --winevent <winevent>', 'set Windows Event Log Names (only on Windows)', fileUtils.appender(), [])
-    .option('-s, --set [key1=value1,key2=value2...]', 'set config variables (for on-prem users)', utils.split)
+    .option('-s, --set [key1=value1,key2=value2...]', 'set config variables', utils.split)
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
