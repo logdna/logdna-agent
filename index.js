@@ -37,6 +37,7 @@ program
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
     .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', fileUtils.appender(), [])
     .option('-w, --winevent <winevent>', 'set Windows Event Log Names (only on Windows)', fileUtils.appender(), [])
+    .option('-s, --set [key=value]', 'set config variables', fileUtils.appender(), [])
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -144,6 +145,18 @@ checkElevated()
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
         }
 
+        if (program.set && program.set.length > 0) {
+            for (var i = 0; i < program.set.length; i++) {
+                var kvPair = utils.split(program.set[i], '=');
+                if (kvPair.length === 2) {
+                    parsedConfig[kvPair[0]] = kvPair[1];
+                    saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' been saved to config.');
+                } else {
+                    saveMessages.push('Unknown setting: ' + program.set[i] + '. Usage: -s [key=value]');
+                }
+            }
+        }
+
         if (program.winevent && program.winevent.length > 0) {
             if (os.platform() === 'win32') {
                 processed = utils.processOption(program.winevent, parsedConfig.winevent);
@@ -200,7 +213,7 @@ checkElevated()
             if (parsedConfig.exclude_regex.substring(0, 1) === '/' && parsedConfig.exclude_regex.substring(parsedConfig.exclude_regex.length - 1) === '/') {
                 parsedConfig.exclude_regex = parsedConfig.exclude_regex.substring(1, parsedConfig.exclude_regex.length - 1);
             }
-            saveMessages.push('Added exclude pattern /' + parsedConfig.exclude_regex + '/ to config.');
+            saveMessages.push('Exclude pattern: /' + parsedConfig.exclude_regex + '/ been saved to config.');
         }
 
         if (program.hostname) {
