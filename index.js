@@ -37,6 +37,7 @@ program
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
     .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', fileUtils.appender(), [])
     .option('-w, --winevent <winevent>', 'set Windows Event Log Names (only on Windows)', fileUtils.appender(), [])
+    .option('-s, --set [key1=value1,key2=value2...]', 'set config variables (for on-prem users)', utils.split)
     .on('--help', function() {
         console.log('  Examples:');
         console.log();
@@ -142,6 +143,18 @@ checkElevated()
         if (program.key) {
             parsedConfig.key = program.key;
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
+        }
+
+        if (program.set && program.set.length > 0) {
+            for (var i = 0; i < program.set.length; i++) {
+                var kvPair = utils.split(program.set[i], '=');
+                if (kvPair.length === 2) {
+                    parsedConfig[kvPair[0]] = kvPair[1];
+                    saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' has been successfully save!');
+                } else {
+                    saveMessages.push('[Error]: Unknown Setting Input: ' + program.set[i] + '. Usage: -s [key1=value1,key2=value2...]');
+                }
+            }
         }
 
         if (program.winevent && program.winevent.length > 0) {
