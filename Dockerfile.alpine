@@ -1,0 +1,22 @@
+FROM node:8.12.0-alpine as builder
+
+WORKDIR /logdna
+
+COPY package.json ./
+
+RUN apk add --update git python g++ make && \
+    NODE_ENV=production yarn install --ignore-optional --non-interactive
+
+COPY index.js ./
+COPY lib ./lib/
+
+FROM node:8.12.0-alpine
+
+WORKDIR /logdna
+
+COPY --from=builder /logdna/node_modules ./node_modules/
+COPY index.js package.json ./
+COPY lib ./lib/
+
+CMD ["node", "index.js"]
+
