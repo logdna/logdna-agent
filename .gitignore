@@ -40,3 +40,6 @@ node_modules
 # Some extra data
 package-lock.json
 *~
+
+# WebStorm config
+.idea
