@@ -24,7 +24,7 @@ jobs:
             echo ${VERSION} >> scripts/windows/VERSION.txt
             cp LICENSE.md scripts/windows/LICENSE.txt
             mkdir -p .builds/windows/tools/
-            cp scripts/windows/*.txt scripts/windows/logdna-agent.exe .builds/windows/tools
+            cp scripts/windows/*.ps1 scripts/windows/*.txt scripts/windows/logdna-agent.exe .builds/windows/tools
             cp scripts/windows/logdna-agent.nuspec .builds/windows
             zip -r logdna-agent.${VERSION}.zip .builds/windows
             aws s3 cp logdna-agent.${VERSION}.zip s3://repo.logdna.com/win/logdna-agent.${VERSION}.zip
