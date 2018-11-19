@@ -1,0 +1,65 @@
+version: 2
+jobs:
+  build_windows:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run:
+          name: Install AWS CLI, Grunt CLI, and NEXE
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y python3 python-dev python3-dev \
+              build-essential libssl-dev libffi-dev \
+              libxml2-dev libxslt1-dev zlib1g-dev python-pip
+            sudo pip install --upgrade pip
+            sudo pip install awscli
+            sudo npm install -g nexe grunt-cli
+      - run:
+          name: Do Gruntfile Steps
+          command: |
+            npm install && grunt lineremover && grunt test
+            nexe -i index.js -t win32-x86-8.11.3 -o scripts/windows/logdna-agent.exe
+            VERSION=$(cat package.json | grep "version" | cut -d':' -f2 | cut -d'"' -f2)
+            echo ${VERSION} >> scripts/windows/VERSION.txt
+            cp LICENSE.md scripts/windows/LICENSE.txt
+            mkdir -p .builds/windows/tools/
+            cp scripts/windows/*.txt scripts/windows/logdna-agent.exe .builds/windows/tools
+            cp scripts/windows/logdna-agent.nuspec .builds/windows
+            zip -r logdna-agent.${VERSION}.zip .builds/windows
+            aws s3 cp logdna-agent.${VERSION}.zip s3://repo.logdna.com/win/logdna-agent.${VERSION}.zip
+  push_to_choco:
+    docker:
+      - image: linuturk/mono-choco
+    steps:
+      - checkout
+      - run:
+          name: Install WGet, UnZip, and AWS CLI
+          command: |
+            apt-get update
+            apt-get install -y wget unzip python python-pip curl
+            pip install awscli
+      - run:
+          name: Create NuPkg and Update
+          command: |
+            VERSION=$(cat package.json | grep "version" | cut -d':' -f2 | cut -d'"' -f2)
+            wget https://s3.amazonaws.com/repo.logdna.com/win/logdna-agent.${VERSION}.zip
+            unzip logdna-agent.${VERSION}.zip && cd .builds/windows
+            sed -i 's/tools\\/tools\//g' logdna-agent.nuspec
+            choco pack logdna-agent.nuspec 2>/dev/null
+            aws s3 cp logdna-agent.${VERSION}.nupkg s3://repo.logdna.com/win/logdna-agent.${VERSION}.nupkg
+            curl --insecure -X PUT -H "X-NuGet-ApiKey: ${CHOCO_API_KEY}" -T "./logdna-agent.${VERSION}.nupkg" "https://push.chocolatey.org/api/v2/package"
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build_windows:
+          filters:
+            branches:
+              only: master
+      - push_to_choco:
+          requires:
+            - build_windows
+          filters:
+            branches:
+              only: master
