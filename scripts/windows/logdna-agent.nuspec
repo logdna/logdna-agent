@@ -5,7 +5,7 @@
     <id>logdna-agent</id>
     <title>LogDNA Agent for Windows</title>
     <version>1.5.5</version>
-    <authors>sedouard,leeliu</authors>
+    <authors>smusali,leeliu</authors>
     <owners>leeliu</owners>
     <summary>LogDNA Collector Agent for Windows</summary>
     <description>LogDNA's collector agent which streams log files to your LogDNA account.</description>
