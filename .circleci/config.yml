@@ -18,7 +18,8 @@ jobs:
       - run:
           name: Do Gruntfile Steps
           command: |
-            npm install && grunt lineremover && grunt test
+            npm install
+            grunt lineremover && grunt test
             nexe -i index.js -t win32-x86-8.11.3 -o scripts/windows/logdna-agent.exe
             VERSION=$(cat package.json | grep "version" | cut -d':' -f2 | cut -d'"' -f2)
             echo ${VERSION} >> scripts/windows/VERSION.txt

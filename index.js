@@ -1,3 +1,5 @@
+/* globals process */
+// override es6 promise with bluebird
 Promise = require('bluebird'); // eslint-disable-line
 var debug = require('debug')('logdna:index');
 var log = require('./lib/log');

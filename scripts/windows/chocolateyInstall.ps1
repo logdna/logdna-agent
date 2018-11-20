@@ -25,6 +25,7 @@ IF(!($packageParameters))
     cmd.exe /c "nssm.exe install logdna-agent $env:ChocolateyInstall\bin\logdna-agent.exe & exit /b 0"
     cmd.exe /c "nssm.exe set logdna-agent AppStdout $env:ALLUSERSPROFILE\logs\logdna-agent.log & exit /b 0"
     cmd.exe /c "nssm.exe set logdna-agent AppStderr $env:ALLUSERSPROFILE\logs\logdna-agent.log & exit /b 0"
+    cmd.exe /c "nssm.exe start logdna-agent & exit /b 0"
 }
 
 $registryPath = "HKLM:\SYSTEM\CurrentControlSet\Services\logdna-agent\Parameters"
