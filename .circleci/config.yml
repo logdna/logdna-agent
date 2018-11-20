@@ -26,16 +26,13 @@ jobs:
             VERSION=${VERSION}.$(date +%Y%m%d)
             sed -i "s|<version>.*</version>|<version>${VERSION}</version>|" scripts/windows/logdna-agent.nuspec
             sed -i "s|logdna-agent.*.zip|logdna-agent.${VERSION}.zip|" scripts/windows/VERIFICATION.txt
-            cat scripts/windows/logdna-agent.nuspec
-            cat scripts/windows/VERIFICATION.txt
             echo ${VERSION} >> scripts/windows/VERSION.txt
             cp LICENSE.md scripts/windows/LICENSE.txt
             mkdir -p .builds/windows/tools/
             cp scripts/windows/*.ps1 scripts/windows/*.txt scripts/windows/logdna-agent.exe .builds/windows/tools
             cp scripts/windows/logdna-agent.nuspec .builds/windows
             zip -r logdna-agent.${VERSION}.zip .builds/windows
-#            aws s3 cp logdna-agent.${VERSION}.zip s3://repo.logdna.com/win/logdna-agent.${VERSION}.zip
-#            aws s3 cp .builds/windows/logdna-agent.nuspec s3://repo.logdna.com/win/logdna-agent.nuspec
+            aws s3 cp logdna-agent.${VERSION}.zip s3://repo.logdna.com/win/logdna-agent.${VERSION}.zip
   push_to_choco:
     docker:
       - image: linuturk/mono-choco
@@ -56,8 +53,8 @@ jobs:
             sed -i 's/tools\\/tools\//g' logdna-agent.nuspec
             cat logdna-agent.nuspec
             choco pack logdna-agent.nuspec 2>/dev/null
-#            aws s3 cp logdna-agent.${VERSION}.nupkg s3://repo.logdna.com/win/logdna-agent.${VERSION}.nupkg
-#            curl --insecure -X PUT -H "X-NuGet-ApiKey: ${CHOCO_API_KEY}" -T "./logdna-agent.${VERSION}.nupkg" "https://push.chocolatey.org/api/v2/package"
+            aws s3 cp logdna-agent.${VERSION}.nupkg s3://repo.logdna.com/win/logdna-agent.${VERSION}.nupkg
+            curl --insecure -X PUT -H "X-NuGet-ApiKey: ${CHOCO_API_KEY}" -T "./logdna-agent.${VERSION}.nupkg" "https://push.chocolatey.org/api/v2/package"
 workflows:
   version: 2
   build_and_deploy:
@@ -66,9 +63,9 @@ workflows:
           filters:
             branches:
               only: master
-#      - push_to_choco:
-#          requires:
-#            - build_windows
-#          filters:
-#            branches:
-#              only: master
+      - push_to_choco:
+          requires:
+            - build_windows
+          filters:
+            branches:
+              only: master
