@@ -20,11 +20,11 @@ jobs:
           command: |
             npm install
             grunt lineremover && grunt test
+            npm install grunt --save-dev
             nexe -i index.js -t win32-x86-8.11.3 -o scripts/windows/logdna-agent.exe
             VERSION=$(cat package.json | grep "version" | cut -d':' -f2 | cut -d'"' -f2)
-            echo "${VERSION}"
-            sed -i '<version>.*</version>/<version>1.5.5</version>' scripts/windows/logdna-agent.nuspec
-            sed -i 'logdna-agent.*.zip/logdna-agent.${VERSION}.zip' scripts/windows/VERIFICATION.txt
+            sed -i 's/<version>.*</version>/<version>1.5.5</version>/' scripts/windows/logdna-agent.nuspec
+            sed -i 's/logdna-agent.*.zip/logdna-agent.${VERSION}.zip/' scripts/windows/VERIFICATION.txt
             sha256sum scripts/windows/logdna-agent.exe
             cat scripts/windows/logdna-agent.nuspec
             cat scripts/windows/VERIFICATION.txt
