@@ -20,6 +20,8 @@ spec:
                 key: logdna-agent-key
           - name: LOGDNA_PLATFORM
             value: k8s
+          - name: TRS_READ_TIMEOUT
+            value: 30000 # 30 seconds
         #  - name: LOGDNA_TAGS
         #    value: production,cluster1,othertags
         resources:
