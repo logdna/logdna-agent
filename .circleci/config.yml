@@ -32,6 +32,7 @@ jobs:
             cp scripts/windows/logdna-agent.nuspec .builds/windows
             zip -r logdna-agent.${VERSION}.zip .builds/windows
             aws s3 cp logdna-agent.${VERSION}.zip s3://repo.logdna.com/win/logdna-agent.${VERSION}.zip
+            aws s3 cp .builds/windows/logdna-agent.nuspec s3://repo.logdna.com/win/logdna-agent.nuspec
   push_to_choco:
     docker:
       - image: linuturk/mono-choco
