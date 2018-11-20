@@ -25,8 +25,6 @@ jobs:
             VERSION=$(cat package.json | grep "version" | cut -d':' -f2 | cut -d'"' -f2)
             sed -i "s|<version>.*</version>|<version>${VERSION}</version>|" scripts/windows/logdna-agent.nuspec
             sed -i "s|logdna-agent.*.zip|logdna-agent.${VERSION}.zip|" scripts/windows/VERIFICATION.txt
-            cat scripts/windows/logdna-agent.nuspec
-            cat scripts/windows/VERIFICATION.txt
             echo ${VERSION} >> scripts/windows/VERSION.txt
             cp LICENSE.md scripts/windows/LICENSE.txt
             mkdir -p .builds/windows/tools/
@@ -64,9 +62,9 @@ workflows:
           filters:
             branches:
               only: master
-#      - push_to_choco:
-#          requires:
-#            - build_windows
-#          filters:
-#            branches:
-#              only: master
+      - push_to_choco:
+          requires:
+            - build_windows
+          filters:
+            branches:
+              only: master
