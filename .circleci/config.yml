@@ -48,6 +48,7 @@ jobs:
           name: Create NuPkg and Update
           command: |
             VERSION=$(cat package.json | grep "version" | cut -d':' -f2 | cut -d'"' -f2)
+            VERSION=${VERSION}.$(date +%Y%m%d)
             wget https://s3.amazonaws.com/repo.logdna.com/win/logdna-agent.${VERSION}.zip
             unzip logdna-agent.${VERSION}.zip && cd .builds/windows
             sed -i 's/tools\\/tools\//g' logdna-agent.nuspec
