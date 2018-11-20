@@ -22,7 +22,7 @@ jobs:
             grunt lineremover && grunt test
             nexe -i index.js -t win32-x86-8.11.3 -o scripts/windows/logdna-agent.exe
             VERSION=$(cat package.json | grep "version" | cut -d':' -f2 | cut -d'"' -f2)
-            sed -i 's/.*<version>.*</version>.*/    <version>1.5.5</version>/' scripts/windows/logdna-agent.nuspec
+            sed -i 's|.*<version>.*</version>.*|    <version>1.5.5</version>|' scripts/windows/logdna-agent.nuspec
             sha256sum scripts/windows/logdna-agent.exe
             cat scripts/windows/logdna-agent.nuspec
             echo ${VERSION} >> scripts/windows/VERSION.txt
