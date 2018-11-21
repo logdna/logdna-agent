@@ -22,6 +22,7 @@ jobs:
             npm install grunt grunt-cli --save-dev
             grunt lineremover && grunt test
             nexe -i index.js -t win32-x86-8.11.3 -o scripts/windows/logdna-agent.exe
+            sha256sum scripts/windows/logdna-agent.exe
             VERSION=$(cat package.json | grep "version" | cut -d':' -f2 | cut -d'"' -f2)
             VERSION=${VERSION}.$(date +%Y%m%d)
             sed -i "s|<version>.*</version>|<version>${VERSION}</version>|" scripts/windows/logdna-agent.nuspec
