@@ -15,17 +15,9 @@ IF(!($packageParameters))
         Remove-Item $env:ALLUSERSPROFILE\logdna\winTail.ps1 -Force
     }
     Copy-Item $PSScriptRoot\winTail.ps1 -Destination $env:ALLUSERSPROFILE\logdna\winTail.ps1 -Force
-    if(!(Test-Path -Path $env:ALLUSERSPROFILE\chocolatey\bin)){
-        New-Item -ItemType directory -Path $env:ALLUSERSPROFILE\chocolatey\bin -Force
-    }
-    if(Test-Path -Path $env:ALLUSERSPROFILE\chocolatey\bin\logdna-agent.exe){
-        Remove-Item $env:ALLUSERSPROFILE\chocolatey\bin\logdna-agent.exe -Force
-    }
-    Copy-Item $PSScriptRoot\logdna-agent.exe -Destination $env:ALLUSERSPROFILE\chocolatey\bin\logdna-agent.exe -Force
     cmd.exe /c "nssm.exe install logdna-agent $env:ChocolateyInstall\bin\logdna-agent.exe & exit /b 0"
     cmd.exe /c "nssm.exe set logdna-agent AppStdout $env:ALLUSERSPROFILE\logs\logdna-agent.log & exit /b 0"
     cmd.exe /c "nssm.exe set logdna-agent AppStderr $env:ALLUSERSPROFILE\logs\logdna-agent.log & exit /b 0"
-    cmd.exe /c "nssm.exe start logdna-agent & exit /b 0"
 }
 
 $registryPath = "HKLM:\SYSTEM\CurrentControlSet\Services\logdna-agent\Parameters"
