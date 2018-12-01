@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /* globals process */
 // override es6 promise with bluebird
 Promise = require('bluebird'); // eslint-disable-line
