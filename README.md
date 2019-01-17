@@ -136,6 +136,7 @@ Our [paid plans](https://logdna.com/#pricing) start at $1.50/GB per month, pay f
 * Lee Liu (LogDNA)
 * Mike Hu (LogDNA)
 * Ryan Staatz (LogDNA)
+* Samir Musali (LogDNA)
 * [Steven Edouard](https://github.com/sedouard) (Microsoft)
 * [Rita Zhang](https://github.com/ritazh) (Microsoft)
 * [Lauren Tran](https://github.com/laurentran) (Microsoft)
