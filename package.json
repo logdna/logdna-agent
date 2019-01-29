@@ -28,7 +28,6 @@
     "glob": "^7.0.3",
     "https-proxy-agent": "^2.1.0",
     "is-administrator": "^1.0.1",
-    "lodash": "^3.10.1",
     "macaddress": "^0.2.8",
     "properties": "^1.2.1",
     "request": "^2.71.0",
