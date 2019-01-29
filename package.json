@@ -18,7 +18,6 @@
   "homepage": "https://github.com/logdna/logdna-agent",
   "dependencies": {
     "agentkeepalive": "^2.1.1",
-    "always-tail": "^0.2.0",
     "async": "^1.5.2",
     "bluebird": "^3.5.3",
     "bufferutil": "^1.2.1",
