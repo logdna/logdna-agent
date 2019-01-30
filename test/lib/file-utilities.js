@@ -1,21 +1,27 @@
-/* globals describe, it, beforeEach */
+/* globals describe, it, beforeEach, after */
 require('../helpers/before');
 var assert = require('assert');
 var debug = require('debug')('logdna:test:lib:file-utilities');
 var fs = require('fs');
 var path = require('path');
-var rimraf = Promise.promisify(require('rimraf'));
+var rimraf = require('rimraf');
 var tempDir = '.temp';
 
 describe('lib:file-utilities', function() {
-    beforeEach(function(done) {
+
+    beforeEach((done) => {
         debug('cleaning up test folder...' + tempDir);
-        return rimraf(tempDir)
-            .then(() => {
-                fs.mkdirSync(tempDir);
-                fs.mkdirSync(path.join(tempDir, 'subdir'));
-                return done();
-            });
+        return rimraf(tempDir, () => {
+            fs.mkdirSync(tempDir);
+            fs.mkdirSync(path.join(tempDir, 'subdir'));
+            return done();
+        });
+    });
+
+    after(function() {
+        return rimraf(tempDir, () => {
+            return debug('Cleaned');
+        });
     });
 
     describe('#getFiles()', function() {
@@ -34,12 +40,9 @@ describe('lib:file-utilities', function() {
                 fs.writeFileSync(testFiles[i], 'arbitraryData\n');
             }
 
-            return new Promise(resolve => {
-                fileUtilities.getFiles({}, tempDir, function(err, array) {
-                    debug(array);
-                    assert.equal(array.length, testFiles.length, 'Expected to find all log files');
-                    resolve(true);
-                });
+            fileUtilities.getFiles({}, tempDir, function(err, array) {
+                debug(array);
+                assert.equal(array.length, testFiles.length, 'Expected to find all log files');
             });
         });
 
@@ -58,12 +61,9 @@ describe('lib:file-utilities', function() {
                 fs.writeFileSync(testFiles[i], 'arbitraryData\n');
             }
 
-            return new Promise(resolve => {
-                fileUtilities.getFiles({}, tempDir, function(err, array) {
-                    debug(array);
-                    assert.equal(array.length, 0, 'Expected to find no log files');
-                    resolve(true);
-                });
+            fileUtilities.getFiles({}, tempDir, function(err, array) {
+                debug(array);
+                assert.equal(array.length, 0, 'Expected to find no log files');
             });
         });
 
@@ -79,12 +79,9 @@ describe('lib:file-utilities', function() {
                 fs.writeFileSync(testFiles[i], 'arbitraryData\n');
             }
 
-            return new Promise(resolve => {
-                fileUtilities.getFiles({}, path.join(tempDir, '*.txt'), function(err, array) {
-                    debug(array);
-                    assert.equal(array.length, 1, 'Expected to find only 1 log file, not recursive');
-                    resolve(true);
-                });
+            fileUtilities.getFiles({}, path.join(tempDir, '*.txt'), function(err, array) {
+                debug(array);
+                assert.equal(array.length, 1, 'Expected to find only 1 log file, not recursive');
             });
         });
 
@@ -102,12 +99,9 @@ describe('lib:file-utilities', function() {
                 fs.writeFileSync(testFiles[i], 'arbitraryData\n');
             }
 
-            return new Promise(resolve => {
-                fileUtilities.getFiles({}, path.join(tempDir, '**', '*.txt'), function(err, array) {
-                    debug(array);
-                    assert.equal(array.length, 2, 'Expected to find 2 log files, recursive');
-                    resolve(true);
-                });
+            fileUtilities.getFiles({}, path.join(tempDir, '**', '*.txt'), function(err, array) {
+                debug(array);
+                assert.equal(array.length, 2, 'Expected to find 2 log files, recursive');
             });
         });
     });
@@ -131,29 +125,25 @@ describe('lib:file-utilities', function() {
             var fileUtilities = require('../../lib/file-utilities');
             fileUtilities.files = [];
 
-            return new Promise((resolve) => {
-                var expectedCount = 2;
-                var count = 0;
-                server.on('message', data => {
-                    debug('received message!');
-                    debug(data);
-                    var message = JSON.parse(data);
-                    assert(message.ls[0].l, 'arbitraryData1');
-                    assert(message.ls[1].l, 'arbitraryData2');
+            var expectedCount = 2;
+            var count = 0;
+            server.on('message', data => {
+                debug('received message!');
+                debug(data);
+                var message = JSON.parse(data);
+                assert(message.ls[0].l, 'arbitraryData1');
+                assert(message.ls[1].l, 'arbitraryData2');
 
-                    count += message.ls.length;
+                count += message.ls.length;
 
-                    if (count === expectedCount) {
-                        resolve(true);
-                    }
-                });
+                if (count === expectedCount) return true;
+            });
 
-                fs.writeFileSync(path.join(tempDir, 'streamtest3.log'), '');
-                fileUtilities.streamAllLogs(config, function() {
-                    // simulate a program writing to a log file
-                    fs.appendFileSync(path.join(tempDir, 'streamtest3.log'), 'arbitraryData1\n');
-                    fs.appendFileSync(path.join(tempDir, 'streamtest3.log'), 'arbitraryData2\n');
-                });
+            fs.writeFileSync(path.join(tempDir, 'streamtest3.log'), '');
+            fileUtilities.streamAllLogs(config, function() {
+                // simulate a program writing to a log file
+                fs.appendFileSync(path.join(tempDir, 'streamtest3.log'), 'arbitraryData1\n');
+                fs.appendFileSync(path.join(tempDir, 'streamtest3.log'), 'arbitraryData2\n');
             });
         });
 
@@ -174,29 +164,25 @@ describe('lib:file-utilities', function() {
             var fileUtilities = require('../../lib/file-utilities');
             fileUtilities.files = [];
 
-            return new Promise((resolve) => {
-                var expectedCount = 2;
-                var count = 0;
-                server.on('message', data => {
-                    debug('received message!');
-                    debug(data);
-                    var message = JSON.parse(data);
-                    assert(message.ls[0].l, 'arbitraryData1');
-                    assert(message.ls[1].l, 'arbitraryData2');
+            var expectedCount = 2;
+            var count = 0;
+            server.on('message', data => {
+                debug('received message!');
+                debug(data);
+                var message = JSON.parse(data);
+                assert(message.ls[0].l, 'arbitraryData1');
+                assert(message.ls[1].l, 'arbitraryData2');
 
-                    count += message.ls.length;
+                count += message.ls.length;
 
-                    if (count === expectedCount) {
-                        resolve(true);
-                    }
-                });
+                if (count === expectedCount) return true;
+            });
 
-                fs.writeFileSync(path.join(tempDir, 'streamtest4.log'), '');
-                fileUtilities.streamAllLogs(config, function() {
-                    // simulate a program writing to a log file
-                    fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData1\n');
-                    fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData2\n');
-                });
+            fs.writeFileSync(path.join(tempDir, 'streamtest4.log'), '');
+            fileUtilities.streamAllLogs(config, function() {
+                // simulate a program writing to a log file
+                fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData1\n');
+                fs.appendFileSync(path.join(tempDir, 'streamtest4.log'), 'arbitraryData2\n');
             });
         });
 
@@ -217,31 +203,27 @@ describe('lib:file-utilities', function() {
             var fileUtilities = require('../../lib/file-utilities');
             fileUtilities.files = [];
 
-            return new Promise((resolve) => {
-                var expectedCount = 2;
-                var count = 0;
-                server.on('message', data => {
-                    debug('received message!');
-                    debug(data);
-                    var message = JSON.parse(data);
-                    assert(message.ls[0].l, 'arbitraryData1');
-                    assert(message.ls[1].l, 'arbitraryData2');
+            var expectedCount = 2;
+            var count = 0;
+            server.on('message', data => {
+                debug('received message!');
+                debug(data);
+                var message = JSON.parse(data);
+                assert(message.ls[0].l, 'arbitraryData1');
+                assert(message.ls[1].l, 'arbitraryData2');
 
-                    count += message.ls.length;
+                count += message.ls.length;
 
-                    if (count === expectedCount) {
-                        resolve(true);
-                    }
-                });
+                if (count === expectedCount) return true;
+            });
 
-                fs.writeFileSync(path.join(tempDir, 'streamtest5.log'), '');
-                fileUtilities.streamAllLogs(config, function() {
-                    // simulate a program writing to a log file
-                    setTimeout(function() {
-                        fs.appendFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData1\n');
-                        fs.appendFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData2\n');
-                    }, 500);
-                });
+            fs.writeFileSync(path.join(tempDir, 'streamtest5.log'), '');
+            fileUtilities.streamAllLogs(config, function() {
+                // simulate a program writing to a log file
+                setTimeout(function() {
+                    fs.appendFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData1\n');
+                    fs.appendFileSync(path.join(tempDir, 'streamtest5.log'), 'arbitraryData2\n');
+                }, 500);
             });
         });
 
@@ -263,36 +245,34 @@ describe('lib:file-utilities', function() {
             var fileUtilities = require('../../lib/file-utilities');
             fileUtilities.files = [];
 
-            return new Promise((resolve) => {
-                var expectedCount = 3;
-                var count = 0;
-                server.on('message', data => {
-                    debug('received message!');
-                    debug(data);
-                    var message = JSON.parse(data);
-                    if (count === 0) {
-                        assert(message.ls[0].l, 'arbitraryData1');
-                        assert(message.ls[1].l, 'arbitraryData2');
-                    } else if (count === 2) {
-                        assert(message.ls[0].l, 'arbitraryData3');
-                    }
-                    count += message.ls.length;
+            var expectedCount = 3;
+            var count = 0;
+            server.on('message', data => {
+                debug('received message!');
+                debug(data);
+                var message = JSON.parse(data);
+                if (count === 0) {
+                    assert(message.ls[0].l, 'arbitraryData1');
+                    assert(message.ls[1].l, 'arbitraryData2');
+                } else if (count === 2) {
+                    assert(message.ls[0].l, 'arbitraryData3');
+                }
+                count += message.ls.length;
 
-                    if (count === expectedCount) {
-                        config.RESCAN_INTERVAL = -1;
-                        resolve(true);
-                    }
-                });
+                if (count === expectedCount) {
+                    config.RESCAN_INTERVAL = -1;
+                    return true;
+                }
+            });
 
-                fs.writeFileSync(path.join(tempDir, 'streamtest6.log'), '');
-                fileUtilities.streamAllLogs(config, function() {
-                    // simulate a program writing to a log file
-                    fs.appendFileSync(path.join(tempDir, 'streamtest6.log'), 'arbitraryData1\n');
-                    fs.appendFileSync(path.join(tempDir, 'streamtest6.log'), 'arbitraryData2\n');
+            fs.writeFileSync(path.join(tempDir, 'streamtest6.log'), '');
+            fileUtilities.streamAllLogs(config, function() {
+                // simulate a program writing to a log file
+                fs.appendFileSync(path.join(tempDir, 'streamtest6.log'), 'arbitraryData1\n');
+                fs.appendFileSync(path.join(tempDir, 'streamtest6.log'), 'arbitraryData2\n');
 
-                    // simulate new file after RESCAN_INTERVAL
-                    fs.writeFileSync(path.join(tempDir, 'streamtest7.log'), 'arbitraryData3\n');
-                });
+                // simulate new file after RESCAN_INTERVAL
+                fs.writeFileSync(path.join(tempDir, 'streamtest7.log'), 'arbitraryData3\n');
             });
         });
     });
