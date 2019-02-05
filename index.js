@@ -5,7 +5,6 @@ var debug = require('debug')('logdna:index');
 var log = require('./lib/log');
 var program = require('commander');
 var pkg = require('./package.json');
-var _ = require('lodash');
 var os = require('os');
 var fs = require('fs');
 
@@ -236,7 +235,7 @@ checkElevated()
         }
 
         // merge into single var after all potential saveConfigs finished
-        _.extend(config, parsedConfig);
+        config = Object.assign(config, parsedConfig);
 
         // debug(console.log(config));
 
