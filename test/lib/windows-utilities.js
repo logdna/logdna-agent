@@ -26,25 +26,23 @@ describe('lib:windows-utilities', function() {
             lineBuffer.setSocket(socket);
             var windowsUtilities = requireUncached('../../lib/windows-utilities');
 
-            return new Promise((resolve) => {
-                server.on('message', data => {
-                    debug('received message!');
-                    debug(data);
-                    var message = JSON.parse(data);
-                    var line = message.ls[0].l;
-                    assert.equal(JSON.parse(line).Message, 'arbitraryData');
-                    resolve(true);
-                });
-
-                setInterval(() => {
-                    log.info('arbitraryData');
-                }, 1000);
-
-                windowsUtilities.streamEventLog({
-                    events: ['Application']
-                }, socket);
-                debug(socket);
+            server.on('message', data => {
+                debug('received message!');
+                debug(data);
+                var message = JSON.parse(data);
+                var line = message.ls[0].l;
+                assert.equal(JSON.parse(line).Message, 'arbitraryData');
+                return true;
             });
+
+            setInterval(() => {
+                log.info('arbitraryData');
+            }, 1000);
+
+            windowsUtilities.streamEventLog({
+                events: ['Application']
+            }, socket);
+            debug(socket);
         });
     });
 });
