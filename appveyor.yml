@@ -1,6 +1,6 @@
 # Build with this version of Node.js
 environment:
-  nodejs_version: "4.1.2"
+  nodejs_version: "6.10.2"
 
 cache:
   - node_modules
@@ -9,7 +9,7 @@ cache:
 install:
   - ps: Install-Product node $env:nodejs_version
   # install modules
-  - npm install -g npm@^2
+  - npm install -g npm@^8
   - npm install
   - npm install grunt-cli -g
   - npm install nexe -g
