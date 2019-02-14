@@ -26,7 +26,7 @@ describe('lib:windows-utilities', function() {
             lineBuffer.setSocket(socket);
             var windowsUtilities = requireUncached('../../lib/windows-utilities');
 
-            server.on('message', data => {
+            server.on('message', function(data) {
                 debug('received message!');
                 debug(data);
                 var message = JSON.parse(data);
@@ -35,7 +35,7 @@ describe('lib:windows-utilities', function() {
                 return true;
             });
 
-            setInterval(() => {
+            setInterval(function() {
                 log.info('arbitraryData');
             }, 1000);
 
