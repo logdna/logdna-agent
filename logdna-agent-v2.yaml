@@ -1,12 +1,12 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: logdna-agent-v2
+  name: logdna-agent
 spec:
   template:
     metadata:
       labels:
-        app: logdna-agent-v2
+        app: logdna-agent
     spec:
       containers:
         - name: logdna-agent
