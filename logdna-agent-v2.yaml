@@ -1,0 +1,68 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: logdna-agent-v2
+spec:
+  template:
+    metadata:
+      labels:
+        app: logdna-agent-v2
+    spec:
+      containers:
+        - name: logdna-agent
+          image: logdna/logdna-agent-v2:stable
+          imagePullPolicy: Always
+          env:
+            - name: LOGDNA_AGENT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: logdna-agent-key
+                  key: logdna-agent-key
+            - name: LOGDNA_PLATFORM
+              value: k8s
+            - name: LOGDNA_TAGS
+              value: agent-v2
+          resources:
+            requests:
+              cpu: 20m
+            limits:
+              memory: 300Mi
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: vardata
+              mountPath: /var/data
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: mnt
+              mountPath: /mnt
+              readOnly: true
+            - name: docker
+              mountPath: /var/run/docker.sock
+            - name: osrelease
+              mountPath: /etc/os-release
+            - name: logdnahostname
+              mountPath: /etc/logdna-hostname
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: vardata
+          hostPath:
+            path: /var/data
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: mnt
+          hostPath:
+            path: /mnt
+        - name: docker
+          hostPath:
+            path: /var/run/docker.sock
+        - name: osrelease
+          hostPath:
+            path: /etc/os-release
+        - name: logdnahostname
+          hostPath:
+            path: /etc/hostname
