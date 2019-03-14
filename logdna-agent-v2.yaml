@@ -3,6 +3,10 @@ kind: DaemonSet
 metadata:
   name: logdna-agent
 spec:
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 100%
   template:
     metadata:
       labels:
