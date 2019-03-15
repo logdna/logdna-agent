@@ -14,7 +14,7 @@ Then re-apply your yaml and restart the agent, all done!
 
 For those that don't, here are the steps.
 
-#### QUick tip
+#### Quick tip
 IF you want to easily restart the agent, run the following.
 ```
 kubectl patch ds/logdna-agent -p '{"spec":{"updateStrategy":{"type":"RollingUpdate"}}}'
