@@ -14,6 +14,13 @@ Then re-apply your yaml and restart the agent, all done!
 
 For those that don't, here are the steps.
 
+#### Quick tip
+IF you want to easily restart the agent, run the following.
+```
+kubectl patch ds/logdna-agent -p '{"spec":{"updateStrategy":{"type":"RollingUpdate"}}}'
+kubectl patch ds/logdna-agent -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"updated\":\"`date +'%s'`\"}}}}}"
+```
+
 ## Step 1 - Finding your current yaml
 To see what is currently running on your cluster, `kubectl get ds logdna-agent -o yaml`
 
