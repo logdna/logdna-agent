@@ -22,11 +22,11 @@ kubectl patch ds/logdna-agent -p "{\"spec\":{\"template\":{\"metadata\":{\"label
 ```
 If you want to easily switch to stable
 ```
-kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agnet","image":"logdna/logdna-agent-v2:stable"}]}}}}'
+kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agent","image":"logdna/logdna-agent-v2:stable"}]}}}}'
 ```
 If you want to easily switch to latest
 ```
-kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agnet","image":"logdna/logdna-agent-v2:latest"}]}}}}'
+kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agent","image":"logdna/logdna-agent-v2:latest"}]}}}}'
 ```
 
 ## Step 1 - Finding your current yaml
