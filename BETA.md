@@ -15,10 +15,18 @@ Then re-apply your yaml and restart the agent, all done!
 For those that don't, here are the steps.
 
 #### Quick tip
-IF you want to easily restart the agent, run the following.
+If you want to easily restart the agent, run the following.
 ```
 kubectl patch ds/logdna-agent -p '{"spec":{"updateStrategy":{"type":"RollingUpdate"}}}'
 kubectl patch ds/logdna-agent -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"updated\":\"`date +'%s'`\"}}}}}"
+```
+If you want to easily switch to stable
+```
+kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agnet","image":"logdna/logdna-agent-v2:stable"}]}}}}'
+```
+If you want to easily switch to latest
+```
+kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agnet","image":"logdna/logdna-agent-v2:latest"}]}}}}'
 ```
 
 ## Step 1 - Finding your current yaml
