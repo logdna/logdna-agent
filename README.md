@@ -129,7 +129,7 @@ to
 image: logdna/logdna-agent-v2:stable
 ```
 
-Then re-apply your YAML and restart the agent. To confirm please run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"` and if you see `image: logdna/logdna-agent-v2:latest` then you are good to go.
+Then re-apply your YAML and restart the agent. To confirm please run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"` and if you see `image: logdna/logdna-agent-v2:stable` then you are good to go.
 
 Otherwise, follow these steps:
 
