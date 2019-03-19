@@ -20,11 +20,11 @@ If you want to easily restart the agent, run the following.
 kubectl patch ds/logdna-agent -p '{"spec":{"updateStrategy":{"type":"RollingUpdate"}}}'
 kubectl patch ds/logdna-agent -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"updated\":\"`date +'%s'`\"}}}}}"
 ```
-If you want to easily switch to stable
+If you want to easily switch to agent-v2 stable
 ```
 kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agent","image":"logdna/logdna-agent-v2:stable"}]}}}}'
 ```
-If you want to easily switch to latest
+If you want to easily switch to agent-v2 latest
 ```
 kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agent","image":"logdna/logdna-agent-v2:latest"}]}}}}'
 ```
