@@ -1,4 +1,4 @@
-#Installing LogDNA's Agent 2.0 for Kubernetes users on IBM Cloud
+# Installing LogDNA's Agent 2.0 for Kubernetes users on IBM Cloud
 
 We've recently made the LogDNA Agent 2.0 publicly available for Kubernetes users. We'll be rolling this out to existing users as well as other platforms and operating systems over the next few weeks, but we've provided instructions here for IBM Cloud users in the interim as we update our documentation globablly.
 
