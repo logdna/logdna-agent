@@ -119,7 +119,7 @@ This automatically installs a logdna-agent pod into each node in your cluster an
 
 ### Upgrading to LogDNA Agent 2.0 for Kubernetes
 
-We've recently made the LogDNA Agent 2.0 publicly available for Kubernetes users. We'll be rolling this out to existing users as well as other platforms and operating systems over the next few weeks, but if you'd like to upgrade your existing Kubernetes agent you can simply change run the following:
+We've recently made the LogDNA Agent 2.0 publicly available for Kubernetes users. We'll be rolling this out to existing users as well as other platforms and operating systems over the next few weeks, but if you'd like to upgrade your existing Kubernetes agent you can simply run the following:
 
 ```
 kubectl patch ds/logdna-agent -p '{"spec":{"updateStrategy":{"type":"RollingUpdate", "maxUnavailable":"100%"}}}'
