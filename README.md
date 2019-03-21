@@ -119,46 +119,15 @@ This automatically installs a logdna-agent pod into each node in your cluster an
 
 ### Upgrading to LogDNA Agent 2.0 for Kubernetes
 
-We've recently made the LogDNA Agent 2.0 publicly available for Kubernetes users. We'll be rolling this out to existing users as well as other platforms and operating systems over the next few weeks, but if you'd like to upgrade your existing Kubernetes agent and have an existing YAML file, you can simple change
+We've recently made the LogDNA Agent 2.0 publicly available for Kubernetes users. We'll be rolling this out to existing users as well as other platforms and operating systems over the next few weeks, but if you'd like to upgrade your existing Kubernetes agent you can simply change run the following:
 
-```yaml 
-image: logdna/logdna-agent:latest
-``` 
-to 
-```yaml 
-image: logdna/logdna-agent-v2:stable
+```
+kubectl patch ds/logdna-agent -p '{"spec":{"updateStrategy":{"type":"RollingUpdate", "maxUnavailable":"100%"}}}'
+
+kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agent","image":"logdna/logdna-agent-v2:stable", "imagePullPolicy": "Always"}]}}}}'
 ```
 
-Then re-apply your YAML and restart the agent. To confirm please run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"` and if you see `image: logdna/logdna-agent-v2:stable` then you are good to go.
-
-Otherwise, follow these steps:
-
-#### Step 1 - Finding your current YAML
-To see what is currently running on your cluster, run `kubectl get ds logdna-agent -o yaml`
-
-What you are looking for is the `env:` section.
-
-It might look similar to
-```yaml
-env:
-  - name: LOGDNA_AGENT_KEY
-    valueFrom:
-      secretKeyRef:
-        name: logdna-agent-key
-        key: logdna-agent-key
-  - name: LOGDNA_PLATFORM
-    value: k8s
-  - name: LOGDNA_TAGS
-    value: agent-v2
-```
-Once you have the env section from your current deployment you are ready for the next step.
-
-#### Step 2 - Creating your new YAML
-Download https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-v2.yaml
-
-Replace the `env:` section with the one that you found in Step 1.
-
-Then apply your yaml and restart the agent and you are all done! Make sure to run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"` to confirm you're running `logdna-agent-v2:latest`.
+To confirm please run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"` and if you see `image: logdna/logdna-agent-v2:stable` then you are good to go.
 
 If you don't have a LogDNA account, you can create one on https://logdna.com or if you're on macOS w/[Homebrew](https://brew.sh) installed:
 
