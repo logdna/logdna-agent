@@ -129,6 +129,14 @@ kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"n
 
 To confirm please run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"` and if you see `image: logdna/logdna-agent-v2:stable` then you are good to go.
 
+If you'd like to to install LogDNA's Agent 2.0 into a new cluster, you can simply run the following two `kubectl` commands:
+
+```
+kubectl create secret generic logdna-agent-key --from-literal=logdna-agent-key=<YOUR LOGDNA INGESTION KEY>
+
+kubectl create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-v2.yaml
+```
+
 If you don't have a LogDNA account, you can create one on https://logdna.com or if you're on macOS w/[Homebrew](https://brew.sh) installed:
 
 ```
