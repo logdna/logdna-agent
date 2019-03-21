@@ -127,7 +127,7 @@ kubectl patch ds/logdna-agent -p '{"spec":{"updateStrategy":{"type":"RollingUpda
 kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agent","image":"logdna/logdna-agent-v2:stable", "imagePullPolicy": "Always"}]}}}}'
 ```
 
-To confirm please run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"` and if you see `image: logdna/logdna-agent-v2:stable` then you are good to go.
+To confirm it upgraded correctly, please run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"` and if you see `image: logdna/logdna-agent-v2:stable` then you are good to go.
 
 If you'd like to to install LogDNA's Agent 2.0 into a new cluster, you can simply run the following two `kubectl` commands:
 
