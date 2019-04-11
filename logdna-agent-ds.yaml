@@ -13,15 +13,15 @@ spec:
         image: logdna/logdna-agent:latest
         imagePullPolicy: Always
         env:
-          - name: LOGDNA_AGENT_KEY
-            valueFrom:
-              secretKeyRef:
-                name: logdna-agent-key
-                key: logdna-agent-key
-          - name: LOGDNA_PLATFORM
-            value: k8s
-        #  - name: LOGDNA_TAGS
-        #    value: production,cluster1,othertags
+        - name: LOGDNA_AGENT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: logdna-agent-key
+              key: logdna-agent-key
+        - name: LOGDNA_PLATFORM
+          value: k8s
+      #   - name: LOGDNA_TAGS
+      #     value: production,cluster1,othertags
         resources:
           requests:
             cpu: 20m
