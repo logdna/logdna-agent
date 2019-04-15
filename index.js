@@ -237,8 +237,6 @@ checkElevated()
         // merge into single var after all potential saveConfigs finished
         config = Object.assign(config, parsedConfig);
 
-        // debug(console.log(config));
-
         config.hostname = process.env.LOGDNA_HOSTNAME || fs.existsSync('/etc/logdna-hostname') && fs.statSync('/etc/logdna-hostname').isFile() && fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') || config.hostname || os.hostname().replace('.ec2.internal', '');
         config.tags = process.env.LOGDNA_TAGS || config.tags;
 
