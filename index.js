@@ -157,7 +157,7 @@ checkElevated()
 
         if (program.winevent && program.winevent.length > 0) {
             if (os.platform() === 'win32') {
-                processed = utils.processOption(program.winevent, parsedConfig.winevent);
+                processed = utils.processOption(program.winevent, parsedConfig.winevent, true);
                 parsedConfig.winevent = processed.values;
                 saveMessages.push('Windows Events: ' + processed.diff + ' been saved to config.');
             } else {
