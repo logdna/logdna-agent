@@ -8,8 +8,7 @@ RUN echo "deb http://repo.logdna.com stable main" > /etc/apt/sources.list.d/logd
     apt-key add /etc/logdna.gpg && \
     apt-get -y update && \
     apt-get -y install logdna-agent && \
-    apt-get -y upgrade apt && \
-    apt-get -y upgrade systemd && \
+    apt-get -y upgrade && \
     rm -rf /var/lib/apt/lists/*
     
 CMD ["/usr/bin/logdna-agent"]
