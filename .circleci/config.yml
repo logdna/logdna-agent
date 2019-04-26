@@ -6,7 +6,7 @@
         docker:
           - image: circleci/buildpack-deps:stretch
     jobs:
-      build:
+      image-build:
         executor: docker-publisher
         steps:
           - checkout
@@ -41,9 +41,23 @@
                 IMAGE_TAG=${CIRCLE_TAG/v/''}
                 docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
                 docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
-                docker push ${IMAGE_NAME}:latest
                 docker push ${IMAGE_NAME}:${IMAGE_TAG}
                 docker push ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
+      docker-approved:
+        executor: docker-publisher
+        steps:
+          - attach_workspace:
+              at: /tmp/workspace
+          - run: cat /tmp/workspace/env-vars >> $BASH_ENV
+          - setup_remote_docker
+          - run:
+              name: Load archived Docker image
+              command: docker load -i /tmp/workspace/image.tar
+          - run:
+              name: Publish Docker Image to Docker Hub
+              command: |
+                echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+                docker push ${IMAGE_NAME}:latest
       ibm-registry:
         executor: docker-publisher
         steps:
@@ -69,7 +83,7 @@
       version: 2
       build-tags:
         jobs:
-          - build:
+          - image-build:
               filters:
                 tags:
                   only: /.*/
@@ -77,17 +91,32 @@
                   ignore: /.*/
           - docker-hub:
               requires:
-                - build
-              filters:
-                tags:
-                  only: /.*/
-                branches:
-                  ignore: /.*/
+                - image-build
+          - docker-approved:
+              type: approval
+              requires:
+              - docker-hub
           - ibm-registry:
               requires:
-                - build
+                - docker-approved
+      monthly-build:
+        triggers:
+          - schedule:
+              crom: "0 0 1 * *"
+        jobs:
+          - image-build:
               filters:
                 tags:
                   only: /.*/
                 branches:
                   ignore: /.*/
+          - docker-hub:
+              requires:
+                - image-build
+          - docker-approved:
+              type: approval
+              requires:
+              - docker-hub
+          - ibm-registry:
+              requires:
+                - docker-approved 
