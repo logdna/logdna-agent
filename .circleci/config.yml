@@ -6,6 +6,20 @@
         docker:
           - image: circleci/buildpack-deps:stretch
     jobs:
+      grunt-test:
+        docker:
+          - image: circleci/node:8
+        steps:
+          - checkout
+          - run:
+              name: Install Dependencies
+              command: |
+                    sudo rm -rf node_modules package-lock.json
+                    npm install eslint grunt-cli
+                    npm install
+          - run:
+              name: Run tests
+              command: grunt test
       image-build:
         executor: docker-publisher
         steps:
@@ -81,6 +95,9 @@
                 docker push icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}                
     workflows:
       version: 2
+      testing:
+        jobs:
+          - grunt-test
       build-tags:
         jobs:
           - image-build:
