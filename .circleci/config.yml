@@ -102,7 +102,11 @@
       monthly-build:
         triggers:
           - schedule:
-              crom: "0 0 1 * *"
+              cron: "0 0 1 * *"
+              filters:
+                branches:
+                  only:
+                  - master
         jobs:
           - image-build:
               filters:
