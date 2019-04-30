@@ -145,7 +145,7 @@ checkElevated()
 
         if (program.set && program.set.length > 0) {
             for (var i = 0; i < program.set.length; i++) {
-                var kvPair = utils.split(program.set[i], '=');
+                var kvPair = utils.split(program.set[i], '=', false);
                 if (kvPair.length === 2) {
                     parsedConfig[kvPair[0]] = kvPair[1];
                     saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' been saved to config.');
@@ -157,7 +157,7 @@ checkElevated()
 
         if (program.winevent && program.winevent.length > 0) {
             if (os.platform() === 'win32') {
-                processed = utils.processOption(program.winevent, parsedConfig.winevent);
+                processed = utils.processOption(program.winevent, parsedConfig.winevent, true);
                 parsedConfig.winevent = processed.values;
                 saveMessages.push('Windows Events: ' + processed.diff + ' been saved to config.');
             } else {
@@ -236,8 +236,6 @@ checkElevated()
 
         // merge into single var after all potential saveConfigs finished
         config = Object.assign(config, parsedConfig);
-
-        // debug(console.log(config));
 
         config.hostname = process.env.LOGDNA_HOSTNAME || fs.existsSync('/etc/logdna-hostname') && fs.statSync('/etc/logdna-hostname').isFile() && fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') || config.hostname || os.hostname().replace('.ec2.internal', '');
         config.tags = process.env.LOGDNA_TAGS || config.tags;
