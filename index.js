@@ -145,7 +145,7 @@ checkElevated()
 
         if (program.set && program.set.length > 0) {
             for (var i = 0; i < program.set.length; i++) {
-                var kvPair = utils.split(program.set[i], '=');
+                var kvPair = utils.split(program.set[i], '=', false);
                 if (kvPair.length === 2) {
                     parsedConfig[kvPair[0]] = kvPair[1];
                     saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' been saved to config.');
