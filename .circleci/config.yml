@@ -82,6 +82,8 @@ jobs:
   build_windows:
     docker:
       - image: circleci/node:8
+    environment:
+      VERSION: $(git tag -l --sort=-v:refname | head -n 1 | cut -d'-' -f2)
     steps:
       - checkout
       - run:
@@ -95,9 +97,6 @@ jobs:
             #  echo "  NUSPEC_VERSION: ${NUSPEC_VERSION}"
             #  exit 1
             # fi
-            # echo 'export VERSION="$(echo ${TAG_VERSION})"' >> ~/.bashrc
-            echo 'export VERSION=1.5.6' >> ~/.bashrc
-            source ~/.bashrc
       - run:
           name: Install Dependencies - AWS CLI, Grunt CLI, and NEXE
           command: |
@@ -134,6 +133,8 @@ jobs:
   push_to_choco:
     docker:
       - image: linuturk/mono-choco
+    environment:
+      VERSION: $(git tag -l --sort=-v:refname | head -n 1 | cut -d'-' -f2)
     steps:
       - attach_workspace:
           at: .
@@ -141,14 +142,12 @@ jobs:
       - run:
           name: Prepare NuPKG
           command: |
-            VERSION=$(cat ./scripts/windows/VERSION.txt)
             unzip logdna-agent.latest.zip
             sed -i 's/tools\\/tools\//g' .builds/windows/logdna-agent.nuspec
             cd .builds/windows && choco pack logdna-agent.nuspec 2>/dev/null
       - run:
           name: Push to Chocolatey
           command: |
-            VERSION=$(cat ./scripts/windows/VERSION.txt)
             curl --insecure -X PUT -H "X-NuGet-ApiKey: ${CHOCO_API_KEY}" -T "./logdna-agent.${VERSION}.nupkg" "https://push.chocolatey.org/api/v2/package"
 workflows:
   version: 2
