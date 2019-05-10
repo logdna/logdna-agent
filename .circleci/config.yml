@@ -141,11 +141,10 @@ jobs:
           name: Prepare NuPKG and Push to Chocolatey
           command: |
             VERSION=$(cat ./scripts/windows/VERSION.txt)
-            unzip logdna-agent.latest.zip
-            sed -i 's/tools\\/tools\//g' .builds/windows/logdna-agent.nuspec
-            cd .builds/windows && choco pack logdna-agent.nuspec 2>/dev/null
-            choco apikey -k ${CHOCO_API_KEY} -s https://push.chocolatey.org/ 2>/dev/null
-            choco push ./logdna-agent.${VERSION}.nupkg
+            unzip logdna-agent.latest.zip && cd .builds/windows
+            sed -i 's/tools\\/tools\//g' ./logdna-agent.nuspec
+            choco pack logdna-agent.nuspec 2>/dev/null
+            choco push --api-key=${CHOCO_API_KEY} ./logdna-agent.${VERSION}.nupkg 2>/dev/null
 workflows:
   version: 2
   build_windows:
