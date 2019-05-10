@@ -140,7 +140,8 @@ jobs:
       - run:
           name: Prepare NuPKG
           command: |
-            VERSION=$(cat ./scripts/windows/VERSION.txt)
+            echo 'export VERSION="$(cat ./scripts/windows/VERSION.txt)"' >> ~/.bashrc
+            source ~/.bashrc
             unzip logdna-agent.latest.zip
             sed -i 's/tools\\/tools\//g' .builds/windows/logdna-agent.nuspec
             cd .builds/windows && choco pack logdna-agent.nuspec 2>/dev/null
@@ -156,12 +157,16 @@ workflows:
           filters:
             tags:
               only: /windows-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+            branches:
+              ignore: /.*/
       - push_to_choco:
           requires:
             - build_windows
           filters:
             tags:
               only: /windows-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+            branches:
+              ignore: /.*/
   build-tags:
     jobs:
       - image-build:
