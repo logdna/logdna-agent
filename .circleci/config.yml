@@ -148,7 +148,7 @@ jobs:
           name: Push to Chocolatey
           command: |
             VERSION=$(cat ./scripts/windows/VERSION.txt)
-            curl --insecure -X PUT -H "X-NuGet-ApiKey: ${CHOCO_API_KEY}" -T "./logdna-agent.${VERSION}.nupkg" "https://push.chocolatey.org/api/v2/package"
+            curl --insecure -X PUT -H "X-NuGet-ApiKey: ${CHOCO_API_KEY}" -T ".builds/windows/logdna-agent.${VERSION}.nupkg" "https://push.chocolatey.org/api/v2/package"
 workflows:
   version: 2
   build_windows:
