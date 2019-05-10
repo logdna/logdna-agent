@@ -112,7 +112,7 @@ jobs:
           command: |
             npm install
             npm install grunt grunt-cli --save-dev
-            grunt lineremover && grunt test
+            grunt lineremover && grunt eslint
             nexe -i index.js -t win32-x86-8.11.3 -o scripts/windows/logdna-agent.exe
             sha256sum scripts/windows/logdna-agent.exe
             echo ${VERSION} >> scripts/windows/VERSION.txt
