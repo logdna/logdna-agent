@@ -144,7 +144,8 @@ jobs:
             unzip logdna-agent.latest.zip
             sed -i 's/tools\\/tools\//g' .builds/windows/logdna-agent.nuspec
             cd .builds/windows && choco pack logdna-agent.nuspec 2>/dev/null
-            curl --insecure -X PUT -H "X-NuGet-ApiKey: ${CHOCO_API_KEY}" -T "./logdna-agent.${VERSION}.nupkg" "https://push.chocolatey.org/api/v2/package"
+            choco apikey -k ${CHOCO_API_KEY} -s https://push.chocolatey.org/ 2>/dev/null
+            choco push ./logdna-agent.${VERSION}.nupkg
 workflows:
   version: 2
   build_windows:
