@@ -89,14 +89,13 @@ jobs:
           command: |
             TAG_VERSION=$(git tag -l --sort=-v:refname | head -n 1 | cut -d'-' -f2)
             NUSPEC_VERSION=$(cat scripts/windows/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
-            # if [[ "${TAG_VERSION}" != "${NUSPEC_VERSION}" ]]; then
-            #  echo "There is mismatch:"
-            #  echo "  TAG_VERSION: ${TAG_VERSION}"
-            #  echo "  NUSPEC_VERSION: ${NUSPEC_VERSION}"
-            #  exit 1
-            # fi
-            # echo 'export VERSION=${TAG_VERSION}' >> ${BASH_ENV}
-            echo 'export VERSION=1.5.6' >> ${BASH_ENV}
+            if [[ "${TAG_VERSION}" != "${NUSPEC_VERSION}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${TAG_VERSION}"
+              echo "  NUSPEC_VERSION: ${NUSPEC_VERSION}"
+              exit 1
+            fi
+            echo 'export VERSION=${TAG_VERSION}' >> ${BASH_ENV}
       - run:
           name: Install Dependencies - AWS CLI, Grunt CLI, and NEXE
           command: |
