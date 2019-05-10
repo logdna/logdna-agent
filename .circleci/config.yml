@@ -143,7 +143,7 @@ jobs:
             VERSION=$(cat ./scripts/windows/VERSION.txt)
             unzip logdna-agent.latest.zip
             sed -i 's/tools\\/tools\//g' .builds/windows/logdna-agent.nuspec
-            cd .builds/windows && choco pack logdna-agent.nuspec 2>/dev/null
+            cd .builds/windows && cat tools/VERIFICATION.txt && exit 1 && choco pack logdna-agent.nuspec 2>/dev/null
       - run:
           name: Push to Chocolatey
           command: |
