@@ -88,7 +88,9 @@ jobs:
           name: Check Tagged Push
           command: |
             TAG_VERSION=$(git describe | cut -d'-' -f2)
+            echo "${TAG_VERSION}"
             NUSPEC_VERSION=$(cat scripts/windows/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
+            echo "${NUSPEC_VERSION}"
             if [[ "${TAG_VERSION}" != "${NUSPEC_VERSION}" ]]; then
               echo "There is mismatch:"
               echo "  TAG_VERSION: ${TAG_VERSION}"
