@@ -87,6 +87,7 @@ jobs:
       - run:
           name: Check Tagged Push
           command: |
+            git describe
             TAG_VERSION=$(git describe | cut -d'-' -f2)
             echo "${TAG_VERSION}"
             NUSPEC_VERSION=$(cat scripts/windows/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
