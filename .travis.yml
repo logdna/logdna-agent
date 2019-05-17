@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- '6.10.2'
+- 10.15.3
 env:
   - CXX=g++-4.8
 addons:
@@ -14,8 +14,8 @@ cache:
   directories:
   - node_modules
 before_install:
-  - "npm config set spin false"
-  - "npm install -g npm@^6"
+  - npm config set spin false
+  - npm install -g npm@^6
   - export DEBUG=logdna*
 install:
 - npm install
