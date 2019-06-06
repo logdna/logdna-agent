@@ -106,6 +106,14 @@ sudo apt-get update
 
 The LogDNA agent authenticates using your [LogDNA Ingestion Key](https://app.logdna.com/manage/profile) and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log data, as well as watches for new files added to your specific logging directories.
 
+If you don't have a LogDNA account, you can create one on https://logdna.com or if you're on macOS w/[Homebrew](https://brew.sh) installed:
+
+```
+brew cask install logdna-cli
+logdna register <email>
+# now paste the Ingestion Key into the kubectl commands above
+```
+
 ## Kubernetes Logging
 
 Set up Kubernetes logging with 2 `kubectl` commands with the LogDNA agent! We extract pertinent Kubernetes metadata: pod name, container name, container id, namespace, and labels etc:
