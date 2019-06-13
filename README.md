@@ -106,6 +106,14 @@ sudo apt-get update
 
 The LogDNA agent authenticates using your [LogDNA Ingestion Key](https://app.logdna.com/manage/profile) and opens a secure web socket to LogDNA's ingestion servers. It then 'tails' for new log data, as well as watches for new files added to your specific logging directories.
 
+If you don't have a LogDNA account, you can create one on https://logdna.com or if you're on macOS w/[Homebrew](https://brew.sh) installed:
+
+```
+brew cask install logdna-cli
+logdna register <email>
+# now paste the Ingestion Key into the kubectl commands above
+```
+
 ## Kubernetes Logging
 
 Set up Kubernetes logging with 2 `kubectl` commands with the LogDNA agent! We extract pertinent Kubernetes metadata: pod name, container name, container id, namespace, and labels etc:
@@ -146,6 +154,26 @@ logdna register <email>
 ```
 
 We created this integration mainly based on customer feedback and that [logging with Kubernetes should not be this painful](https://blog.logdna.com/2017/03/14/logging-with-kubernetes-should-not-be-this-painful/).
+
+## OpenShift Logging
+
+OpenShift logging requires a few additional steps over Kubernetes, but still pretty easy! Like Kubernetes, we extract pertinent metadata: pod name, container name, container id, namespace, project, and labels etc:
+
+```
+oc adm new-project --node-selector='' logdna-agent
+oc project logdna-agent
+oc create serviceaccount logdna-agent
+oc adm policy add-scc-to-user privileged system:serviceaccount:logdna-agent:logdna-agent
+oc create secret generic logdna-agent-key --from-literal=logdna-agent-key=<YOUR LOGDNA INGESTION KEY>
+oc create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds-os.yml 
+```
+
+This automatically installs a logdna-agent pod into each node in your cluster and ships stdout/stderr from all containers, both application logs and node logs. Note: By default, the agent pod will collect logs from all namespaces on each node, including `kube-system`. View your logs at https://app.logdna.com. See [YAML file](https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds-os.yaml) for additional options such as `LOGDNA_TAGS`.
+
+Notes:
+* The `oc adm new-project` method prevents having to adjust the project namespace's node-selector after creation.
+* This uses `JOURNALD=files`, you may need to change this if you have changed OpenShift logging configuration.
+* This has been tested on OpenShift 3.5-11
 
 ### LogDNA Pay-per-gig Pricing
 
