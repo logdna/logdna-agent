@@ -109,7 +109,6 @@ jobs:
       - run:
           name: Do Gruntfile Steps
           command: |
-            VERSION=$(git tag -l --sort=-v:refname | head -n 1 | cut -d'-' -f2)
             npm install
             npm install grunt grunt-cli --save-dev
             grunt lineremover && grunt eslint
@@ -124,7 +123,7 @@ jobs:
             zip -r logdna-agent.${VERSION}.zip .builds/windows
             zip -r logdna-agent.latest.zip .builds/windows
             aws s3 cp logdna-agent.${VERSION}.zip s3://repo.logdna.com/win/logdna-agent.${VERSION}.zip
-#            aws s3 cp logdna-agent.latest.zip s3://repo.logdna.com/win/logdna-agent.latest.zip
+            aws s3 cp logdna-agent.latest.zip s3://repo.logdna.com/win/logdna-agent.latest.zip
       - persist_to_workspace:
           root: .
           paths:
