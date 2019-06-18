@@ -64,6 +64,7 @@ describe('lib:connection-manager', function() {
                 autoupdate: 0
                 , key: 'SOME_FAKE_KEY'
                 , logdir: [tempDir]
+                , UA: 'logdna-agent-test'
                 , LOGDNA_LOGSSL: false
                 , LOGDNA_LOGHOST: 'localhost'
                 , LOGDNA_LOGPORT: port.toString()
