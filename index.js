@@ -20,8 +20,6 @@ var k8s = require('./lib/k8s');
 var utils = require('./lib/utils');
 
 // Variables
-var isWinAdmin; // windows only
-var processed;
 var HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
 
 process.title = 'logdna-agent';
@@ -62,6 +60,7 @@ program
     })
     .parse(process.argv);
 
+var isWinAdmin; // windows only
 if (os.platform() === 'linux') {
     pkg.name += '-linux';
 } else if (os.platform() === 'win32') {
@@ -85,6 +84,7 @@ function checkElevated() {
 
 config.UA = pkg.name + '/' + pkg.version;
 config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
+var processed;
 
 checkElevated()
     .then((isElevated) => {
