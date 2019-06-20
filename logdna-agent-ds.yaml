@@ -38,6 +38,9 @@ spec:
         - name: mnt
           mountPath: /mnt
           readOnly: true
+        - name: "u01"
+          mountPath: /u01
+          readOnly: true
         - name: docker
           mountPath: /var/run/docker.sock
         - name: osrelease
@@ -57,6 +60,9 @@ spec:
       - name: mnt
         hostPath:
           path: /mnt
+      - name: "u01"
+        hostPath:
+          path: /u01
       - name: docker
         hostPath:
           path: /var/run/docker.sock
