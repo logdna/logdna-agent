@@ -29,8 +29,7 @@
     "is-administrator": "^1.0.1",
     "macaddress": "^0.2.8",
     "properties": "^1.2.1",
-    "request": "^2.71.0",
-    "ws": "^7.0.0"
+    "request": "^2.71.0"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.11"
