@@ -11,8 +11,8 @@ describe('lib:windows-utilities', function() {
         return;
     }
 
-    var EventLogger = require('node-windows').EventLogger;
-    var log = new EventLogger(provider);
+    // var EventLogger = require('node-windows').EventLogger;
+    // var log = new EventLogger(provider);
 
     describe('#streamEventLog()', function() {
         it('streams event logs to a socket', function() {
