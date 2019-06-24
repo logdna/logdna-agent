@@ -1,9 +1,9 @@
 /* globals describe, it */
 require('../helpers/before');
-var assert = require('assert');
-var requireUncached = require('require-uncached');
-var debug = require('debug')('logdna:test:lib:windows-utilities');
-var provider = 'testapp';
+// var assert = require('assert');
+// var requireUncached = require('require-uncached');
+// var debug = require('debug')('logdna:test:lib:windows-utilities');
+// var provider = 'testapp';
 var os = require('os');
 
 describe('lib:windows-utilities', function() {

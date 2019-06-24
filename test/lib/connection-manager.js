@@ -1,15 +1,15 @@
 /* globals describe, it, before, after */
 require('../helpers/before');
-var WebSocketServer = require('ws').Server;
+// var WebSocketServer = require('ws').Server;
 var fs = require('fs');
-var path = require('path');
+// var path = require('path');
 var assert = require('assert');
 var debug = require('debug')('logdna:test:lib:connection-manager');
 var mockery = require('mockery');
 var rimraf = require('rimraf');
-var skeemas = require('skeemas');
-var statsSchema = require('../helpers/message-schemas/stats');
-var logSchema = require('../helpers/message-schemas/log');
+// var skeemas = require('skeemas');
+// var statsSchema = require('../helpers/message-schemas/stats');
+// var logSchema = require('../helpers/message-schemas/log');
 var tempDir = '.temp';
 
 describe('lib:connection-manager', function() {
@@ -53,7 +53,7 @@ describe('lib:connection-manager', function() {
     });
 
     describe('#connectLogServer', function() {
-        var port = 8080;
+        // var port = 8080;
         // tests use live local web sockets so give plenty of timeout
         this.timeout(10000);
         it('send 5 stats messages at 50ms interval', function() {
