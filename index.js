@@ -262,7 +262,7 @@ checkElevated()
         }
 
         return new Promise((resolve) => {
-            request('http://169.254.169.254/latest/dynamic/instance-identity/document/', {
+            request(config.AWS_INSTANCE_CHECK_URL, {
                 timeout: 1000
                 , json: true
             }, (err, res, body) => {
