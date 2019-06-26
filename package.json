@@ -4,7 +4,7 @@
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,9 @@
     "is-administrator": "^1.0.1",
     "macaddress": "^0.2.8",
     "properties": "^1.2.1",
-    "request": "^2.71.0"
+    "request": "^2.71.0",
+    "rewire": "^4.0.1",
+    "sinon": "^7.3.2"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.11"
@@ -44,6 +46,7 @@
     "grunt-mocha-cli": "^4.0.0",
     "grunt-zip": "^0.17.1",
     "guid": "0.0.12",
+    "jest": "^24.8.0",
     "load-grunt-tasks": "^3.4.0",
     "mock-socket": "git+https://git@github.com/sedouard/mock-socket.git",
     "mockery": "^1.4.0",
