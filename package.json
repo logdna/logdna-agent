@@ -4,7 +4,8 @@
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+     "test": "grunt test"
+     , "jest": "jest"
   },
   "repository": {
     "type": "git",
@@ -29,9 +30,7 @@
     "is-administrator": "^1.0.1",
     "macaddress": "^0.2.8",
     "properties": "^1.2.1",
-    "request": "^2.71.0",
-    "rewire": "^4.0.1",
-    "sinon": "^7.3.2"
+    "request": "^2.71.0"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.11"
