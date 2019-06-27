@@ -43,3 +43,6 @@ package-lock.json
 
 # WebStorm config
 .idea
+
+# Tests
+**/test.*
