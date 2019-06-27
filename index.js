@@ -16,7 +16,6 @@ var pkg = require('./package.json');
 var distro = Promise.promisify(require('./lib/os-version'));
 var config = require('./lib/config');
 var fileUtils = require('./lib/file-utilities');
-var apiClient = require('./lib/api-client');
 var connectionManager = require('./lib/connection-manager');
 var k8s = require('./lib/k8s');
 var utils = require('./lib/utils');
@@ -62,11 +61,9 @@ program
     })
     .parse(process.argv);
 
-var isWinAdmin; // windows only
 if (os.platform() === 'linux') {
     pkg.name += '-linux';
 } else if (os.platform() === 'win32') {
-    isWinAdmin = require('is-administrator');
     pkg.name += '-windows';
 } else if (os.platform() === 'darwin') {
     pkg.name += '-mac';
@@ -75,7 +72,7 @@ if (os.platform() === 'linux') {
 function checkElevated() {
     return new Promise((resolve) => {
         if (os.platform() === 'win32') {
-            resolve(isWinAdmin());
+            resolve(require('is-administrator')());
         } else if (process.getuid() <= 0) {
             resolve(true);
         } else {
@@ -302,10 +299,6 @@ checkElevated()
             k8s.init();
         }
 
-        return apiClient.getAuthToken(config, pkg.name);
-    }).then(() => {
-        debug('got auth token:');
-        debug(config.auth_token);
         debug('connecting to log server');
         return connectionManager.connectLogServer(config, pkg.name);
     }).then(() => {
