@@ -1,27 +1,40 @@
 // External Modules
-/* globals process */
-// override es6 promise with bluebird
-Promise = require('bluebird'); // eslint-disable-line
-var debug = require('debug')('logdna:index');
-var program = require('commander');
-var os = require('os');
-var fs = require('fs');
-var properties = Promise.promisifyAll(require('properties'));
-var macaddress = Promise.promisifyAll(require('macaddress'));
-var request = require('request');
+const async = require('async');
+const debug = require('debug')('logdna:index');
+const program = require('commander');
+const os = require('os');
+const fs = require('fs');
+const properties = require('properties');
+const macaddress = require('macaddress');
+const request = require('request');
 
 // Internal Modules
-var log = require('./lib/log');
-var pkg = require('./package.json');
-var distro = Promise.promisify(require('./lib/os-version'));
-var config = require('./lib/config');
-var fileUtils = require('./lib/file-utilities');
-var connectionManager = require('./lib/connection-manager');
-var k8s = require('./lib/k8s');
-var utils = require('./lib/utils');
+const log = require('./lib/log');
+const distro = require('./lib/os-version');
+const fileUtils = require('./lib/file-utilities');
+const connectionManager = require('./lib/connection-manager');
+const k8s = require('./lib/k8s');
+const utils = require('./lib/utils');
+
+// Constants
+const HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
 
 // Variables
-var HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
+var config = require('./lib/config');
+var pkg = require('./package.json');
+var processed;
+
+// Initializations
+if (os.platform() === 'linux') {
+    pkg.name += '-linux';
+} else if (os.platform() === 'win32') {
+    pkg.name += '-windows';
+} else if (os.platform() === 'darwin') {
+    pkg.name += '-mac';
+}
+
+config.UA = pkg.name + '/' + pkg.version;
+config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
 
 process.title = 'logdna-agent';
 program._name = 'logdna-agent';
@@ -61,47 +74,22 @@ program
     })
     .parse(process.argv);
 
-if (os.platform() === 'linux') {
-    pkg.name += '-linux';
-} else if (os.platform() === 'win32') {
-    pkg.name += '-windows';
-} else if (os.platform() === 'darwin') {
-    pkg.name += '-mac';
-}
-
-function checkElevated() {
-    return new Promise((resolve) => {
-        if (os.platform() === 'win32') {
-            resolve(require('is-administrator')());
-        } else if (process.getuid() <= 0) {
-            resolve(true);
-        } else {
-            resolve(false);
-        }
-    });
-}
-
-config.UA = pkg.name + '/' + pkg.version;
-config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
-var processed;
-
-checkElevated()
-    .then((isElevated) => {
-        if (!isElevated) {
-            console.log('You must be an Administrator (root, sudo) run this agent! See -h or --help for more info.');
-            process.exit();
-        }
-
-        return properties.parseAsync(config.CONF_FILE, {
+if ((os.platform() === 'win32' && require('is-administrator')()) || process.getuid() <= 0) {
+    async.waterfall([(cb) => {
+        return properties.parse(config.CONF_FILE, {
             path: true
-        }).catch(() => {});
-    })
-    .then((parsedConfig) => {
+        }, cb);
+    }, (parsedConfig, cb) => {
         parsedConfig = parsedConfig || {};
 
         // allow key to be passed via env
         if (process.env.LOGDNA_AGENT_KEY) {
             parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
+        }
+
+        if (!program.key && !parsedConfig.key) {
+            console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
+            process.exit();
         }
 
         // allow exclude to be passed via env
@@ -116,11 +104,6 @@ checkElevated()
 
         if (process.env.USEJOURNALD) {
             parsedConfig.usejournald = process.env.USEJOURNALD;
-        }
-
-        if (!program.key && !parsedConfig.key) {
-            console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
-            process.exit();
         }
 
         // sanitize
@@ -251,29 +234,26 @@ checkElevated()
             }
         }
 
-        return distro().catch(() => {});
-    })
-    .then((dist) => {
+        return distro(cb);
+    }, (dist, cb) => {
         if (dist && dist.os) {
             config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
         }
 
-        return new Promise((resolve) => {
-            request(config.AWS_INSTANCE_CHECK_URL, {
-                timeout: 1000
-                , json: true
-            }, (err, res, body) => {
-                if (res && res.statusCode && body) {
-                    config.awsid = body.instanceId;
-                    config.awsregion = body.region;
-                    config.awsaz = body.availabilityZone;
-                    config.awsami = body.imageId;
-                    config.awstype = body.instanceType;
-                }
-                resolve(macaddress.allAsync().catch(() => {}));
-            });
+        return request(config.AWS_INSTANCE_CHECK_URL, {
+            timeout: 1000
+            , json: true
+        }, (err, res, body) => {
+            if (res && res.statusCode && body) {
+                config.awsid = body.instanceId;
+                config.awsregion = body.region;
+                config.awsaz = body.availabilityZone;
+                config.awsami = body.imageId;
+                config.awstype = body.instanceType;
+            }
+            return macaddress.all(cb);
         });
-    }).then((all) => {
+    }, (all, cb) => {
         if (all) {
             var ifaces = Object.keys(all);
             for (var i = 0; i < ifaces.length; i++) {
@@ -300,14 +280,14 @@ checkElevated()
         }
 
         debug('connecting to log server');
-        return connectionManager.connectLogServer(config, pkg.name);
-    }).then(() => {
+        return connectionManager.connectLogServer(config, pkg.name, cb);
+    }], (error, success) => {
         debug('logdna agent successfully started');
     });
-
-Promise.onPossiblyUnhandledRejection((error) => {
-    throw error;
-});
+} else {
+    console.log('You must be an Administrator (root, sudo) run this agent! See -h or --help for more info.');
+    process.exit();
+}
 
 process.on('uncaughtException', (err) => {
     log('------------------------------------------------------------------');
