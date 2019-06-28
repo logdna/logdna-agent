@@ -33,11 +33,9 @@ describe('lib:file-utilities', () => {
     it('Gets the correct OS version', () => {
         return osVersion((error, os) => {
             debug(os);
-            assert.equal(os.code.split(', ')[1], 'Trusty Tahr');
             assert.equal(os.name, 'Ubuntu 14.04.4 LTS');
             assert.equal(os.os, 'Ubuntu');
             assert.equal(os.release, '14.04');
-            assert.equal(os.name, 'Ubuntu 14.04.4 LTS');
         });
     });
 
