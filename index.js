@@ -83,7 +83,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         parsedConfig = parsedConfig || {};
 
         // allow key to be passed via env
-        if (process.env.LOGDNA_AGENT_KEY) {
+        if (process.env.LOGDNA_AGENT_KEY || process.env.AGENT_KEY || process.env.INGESTION_KEY) {
             parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
         }
 
@@ -93,12 +93,12 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         }
 
         // allow exclude to be passed via env
-        if (process.env.LOGDNA_EXCLUDE) {
+        if (process.env.LOGDNA_EXCLUDE || process.env.EXCLUDE) {
             parsedConfig.exclude = process.env.LOGDNA_EXCLUDE;
         }
 
         // allow exclude regex to be passed via env
-        if (process.env.LOGDNA_EXCLUDE_REGEX) {
+        if (process.env.LOGDNA_EXCLUDE_REGEX || process.env.EXCLUDE_REGEX) {
             parsedConfig.exclude_regex = process.env.LOGDNA_EXCLUDE_REGEX;
         }
 
@@ -209,7 +209,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 if (error) {
                     return log(`Error while saving to: ${config.CONF_FILE}: ${error}`);
                 }
-                
+
                 for (var i = 0; i < saveMessages.length; i++) {
                     console.log(saveMessages[i]);
                 }
