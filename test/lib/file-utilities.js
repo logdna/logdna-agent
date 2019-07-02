@@ -124,7 +124,7 @@ describe('lib:file-utilities', () => {
                 }, cb);
             }, (config, cb) => {
                 return cb(fileUtilities.saveConfig(config, path.join(tempDir, 'test.config')));
-            }, (cb) => {
+            }, (success, cb) => {
                 return properties.parse(configPath, {
                     path: true
                 }, cb);

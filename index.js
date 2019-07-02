@@ -205,7 +205,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         }
 
         if (saveMessages.length) {
-            return fileUtils.saveConfig(parsedConfig, config.CONF_FILE).then(() => {
+            return fileUtils.saveConfig(parsedConfig, config.CONF_FILE, (error, success) => {
+                if (error) {
+                    return log(`Error while saving to: ${config.CONF_FILE}: ${error}`);
+                }
+                
                 for (var i = 0; i < saveMessages.length; i++) {
                     console.log(saveMessages[i]);
                 }
