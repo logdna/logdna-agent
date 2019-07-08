@@ -19,7 +19,6 @@
   "dependencies": {
     "agentkeepalive": "^2.1.1",
     "async": "^1.5.2",
-    "bluebird": "^3.5.3",
     "commander": "^2.8.1",
     "debug": "^2.2.0",
     "file-queue": "^0.2.1",
@@ -29,8 +28,7 @@
     "is-administrator": "^1.0.1",
     "macaddress": "^0.2.8",
     "properties": "^1.2.1",
-    "request": "^2.71.0",
-    "ws": "^7.0.0"
+    "request": "^2.71.0"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.11"

@@ -87,7 +87,7 @@ jobs:
       - run:
           name: Check Tagged Push
           command: |
-            TAG_VERSION=$(git tag -l --sort=-v:refname | head -n 1 | cut -d'-' -f2)
+            TAG_VERSION=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
             NUSPEC_VERSION=$(cat scripts/windows/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
             if [[ "${TAG_VERSION}" != "${NUSPEC_VERSION}" ]]; then
               echo "There is mismatch:"
@@ -95,7 +95,6 @@ jobs:
               echo "  NUSPEC_VERSION: ${NUSPEC_VERSION}"
               exit 1
             fi
-            echo 'export VERSION=${TAG_VERSION}' >> ${BASH_ENV}
       - run:
           name: Install Dependencies - AWS CLI, Grunt CLI, and NEXE
           command: |
@@ -109,6 +108,7 @@ jobs:
       - run:
           name: Do Gruntfile Steps
           command: |
+            VERSION=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
             npm install
             npm install grunt grunt-cli --save-dev
             grunt lineremover && grunt eslint
