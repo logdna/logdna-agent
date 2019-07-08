@@ -257,7 +257,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
             return macaddress.all(cb);
         });
-    }, (all, cb) => {
+    }], (error, all) => {
         if (all) {
             var ifaces = Object.keys(all);
             for (var i = 0; i < ifaces.length; i++) {
@@ -284,8 +284,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         }
 
         debug('connecting to log server');
-        return connectionManager.connectLogServer(config, pkg.name, cb);
-    }], (error, success) => {
+        connectionManager.connectLogServer(config);
         debug('logdna agent successfully started');
     });
 } else {
