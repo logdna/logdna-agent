@@ -4,7 +4,7 @@
   <metadata>
     <id>logdna-agent</id>
     <title>LogDNA Agent for Windows</title>
-    <version>1.5.6</version>
+    <version>1.6.0</version>
     <authors>smusali,leeliu</authors>
     <owners>leeliu</owners>
     <summary>LogDNA Collector Agent for Windows</summary>
@@ -14,8 +14,8 @@
     <packageSourceUrl>https://github.com/logdna/logdna-agent</packageSourceUrl>
     <docsUrl>https://github.com/logdna/logdna-agent</docsUrl>
     <bugTrackerUrl>https://github.com/logdna/logdna-agent/issues</bugTrackerUrl>
-    <tags>logdna-agent logdna-cli cli tail logging devops logdna</tags>
-    <copyright>Copyright 2018 LogDNA, Inc., portions by Microsoft and Contributors</copyright>
+    <tags>logdna-agent winevent tail logging devops logdna</tags>
+    <copyright>Copyright 2019 LogDNA, Inc., portions by Microsoft and Contributors</copyright>
     <licenseUrl>https://github.com/logdna/logdna-agent/blob/master/LICENSE.md</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>https://logdna.com/assets/images/logdna_logo.png</iconUrl>
