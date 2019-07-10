@@ -4,7 +4,7 @@ const debug = require('debug')('logdna:test:lib:os-version');
 const mockery = require('mockery');
 const osVersion = require('../../lib/os-version');
 
-describe('lib:file-utilities', () => {
+describe('lib:os-version', () => {
     before(() => {
         mockery.enable({
             warnOnUnregistered: false
