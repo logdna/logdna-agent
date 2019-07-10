@@ -6,6 +6,17 @@ executors:
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
+  test:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - run:
+          name: Run Tests
+          command: ./node_modules/.bin/grunt test
   image-build:
     executor: docker-publisher
     steps:
@@ -81,7 +92,7 @@ jobs:
             docker push icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
   build_windows:
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:10
     steps:
       - checkout
       - run:
@@ -148,7 +159,10 @@ workflows:
   version: 2
   build_windows:
     jobs:
+      - test
       - build_windows:
+          requires:
+            - test
           filters:
             tags:
               only: /windows-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/

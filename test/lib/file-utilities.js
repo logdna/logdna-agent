@@ -129,7 +129,6 @@ describe('lib:file-utilities', () => {
                     path: true
                 }, cb);
             }], (error, config) => {
-                assert.ok(config.logdir);
                 assert.ok(config.key);
                 assert.equal(config.autoupdate, 0);
             });
