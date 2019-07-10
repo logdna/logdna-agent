@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run:
           name: Install Grunt Dependency
-          command: npm install -g grunt
+          command: sudo npm install -g grunt
       - run:
           name: Run Tests
           command: grunt test
