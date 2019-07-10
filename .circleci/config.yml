@@ -13,10 +13,10 @@ jobs:
       - checkout
       - run:
           name: Install Grunt Dependency
-          command: sudo npm install -g grunt
+          command: npm install
       - run:
           name: Run Tests
-          command: grunt test
+          command: ./node_modules/.bin/grunt test
   image-build:
     executor: docker-publisher
     steps:
