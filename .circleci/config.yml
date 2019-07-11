@@ -57,11 +57,10 @@ jobs:
             echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
             TAG=${CIRCLE_TAG/v/''}
             D_TAG="$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | sort -g -r | head -1)"
-            lenght="$(echo $TAG | wc -m)"
-            if [ $lenght > 3 ]; then
-              IMAGE_TAG=$D_TAG
+            if [ $(echo $TAG | wc -m) -lt 3 ]; then
+              IMAGE_TAG=${D_TAG}
             else
-              IMAGE_TAG=$TAG
+              IMAGE_TAG=${TAG}
             fi
             docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
             docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
