@@ -44,8 +44,6 @@
     "grunt-zip": "^0.17.1",
     "guid": "0.0.12",
     "load-grunt-tasks": "^3.4.0",
-    "mock-socket": "git+https://git@github.com/sedouard/mock-socket.git",
-    "mockery": "^1.4.0",
     "require-uncached": "^1.0.2",
     "rimraf": "^2.5.2",
     "skeemas": "^1.2.2"
