@@ -67,13 +67,7 @@ jobs:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            TAG=${CIRCLE_TAG}
-            D_TAG="$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)"
-            if [ $(echo $TAG | wc -m) -lt 3 ]; then
-              IMAGE_TAG=${D_TAG}
-            else
-              IMAGE_TAG=${TAG}
-            fi
+            IMAGE_TAG=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
             docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:latest
             docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
             docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
@@ -109,11 +103,10 @@ jobs:
       - run:
           name: Check Tagged Push
           command: |
-            TAG_VERSION=${CIRCLE_TAG}
             NUSPEC_VERSION=$(cat scripts/windows/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
-            if [[ "${TAG_VERSION}" != "${NUSPEC_VERSION}" ]]; then
+            if [[ "${CIRCLE_TAG}" != "${NUSPEC_VERSION}" ]]; then
               echo "There is mismatch:"
-              echo "  TAG_VERSION: ${TAG_VERSION}"
+              echo "  TAG_VERSION: ${CIRCLE_TAG}"
               echo "  NUSPEC_VERSION: ${NUSPEC_VERSION}"
               exit 1
             fi
@@ -203,7 +196,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "0 21 12 * *"
+          cron: "0 21 17 * *"
           filters:
             branches:
               only: master
