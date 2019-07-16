@@ -20,7 +20,7 @@ jobs:
             docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
       - run:
           name: Archive Docker image
-          command: docker save -o image.tar ${IMAGE_NAME}
+          command: docker save -o image.tar ${IMAGE_NAME}:sandbox-${DATESTAMP}
       - persist_to_workspace:
           root: .
           paths:
@@ -162,17 +162,12 @@ workflows:
       - build_windows:
           filters:
             tags:
-              only: /windows-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+              only: /.*/
             branches:
               ignore: /.*/
       - push_to_choco:
           requires:
             - build_windows
-          filters:
-            tags:
-              only: /windows-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
-            branches:
-              ignore: /.*/
   build-tags:
     jobs:
       - image-build:
@@ -209,4 +204,8 @@ workflows:
             - docker-hub
       - ibm-registry:
           requires:
-            - docker-approved 
+            - docker-approved
+      - build_windows:
+      - push_to_choco:
+          requires:
+            - build_windows
