@@ -98,7 +98,7 @@ jobs:
       - run:
           name: Check Tagged Push
           command: |
-            TAG_VERSION=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
+            TAG_VERSION=${CIRCLE_TAG}
             NUSPEC_VERSION=$(cat scripts/windows/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
             if [[ "${TAG_VERSION}" != "${NUSPEC_VERSION}" ]]; then
               echo "There is mismatch:"
@@ -162,7 +162,7 @@ workflows:
       - build_windows:
           filters:
             tags:
-              only: /.*/
+              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
             branches:
               ignore: /.*/
       - push_to_choco:
@@ -173,7 +173,7 @@ workflows:
       - image-build:
           filters:
             tags:
-              ignore: /windows-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
             branches:
               ignore: /.*/
       - docker-hub:
@@ -205,7 +205,4 @@ workflows:
       - ibm-registry:
           requires:
             - docker-approved
-      - build_windows:
-      - push_to_choco:
-          requires:
-            - build_windows
+            
