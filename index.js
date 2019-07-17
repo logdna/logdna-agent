@@ -76,21 +76,21 @@ program
 
 if ((os.platform() === 'win32' && require('is-administrator')()) || process.getuid() <= 0) {
     async.waterfall([(cb) => {
-        if(fs.existsSync(config.CONF_FILE)) {
+        if (fs.existsSync(config.CONF_FILE)) {
             properties.parse(config.CONF_FILE, {
                 path: true
             }, cb);
         } else {
-            cb(null, null)
-        }       
+            cb(null, null);
+        }
     }, (parsedConfig, cb) => {
         parsedConfig = parsedConfig || {};
+
         // allow key to be passed via env
-        
         if (process.env.LOGDNA_AGENT_KEY || process.env.AGENT_KEY || process.env.INGESTION_KEY) {
             parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
         }
-         
+
         // allow exclude to be passed via env
         if (process.env.LOGDNA_EXCLUDE || process.env.EXCLUDE) {
             parsedConfig.exclude = process.env.LOGDNA_EXCLUDE;
@@ -118,18 +118,16 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
 
         var saveMessages = [];
 
-       
-        
         if (!program.key && !parsedConfig.key) {
             console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
             process.exit();
         }
 
-         if (program.key) {
+        if (program.key) {
             parsedConfig.key = program.key;
             saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
         }
-        
+
         if (program.set && program.set.length > 0) {
             for (var i = 0; i < program.set.length; i++) {
                 var kvPair = utils.split(program.set[i], '=', false);
@@ -209,7 +207,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             parsedConfig.tags = processed.values;
             saveMessages.push('Tags: ' + processed.diff + ' been saved to config.');
         }
-        
+
         if (saveMessages.length) {
             return fileUtils.saveConfig(parsedConfig, config.CONF_FILE, (error, success) => {
                 if (error) {
@@ -225,7 +223,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
 
         // merge into single var after all potential saveConfigs finished
         config = Object.assign(config, parsedConfig);
-       
+
         config.hostname = process.env.LOGDNA_HOSTNAME ||
                           fs.existsSync('/etc/logdna-hostname') &&
                           fs.statSync('/etc/logdna-hostname').isFile() &&
