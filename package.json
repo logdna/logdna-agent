@@ -19,7 +19,7 @@
   "dependencies": {
     "agentkeepalive": "^2.1.1",
     "async": "^1.5.2",
-    "commander": "^2.8.1",
+    "commander": "^2.20.0",
     "debug": "^2.2.0",
     "file-queue": "^0.2.1",
     "getos": "^2.4.0",
