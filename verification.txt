@@ -1,7 +1,0 @@
-VERIFICATION
-Verification is intended to assist the Chocolatey moderators and community
-in verifying that this package's contents are trustworthy.
- 
-This package is published by the LogDNA. You can build a binary directly
-by following instructions here:
-https://github.com/logdna/logdna-agent/blob/master/CONTRIBUTING.md
