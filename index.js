@@ -281,7 +281,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
         }
 
-        log(program._name + ' ' + pkg.version + ' started on herererer ' + config.hostname + ' (' + config.ip + ')');
+        log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
 
         if (config.platform && config.platform.indexOf('k8s') === 0) {
             k8s.init();
