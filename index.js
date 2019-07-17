@@ -91,6 +91,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
         }
 
+        if (!program.key && !parsedConfig.key) {
+            console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
+            process.exit();
+        }
+
         // allow exclude to be passed via env
         if (process.env.LOGDNA_EXCLUDE || process.env.EXCLUDE) {
             parsedConfig.exclude = process.env.LOGDNA_EXCLUDE;
@@ -117,11 +122,6 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         }
 
         var saveMessages = [];
-
-        if (!program.key && !parsedConfig.key) {
-            console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
-            process.exit();
-        }
 
         if (program.key) {
             parsedConfig.key = program.key;
