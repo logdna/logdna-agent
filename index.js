@@ -262,6 +262,10 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             return macaddress.all(cb);
         });
     }], (error, all) => {
+        if(error) {
+          log(error);
+          process.exit();
+        }
         if (all) {
             var ifaces = Object.keys(all);
             for (var i = 0; i < ifaces.length; i++) {
