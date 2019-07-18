@@ -75,232 +75,236 @@ program
     .parse(process.argv);
 
 
-const checkFileExistence = (cb) => { 
-  fs.access(config.CONF_FILE, (error) => {
-    error ? cb(null, null) : properties.parse(config.CONF_FILE, {
-          path: true
-      }, cb); 
-  })
+const checkFileExistence = (cb) => {
+    fs.access(config.CONF_FILE, (error) => {
+        if (error) {
+            cb(null, null);
+        } else {
+            properties.parse(config.CONF_FILE, {
+                path: true
+            }, cb);
+        }
+    });
 };
 
 const mainExecution = (parsedConfig, cb) => {
-  parsedConfig = parsedConfig || {};
+    parsedConfig = parsedConfig || {};
 
-  // allow key to be passed via env
-  if (process.env.LOGDNA_AGENT_KEY || process.env.AGENT_KEY || process.env.INGESTION_KEY) {
-      parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
-  }
+    // allow key to be passed via env
+    if (process.env.LOGDNA_AGENT_KEY || process.env.AGENT_KEY || process.env.INGESTION_KEY) {
+        parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
+    }
 
-  if (!program.key && !parsedConfig.key) {
-      console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
-      process.exit();
-  }
+    if (!program.key && !parsedConfig.key) {
+        console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
+        process.exit();
+    }
 
-  // allow exclude to be passed via env
-  if (process.env.LOGDNA_EXCLUDE || process.env.EXCLUDE) {
-      parsedConfig.exclude = process.env.LOGDNA_EXCLUDE;
-  }
+    // allow exclude to be passed via env
+    if (process.env.LOGDNA_EXCLUDE || process.env.EXCLUDE) {
+        parsedConfig.exclude = process.env.LOGDNA_EXCLUDE;
+    }
 
-  // allow exclude regex to be passed via env
-  if (process.env.LOGDNA_EXCLUDE_REGEX || process.env.EXCLUDE_REGEX) {
-      parsedConfig.exclude_regex = process.env.LOGDNA_EXCLUDE_REGEX;
-  }
+    // allow exclude regex to be passed via env
+    if (process.env.LOGDNA_EXCLUDE_REGEX || process.env.EXCLUDE_REGEX) {
+        parsedConfig.exclude_regex = process.env.LOGDNA_EXCLUDE_REGEX;
+    }
 
-  if (process.env.USEJOURNALD) {
-      parsedConfig.usejournald = process.env.USEJOURNALD;
-  }
+    if (process.env.USEJOURNALD) {
+        parsedConfig.usejournald = process.env.USEJOURNALD;
+    }
 
-  // sanitize
-  if (!parsedConfig.logdir) {
-      parsedConfig.logdir = [config.DEFAULT_LOG_PATH]; // default entry
-  } else if (!Array.isArray(parsedConfig.logdir)) {
-      parsedConfig.logdir = parsedConfig.logdir.split(','); // force array
-  }
+    // sanitize
+    if (!parsedConfig.logdir) {
+        parsedConfig.logdir = [config.DEFAULT_LOG_PATH]; // default entry
+    } else if (!Array.isArray(parsedConfig.logdir)) {
+        parsedConfig.logdir = parsedConfig.logdir.split(','); // force array
+    }
 
-  if (parsedConfig.exclude && !Array.isArray(parsedConfig.exclude)) {
-      parsedConfig.exclude = parsedConfig.exclude.split(',');
-  }
+    if (parsedConfig.exclude && !Array.isArray(parsedConfig.exclude)) {
+        parsedConfig.exclude = parsedConfig.exclude.split(',');
+    }
 
-  var saveMessages = [];
+    var saveMessages = [];
 
-  if (program.key) {
-      parsedConfig.key = program.key;
-      saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
-  }
+    if (program.key) {
+        parsedConfig.key = program.key;
+        saveMessages.push('Your LogDNA Ingestion Key has been successfully saved!');
+    }
 
-  if (program.set && program.set.length > 0) {
-      for (var i = 0; i < program.set.length; i++) {
-          var kvPair = utils.split(program.set[i], '=', false);
-          if (kvPair.length === 2) {
-              parsedConfig[kvPair[0]] = kvPair[1];
-              saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' been saved to config.');
-          } else {
-              saveMessages.push('Unknown setting: ' + program.set[i] + '. Usage: -s [key=value]');
-          }
-      }
-  }
+    if (program.set && program.set.length > 0) {
+        for (var i = 0; i < program.set.length; i++) {
+            var kvPair = utils.split(program.set[i], '=', false);
+            if (kvPair.length === 2) {
+                parsedConfig[kvPair[0]] = kvPair[1];
+                saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' been saved to config.');
+            } else {
+                saveMessages.push('Unknown setting: ' + program.set[i] + '. Usage: -s [key=value]');
+            }
+        }
+    }
 
-  if (program.winevent && program.winevent.length > 0) {
-      if (os.platform() === 'win32') {
-          processed = utils.processOption(program.winevent, parsedConfig.winevent, true);
-          parsedConfig.winevent = processed.values;
-          saveMessages.push('Windows Events: ' + processed.diff + ' been saved to config.');
-      } else {
-          saveMessages.push('-w is only available for Windows.');
-      }
-  }
+    if (program.winevent && program.winevent.length > 0) {
+        if (os.platform() === 'win32') {
+            processed = utils.processOption(program.winevent, parsedConfig.winevent, true);
+            parsedConfig.winevent = processed.values;
+            saveMessages.push('Windows Events: ' + processed.diff + ' been saved to config.');
+        } else {
+            saveMessages.push('-w is only available for Windows.');
+        }
+    }
 
-  if (program.list) {
-      if (typeof program.list === 'boolean') {
-          program.list = ['all'];
-      }
-      var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
-      const listResult = utils.pick2list(program.list, conf);
-      if (listResult.valid) {
-          var msg = utils.stringify(listResult.cfg);
-          saveMessages.push(config.CONF_FILE + ':\n' + msg);
-      } else {
-          saveMessages.push(listResult.msg);
-      }
-  }
+    if (program.list) {
+        if (typeof program.list === 'boolean') {
+            program.list = ['all'];
+        }
+        var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
+        const listResult = utils.pick2list(program.list, conf);
+        if (listResult.valid) {
+            var msg = utils.stringify(listResult.cfg);
+            saveMessages.push(config.CONF_FILE + ':\n' + msg);
+        } else {
+            saveMessages.push(listResult.msg);
+        }
+    }
 
-  if (program.unset && program.unset.length > 0) {
-      const unsetResult = utils.unsetConfig(program.unset, parsedConfig);
-      parsedConfig = unsetResult.cfg;
-      saveMessages.push(unsetResult.msg);
-  }
+    if (program.unset && program.unset.length > 0) {
+        const unsetResult = utils.unsetConfig(program.unset, parsedConfig);
+        parsedConfig = unsetResult.cfg;
+        saveMessages.push(unsetResult.msg);
+    }
 
-  if (program.logdir && program.logdir.length > 0) {
-      processed = utils.processOption(program.logdir, parsedConfig.logdir);
-      parsedConfig.logdir = processed.values;
-      saveMessages.push('Log Directories: ' + processed.diff + ' been saved to config.');
-  }
+    if (program.logdir && program.logdir.length > 0) {
+        processed = utils.processOption(program.logdir, parsedConfig.logdir);
+        parsedConfig.logdir = processed.values;
+        saveMessages.push('Log Directories: ' + processed.diff + ' been saved to config.');
+    }
 
-  if (program.logfile && program.logfile.length > 0) {
-      processed = utils.processOption(program.logfile, parsedConfig.logdir);
-      parsedConfig.logdir = processed.values;
-      saveMessages.push('Log Files: ' + processed.diff + ' been saved to config.');
-  }
+    if (program.logfile && program.logfile.length > 0) {
+        processed = utils.processOption(program.logfile, parsedConfig.logdir);
+        parsedConfig.logdir = processed.values;
+        saveMessages.push('Log Files: ' + processed.diff + ' been saved to config.');
+    }
 
-  if (program.exclude && program.exclude.length > 0) {
-      processed = utils.processOption(program.exclude, parsedConfig.exclude);
-      parsedConfig.exclude = processed.values;
-      saveMessages.push('Exclusions: ' + processed.diff + ' been saved to config.');
-  }
+    if (program.exclude && program.exclude.length > 0) {
+        processed = utils.processOption(program.exclude, parsedConfig.exclude);
+        parsedConfig.exclude = processed.values;
+        saveMessages.push('Exclusions: ' + processed.diff + ' been saved to config.');
+    }
 
-  if (program.excludeRegex) {
-      parsedConfig.exclude_regex = program.excludeRegex;
-      // strip leading and trailing / if exists
-      if (parsedConfig.exclude_regex.substring(0, 1) === '/' && parsedConfig.exclude_regex.substring(parsedConfig.exclude_regex.length - 1) === '/') {
-          parsedConfig.exclude_regex = parsedConfig.exclude_regex.substring(1, parsedConfig.exclude_regex.length - 1);
-      }
-      saveMessages.push('Exclude pattern: /' + parsedConfig.exclude_regex + '/ been saved to config.');
-  }
+    if (program.excludeRegex) {
+        parsedConfig.exclude_regex = program.excludeRegex;
+        // strip leading and trailing / if exists
+        if (parsedConfig.exclude_regex.substring(0, 1) === '/' && parsedConfig.exclude_regex.substring(parsedConfig.exclude_regex.length - 1) === '/') {
+            parsedConfig.exclude_regex = parsedConfig.exclude_regex.substring(1, parsedConfig.exclude_regex.length - 1);
+        }
+        saveMessages.push('Exclude pattern: /' + parsedConfig.exclude_regex + '/ been saved to config.');
+    }
 
-  if (program.hostname) {
-      parsedConfig.hostname = program.hostname;
-      saveMessages.push('Hostname: ' + parsedConfig.hostname + ' saved to config.');
-  }
+    if (program.hostname) {
+        parsedConfig.hostname = program.hostname;
+        saveMessages.push('Hostname: ' + parsedConfig.hostname + ' saved to config.');
+    }
 
-  if (program.tags && program.tags.length > 0) {
-      processed = utils.processOption(program.tags, parsedConfig.tags);
-      parsedConfig.tags = processed.values;
-      saveMessages.push('Tags: ' + processed.diff + ' been saved to config.');
-  }
+    if (program.tags && program.tags.length > 0) {
+        processed = utils.processOption(program.tags, parsedConfig.tags);
+        parsedConfig.tags = processed.values;
+        saveMessages.push('Tags: ' + processed.diff + ' been saved to config.');
+    }
 
-  if (saveMessages.length) {
-      return fileUtils.saveConfig(parsedConfig, config.CONF_FILE, (error, success) => {
-          if (error) {
-              return log(`Error while saving to: ${config.CONF_FILE}: ${error}`);
-          }
+    if (saveMessages.length) {
+        return fileUtils.saveConfig(parsedConfig, config.CONF_FILE, (error, success) => {
+            if (error) {
+                return log(`Error while saving to: ${config.CONF_FILE}: ${error}`);
+            }
 
-          for (var i = 0; i < saveMessages.length; i++) {
-              console.log(saveMessages[i]);
-          }
-          process.exit(0);
-      });
-  }
+            for (var i = 0; i < saveMessages.length; i++) {
+                console.log(saveMessages[i]);
+            }
+            process.exit(0);
+        });
+    }
 
-  // merge into single var after all potential saveConfigs finished
-  config = Object.assign(config, parsedConfig);
+    // merge into single var after all potential saveConfigs finished
+    config = Object.assign(config, parsedConfig);
 
-  config.hostname = process.env.LOGDNA_HOSTNAME ||
+    config.hostname = process.env.LOGDNA_HOSTNAME ||
                     fs.existsSync('/etc/logdna-hostname') &&
                     fs.statSync('/etc/logdna-hostname').isFile() &&
                     fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') ||
                     config.hostname ||
                     os.hostname().replace('.ec2.internal', '');
 
-  config.tags = process.env.LOGDNA_TAGS || config.tags;
+    config.tags = process.env.LOGDNA_TAGS || config.tags;
 
-  if (process.env.LOGDNA_PLATFORM) {
-      config.platform = process.env.LOGDNA_PLATFORM;
-      config.tags = config.tags ? config.tags + ',' + config.platform : config.platform;
+    if (process.env.LOGDNA_PLATFORM) {
+        config.platform = process.env.LOGDNA_PLATFORM;
+        config.tags = config.tags ? config.tags + ',' + config.platform : config.platform;
 
-      if (config.platform.indexOf('k8s') === 0) {
-          config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
-      }
-  }
+        if (config.platform.indexOf('k8s') === 0) {
+            config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
+        }
+    }
 
-  return distro(cb);
+    return distro(cb);
 };
 
 const awsProcessing = (dist, cb) => {
-  if (dist && dist.os) {
-      config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
-  }
+    if (dist && dist.os) {
+        config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
+    }
 
-  return request(config.AWS_INSTANCE_CHECK_URL, {
-      timeout: 1000
-      , json: true
-  }, (err, res, body) => {
-      if (res && res.statusCode && body) {
-          config.awsid = body.instanceId;
-          config.awsregion = body.region;
-          config.awsaz = body.availabilityZone;
-          config.awsami = body.imageId;
-          config.awstype = body.instanceType;
-      }
-      return macaddress.all(cb);
-  });
+    return request(config.AWS_INSTANCE_CHECK_URL, {
+        timeout: 1000
+        , json: true
+    }, (err, res, body) => {
+        if (res && res.statusCode && body) {
+            config.awsid = body.instanceId;
+            config.awsregion = body.region;
+            config.awsaz = body.availabilityZone;
+            config.awsami = body.imageId;
+            config.awstype = body.instanceType;
+        }
+        return macaddress.all(cb);
+    });
 };
 
 if ((os.platform() === 'win32' && require('is-administrator')()) || process.getuid() <= 0) {
     async.waterfall([checkFileExistence, mainExecution, awsProcessing]
-      , (error, all) => {
-        if(error) {
-          console.error(error);
-          process.exit();
-        }
-        if (all) {
-            var ifaces = Object.keys(all);
-            for (var i = 0; i < ifaces.length; i++) {
-                if (
-                    all[ifaces[i]].ipv4 && (
-                        all[ifaces[i]].ipv4.indexOf('10.') === 0 ||
+        , (error, all) => {
+            if (error) {
+                console.error(error);
+                process.exit();
+            }
+            if (all) {
+                var ifaces = Object.keys(all);
+                for (var i = 0; i < ifaces.length; i++) {
+                    if (
+                        all[ifaces[i]].ipv4 && (
+                            all[ifaces[i]].ipv4.indexOf('10.') === 0 ||
                         all[ifaces[i]].ipv4.indexOf('172.1') === 0 ||
                         all[ifaces[i]].ipv4.indexOf('172.2') === 0 ||
                         all[ifaces[i]].ipv4.indexOf('172.3') === 0 ||
                         all[ifaces[i]].ipv4.indexOf('192.168.') === 0
-                    )
-                ) {
-                    config.mac = all[ifaces[i]].mac;
-                    config.ip = all[ifaces[i]].ipv4 || all[ifaces[i]].ipv6;
-                    break;
+                        )
+                    ) {
+                        config.mac = all[ifaces[i]].mac;
+                        config.ip = all[ifaces[i]].ipv4 || all[ifaces[i]].ipv6;
+                        break;
+                    }
                 }
             }
-        }
 
-        log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
+            log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
 
-        if (config.platform && config.platform.indexOf('k8s') === 0) {
-            k8s.init();
-        }
+            if (config.platform && config.platform.indexOf('k8s') === 0) {
+                k8s.init();
+            }
 
-        debug('connecting to log server');
-        connectionManager.connectLogServer(config);
-        debug('logdna agent successfully started');
-    });
+            debug('connecting to log server');
+            connectionManager.connectLogServer(config);
+            debug('logdna agent successfully started');
+        });
 } else {
     console.log('You must be an Administrator (root, sudo) run this agent! See -h or --help for more info.');
     process.exit();
