@@ -76,7 +76,7 @@ program
 
 
 const checkFileExistence = (cb) => {
-  f (fs.existsSync(config.CONF_FILE)) {
+  if (fs.existsSync(config.CONF_FILE)) {
       properties.parse(config.CONF_FILE, {
           path: true
       }, cb);
