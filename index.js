@@ -263,7 +263,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         });
     }], (error, all) => {
         if(error) {
-          log(error);
+          console.(error);
           process.exit();
         }
         if (all) {
