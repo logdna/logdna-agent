@@ -75,14 +75,12 @@ program
     .parse(process.argv);
 
 
-const checkFileExistence = (cb) => {
-  if (fs.existsSync(config.CONF_FILE)) {
-      properties.parse(config.CONF_FILE, {
+const checkFileExistence = (cb) => { 
+  fs.access(config.CONF_FILE, (error) => {
+    error ? cb(null, null) : properties.parse(config.CONF_FILE, {
           path: true
-      }, cb);
-  } else {
-      cb(null, null);
-  }
+      }, cb); 
+  })
 };
 
 const mainExecution = (parsedConfig, cb) => {
