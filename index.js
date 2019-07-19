@@ -17,6 +17,7 @@ const utils = require('./lib/utils');
 
 // Constants
 const HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
+const HOSTNAME_PATH = '/etc/logdna-hostname';
 
 // Variables
 var config = require('./lib/config');
@@ -102,6 +103,21 @@ const mainExecution = (parsedConfig, cb) => {
     if (!program.key && !parsedConfig.key) {
         console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.');
         process.exit();
+    }
+
+    if (process.env.LOGDNA_HOSTNAME) {
+        parsedConfig.hostname = process.env.LOGDNA_HOSTNAME;
+    }
+
+    if (!program.hostname && !parsedConfig.hostname) {
+        if (fs.existsSync(HOSTNAME_PATH) && fs.statSync(HOSTNAME_PATH).isFile()) {
+            parsedConfig.hostname = fs.readFileSync(HOSTNAME_PATH).toString().trim().replace(HOSTNAME_IP_REGEX, '');
+        } else if (os.hostname()) {
+            parsedConfig.hostname = os.hostname().replace('.ec2.internal', '');
+        } else {
+            console.error('Hostname information cannot be found! Use -n to set or use environment variable LOGDNA_HOSTNAME.');
+            process.exit();
+        }
     }
 
     // allow exclude to be passed via env
@@ -207,7 +223,7 @@ const mainExecution = (parsedConfig, cb) => {
 
     if (program.hostname) {
         parsedConfig.hostname = program.hostname;
-        saveMessages.push('Hostname: ' + parsedConfig.hostname + ' saved to config.');
+        saveMessages.push('Hostname: ' + parsedConfig.hostname + ' has been saved to config.');
     }
 
     if (program.tags && program.tags.length > 0) {
@@ -232,18 +248,6 @@ const mainExecution = (parsedConfig, cb) => {
 
     // merge into single var after all potential saveConfigs finished
     config = Object.assign(config, parsedConfig);
-
-    config.hostname = process.env.LOGDNA_HOSTNAME ||
-                    fs.existsSync('/etc/logdna-hostname') &&
-                    fs.statSync('/etc/logdna-hostname').isFile() &&
-                    fs.readFileSync('/etc/logdna-hostname').toString().trim().replace(HOSTNAME_IP_REGEX, '') ||
-                    config.hostname ||
-                    os.hostname().replace('.ec2.internal', '');
-
-    if (!config.hostname) {
-        console.error('Hostname information cannot be found! Use -n to set or use environment variable LOGDNA_HOSTNAME.');
-        process.exit();
-    }
 
     config.tags = process.env.LOGDNA_TAGS || config.tags;
 
