@@ -77,7 +77,7 @@ program
 if ((os.platform() === 'win32' && require('is-administrator')()) || process.getuid() <= 0) {
     async.waterfall([
         (cb) => {
-            return fs.access(config.CONF_FILE, (error) => {
+            fs.access(config.CONF_FILE, (error) => {
                 if (error) {
                     return cb(null, {});
                 }
@@ -260,7 +260,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 }
             }
 
-            return distro((error, dist) => {
+            distro((error, dist) => {
                 return cb(null, error ? {} : dist);
             });
         }
@@ -280,7 +280,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                     config.awsami = body.imageId;
                     config.awstype = body.instanceType;
                 }
-                return macaddress.all((error, all) => {
+                macaddress.all((error, all) => {
                     if (error) {
                         log(`Error in Getting MacAddress: ${error}`);
                     }
