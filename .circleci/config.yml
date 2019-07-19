@@ -164,7 +164,12 @@ workflows:
   version: 2
   build_windows:
     jobs:
-      - test
+      - test:
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+            branches:
+              ignore: /.*/
       - build_windows:
           requires:
             - test
@@ -176,6 +181,11 @@ workflows:
       - push_to_choco:
           requires:
             - build_windows
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+            branches:
+              ignore: /.*/
   build-tags:
     jobs:
       - image-build:
