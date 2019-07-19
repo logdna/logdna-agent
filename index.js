@@ -11,7 +11,6 @@ const request = require('request');
 // Internal Modules
 const log = require('./lib/log');
 const distro = require('./lib/os-version');
-const fileUtils = require('./lib/file-utilities');
 const connectionManager = require('./lib/connection-manager');
 const k8s = require('./lib/k8s');
 const utils = require('./lib/utils');
@@ -43,16 +42,16 @@ program
     .description('This agent collect and ship logs for processing. Defaults to /var/log if run without parameters.')
     .option('-c, --config <file>', 'uses alternate config file (default: ' + config.DEFAULT_CONF_FILE + ')')
     .option('-k, --key <key>', 'sets your LogDNA Ingestion Key in the config')
-    .option('-d, --logdir <dir>', 'adds log directories to config, supports glob patterns', fileUtils.appender(), [])
-    .option('-f, --logfile <file>', 'adds log files to config', fileUtils.appender(), [])
-    .option('-e, --exclude <file>', 'exclude files from logdir', fileUtils.appender(), [])
+    .option('-d, --logdir <dir>', 'adds log directories to config, supports glob patterns', utils.appender(), [])
+    .option('-f, --logfile <file>', 'adds log files to config', utils.appender(), [])
+    .option('-e, --exclude <file>', 'exclude files from logdir', utils.appender(), [])
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
-    .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', fileUtils.appender(), [])
+    .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', utils.appender(), [])
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
-    .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', fileUtils.appender(), [])
-    .option('-w, --winevent <winevent>', 'set Windows Event Log Names (only on Windows)', fileUtils.appender(), [])
-    .option('-s, --set [key=value]', 'set config variables', fileUtils.appender(), [])
+    .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', utils.appender(), [])
+    .option('-w, --winevent <winevent>', 'set Windows Event Log Names (only on Windows)', utils.appender(), [])
+    .option('-s, --set [key=value]', 'set config variables', utils.appender(), [])
     .on('--help', () => {
         console.log('  Examples:');
         console.log();
@@ -76,14 +75,17 @@ program
 
 
 const checkFileExistence = (cb) => {
-    fs.access(config.CONF_FILE, (error) => {
+    return fs.access(config.CONF_FILE, (error) => {
         if (error) {
-            cb(null, null);
-        } else {
-            properties.parse(config.CONF_FILE, {
-                path: true
-            }, cb);
+            return cb(null, {});
         }
+
+        return properties.parse(config.CONF_FILE, {
+            path: true
+        }, (error, parsedConfig) => {
+            log(`Error in Parsing ${config.CONF_FILE}: ${error}`);
+            return cb(null, error ? {} : parsedConfig);
+        });
     });
 };
 
@@ -213,14 +215,15 @@ const mainExecution = (parsedConfig, cb) => {
     }
 
     if (saveMessages.length) {
-        return fileUtils.saveConfig(parsedConfig, config.CONF_FILE, (error, success) => {
+        return utils.saveConfig(parsedConfig, config.CONF_FILE, (error, success) => {
             if (error) {
                 return log(`Error while saving to: ${config.CONF_FILE}: ${error}`);
             }
 
-            for (var i = 0; i < saveMessages.length; i++) {
-                console.log(saveMessages[i]);
-            }
+            saveMessages.forEach((message) => {
+                console.log(message);
+            });
+
             process.exit(0);
         });
     }
@@ -246,7 +249,9 @@ const mainExecution = (parsedConfig, cb) => {
         }
     }
 
-    return distro(cb);
+    return distro((error, dist) => {
+        return cb(null, error ? {} : dist);
+    });
 };
 
 const awsProcessing = (dist, cb) => {
@@ -265,46 +270,50 @@ const awsProcessing = (dist, cb) => {
             config.awsami = body.imageId;
             config.awstype = body.instanceType;
         }
-        return macaddress.all(cb);
+        return macaddress.all((error, all) => {
+            if (error) {
+                log(`Error in Getting MacAddress: ${error}`);
+            }
+            return cb(null, error ? {} : all);
+        });
     });
 };
 
 if ((os.platform() === 'win32' && require('is-administrator')()) || process.getuid() <= 0) {
-    async.waterfall([checkFileExistence, mainExecution, awsProcessing]
-        , (error, all) => {
-            if (error) {
-                console.error(error);
-                process.exit();
-            }
-            if (all) {
-                var ifaces = Object.keys(all);
-                for (var i = 0; i < ifaces.length; i++) {
-                    if (
-                        all[ifaces[i]].ipv4 && (
-                            all[ifaces[i]].ipv4.indexOf('10.') === 0 ||
+    async.waterfall([
+        checkFileExistence
+        , mainExecution
+        , awsProcessing
+    ], (error, all) => {
+        if (all) {
+            var ifaces = Object.keys(all);
+            for (var i = 0; i < ifaces.length; i++) {
+                if (
+                    all[ifaces[i]].ipv4 && (
+                        all[ifaces[i]].ipv4.indexOf('10.') === 0 ||
                         all[ifaces[i]].ipv4.indexOf('172.1') === 0 ||
                         all[ifaces[i]].ipv4.indexOf('172.2') === 0 ||
                         all[ifaces[i]].ipv4.indexOf('172.3') === 0 ||
                         all[ifaces[i]].ipv4.indexOf('192.168.') === 0
-                        )
-                    ) {
-                        config.mac = all[ifaces[i]].mac;
-                        config.ip = all[ifaces[i]].ipv4 || all[ifaces[i]].ipv6;
-                        break;
-                    }
+                    )
+                ) {
+                    config.mac = all[ifaces[i]].mac;
+                    config.ip = all[ifaces[i]].ipv4 || all[ifaces[i]].ipv6;
+                    break;
                 }
             }
+        }
 
-            log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
+        log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
 
-            if (config.platform && config.platform.indexOf('k8s') === 0) {
-                k8s.init();
-            }
+        if (config.platform && config.platform.indexOf('k8s') === 0) {
+            k8s.init();
+        }
 
-            debug('connecting to log server');
-            connectionManager.connectLogServer(config);
-            debug('logdna agent successfully started');
-        });
+        debug('connecting to log server');
+        connectionManager.connectLogServer(config);
+        debug('logdna agent successfully started');
+    });
 } else {
     console.log('You must be an Administrator (root, sudo) run this agent! See -h or --help for more info.');
     process.exit();

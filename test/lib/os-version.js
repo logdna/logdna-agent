@@ -1,7 +1,13 @@
 /* globals describe, it, before, after */
+
+// External Modules
 const assert = require('assert');
 const debug = require('debug')('logdna:test:lib:os-version');
+
+// Internal Modules
 const osVersion = require('../../lib/os-version');
+
+// Constants
 const testConfig = '../assets/test-os-version.config';
 
 describe('lib:os-version', () => {

@@ -1,15 +1,20 @@
 /* globals describe, it, beforeEach, after */
 
-// Constants
+// External Modules
 const assert = require('assert');
 const async = require('async');
-const configPath = './test/assets/testconfig.config';
 const debug = require('debug')('logdna:test:lib:file-utilities');
-const fileUtilities = require('../../lib/file-utilities');
 const fs = require('fs');
 const path = require('path');
 const properties = require('properties');
 const rimraf = require('rimraf');
+
+// Internal Modules
+const fileUtilities = require('../../lib/file-utilities');
+const utils = require('../../lib/utils');
+
+// Constants
+const configPath = './test/assets/testconfig.config';
 const tempDir = '.temp';
 
 describe('lib:file-utilities', () => {
@@ -103,7 +108,7 @@ describe('lib:file-utilities', () => {
 
     describe('#appender()', () => {
         it('provides an appender that appends to end of array', () => {
-            const func = fileUtilities.appender();
+            const func = utils.appender();
 
             func('x');
             func('y');
@@ -123,7 +128,7 @@ describe('lib:file-utilities', () => {
                     path: true
                 }, cb);
             }, (config, cb) => {
-                return fileUtilities.saveConfig(config, path.join(tempDir, 'test.config'), cb);
+                return utils.saveConfig(config, path.join(tempDir, 'test.config'), cb);
             }, (success, cb) => {
                 return properties.parse(configPath, {
                     path: true
