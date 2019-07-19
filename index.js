@@ -121,12 +121,12 @@ const mainExecution = (parsedConfig, cb) => {
     }
 
     // allow exclude to be passed via env
-    if (process.env.LOGDNA_EXCLUDE || process.env.EXCLUDE) {
+    if (process.env.LOGDNA_EXCLUDE) {
         parsedConfig.exclude = process.env.LOGDNA_EXCLUDE;
     }
 
     // allow exclude regex to be passed via env
-    if (process.env.LOGDNA_EXCLUDE_REGEX || process.env.EXCLUDE_REGEX) {
+    if (process.env.LOGDNA_EXCLUDE_REGEX) {
         parsedConfig.exclude_regex = process.env.LOGDNA_EXCLUDE_REGEX;
     }
 
