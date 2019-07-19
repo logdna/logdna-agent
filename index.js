@@ -83,7 +83,9 @@ const checkFileExistence = (cb) => {
         return properties.parse(config.CONF_FILE, {
             path: true
         }, (error, parsedConfig) => {
-            log(`Error in Parsing ${config.CONF_FILE}: ${error}`);
+            if (error) {
+                log(`Error in Parsing ${config.CONF_FILE}: ${error}`);
+            }
             return cb(null, error ? {} : parsedConfig);
         });
     });
@@ -93,7 +95,7 @@ const mainExecution = (parsedConfig, cb) => {
     parsedConfig = parsedConfig || {};
 
     // allow key to be passed via env
-    if (process.env.LOGDNA_AGENT_KEY || process.env.AGENT_KEY || process.env.INGESTION_KEY) {
+    if (process.env.LOGDNA_AGENT_KEY) {
         parsedConfig.key = process.env.LOGDNA_AGENT_KEY;
     }
 
