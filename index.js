@@ -240,6 +240,11 @@ const mainExecution = (parsedConfig, cb) => {
                     config.hostname ||
                     os.hostname().replace('.ec2.internal', '');
 
+    if (!config.hostname) {
+        console.error('Hostname information cannot be found! Use -n to set or use environment variable LOGDNA_HOSTNAME.');
+        process.exit();
+    }
+
     config.tags = process.env.LOGDNA_TAGS || config.tags;
 
     if (process.env.LOGDNA_PLATFORM) {
