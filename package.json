@@ -1,6 +1,6 @@
 {
   "name": "logdna-agent",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
@@ -18,10 +18,7 @@
   "homepage": "https://github.com/logdna/logdna-agent",
   "dependencies": {
     "agentkeepalive": "^2.1.1",
-    "always-tail": "^0.2.0",
     "async": "^1.5.2",
-    "bluebird": "^3.3.3",
-    "bufferutil": "^1.2.1",
     "commander": "^2.8.1",
     "debug": "^2.2.0",
     "file-queue": "^0.2.1",
@@ -29,29 +26,24 @@
     "glob": "^7.0.3",
     "https-proxy-agent": "^2.1.0",
     "is-administrator": "^1.0.1",
-    "lodash": "^3.10.1",
     "macaddress": "^0.2.8",
     "properties": "^1.2.1",
-    "request": "^2.71.0",
-    "utf-8-validate": "^1.2.1",
-    "ws": "^1.0.1"
+    "request": "^2.71.0"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.11"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
+    "grunt": "^1.0.3",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-curl": "^2.2.0",
     "grunt-eslint": "^20.0.0",
     "grunt-exec": "^0.4.6",
     "grunt-line-remover": "0.0.2",
-    "grunt-mocha-cli": "^2.0.0",
+    "grunt-mocha-cli": "^4.0.0",
     "grunt-zip": "^0.17.1",
     "guid": "0.0.12",
     "load-grunt-tasks": "^3.4.0",
-    "mock-socket": "git+https://git@github.com/sedouard/mock-socket.git",
-    "mockery": "^1.4.0",
     "require-uncached": "^1.0.2",
     "rimraf": "^2.5.2",
     "skeemas": "^1.2.2"
