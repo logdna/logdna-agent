@@ -3,6 +3,13 @@
 [![Build Status](https://travis-ci.org/logdna/logdna-agent.svg?branch=master)](https://travis-ci.org/logdna/logdna-agent)
 [![Build status](https://ci.appveyor.com/api/projects/status/mk5rb0uk6xkjxhk2/branch/master?svg=true)](https://ci.appveyor.com/project/mikehu/logdna-agent/branch/master)
 
+
+#6RS ARM64 Package 
+```
+docker build --build-arg ARTIFACTORY_PASSWORD=6RS_ARTIFACTORY_PASSWORD --build-arg ARTIFACTORY_URL=6RS_ARTIFACTORY_URL -t test -f 6rs-arm64-builder.dockerfile .
+```
+
+
 LogDNA's collector agent which streams log files to your LogDNA account. LogDNA is a hosted, cloud logging service.
 
 ## Getting Started
