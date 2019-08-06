@@ -114,7 +114,7 @@ jobs:
             echo "${IBM_API_KEY}" | docker login -u iamapikey --password-stdin icr.io
             docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:${IMAGE_TAG}
             docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:latest
-            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:{IMAGE_TAG}-${DATESTAMP}
+            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
             docker push icr.io/ext/logdna-agent:${IMAGE_TAG}
             docker push icr.io/ext/logdna-agent:latest
             docker push icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
@@ -229,7 +229,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "50 23 6 * *"
+          cron: "0 0 7 * *"
           filters:
             branches:
               only: master
