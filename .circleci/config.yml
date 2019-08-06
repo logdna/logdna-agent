@@ -3,7 +3,7 @@ executors:
   docker-publisher:
     environment:
       IMAGE_NAME: logdna/logdna-agent
-      DATESTAMP: date +%Y%m%d
+      DATESTAMP: $(date +%Y%m%d)
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
@@ -26,9 +26,9 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            echo "$IMAGE_NAME}"
+            echo "${IMAGE_NAME}"
             echo "${DATESTAMP}"
-            docker build -f ./Dockerfile -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
+            docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
       - run:
           name: Archive Docker image
           command: docker save -o image.tar ${IMAGE_NAME}:sandbox-${DATESTAMP}
@@ -202,7 +202,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "18 2 6 * *"
+          cron: "24 2 6 * *"
           filters:
             branches:
               only: master
