@@ -24,7 +24,7 @@ jobs:
       - run:
           echo "export DATESTAMP=$(date +%Y%m%d)" > env-vars
           echo "export MAJOR_VERSION=1" >> env-vars
-          export DATESTAMP=$(date +%Y%m%d)
+          cat env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
           name: Build Docker image
@@ -207,7 +207,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "0 21 19 * *"
+          cron: "0 1 6 * *"
           filters:
             branches:
               only: master
