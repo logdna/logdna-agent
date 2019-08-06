@@ -91,7 +91,13 @@ jobs:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            IMAGE_TAG=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
+            TAG=${CIRCLE_TAG}
+            D_TAG="$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)"
+            if [ $(echo $TAG | wc -m) -lt 3 ]; then
+              IMAGE_TAG=${D_TAG}
+            else
+              IMAGE_TAG=${TAG}
+            fi
             echo "${IMAGE_TAG}"
             docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:latest
             docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
@@ -112,7 +118,13 @@ jobs:
       - run:
           name: Publish Docker Image to IBM registry
           command: |
-            IMAGE_TAG=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
+            TAG=${CIRCLE_TAG}
+            D_TAG="$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)"
+            if [ $(echo $TAG | wc -m) -lt 3 ]; then
+              IMAGE_TAG=${D_TAG}
+            else
+              IMAGE_TAG=${TAG}
+            fi
             echo "${IMAGE_TAG}"
             echo "${IBM_API_KEY}" | docker login -u iamapikey --password-stdin icr.io
             docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:${IMAGE_TAG}
@@ -232,7 +244,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "51 22 6 * *"
+          cron: "43 23 6 * *"
           filters:
             branches:
               only: master
