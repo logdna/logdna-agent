@@ -22,9 +22,6 @@ jobs:
     executor: docker-publisher
     steps:
       - checkout
-      - run:
-          echo "export MAJOR_VERSION=1" >> env-vars
-          cat env-vars >> ${BASH_ENV}
       - setup_remote_docker
       - run:
           name: Build Docker image
@@ -37,13 +34,11 @@ jobs:
           root: .
           paths:
             - ./image.tar
-            - ./env-vars
   docker-hub:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -59,7 +54,6 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -80,7 +74,6 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -207,7 +200,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "0 2 6 * *"
+          cron: "12 2 6 * *"
           filters:
             branches:
               only: master
