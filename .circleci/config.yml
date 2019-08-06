@@ -26,7 +26,9 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
+            echo "$IMAGE_NAME}"
+            echo "${DATESTAMP}"
+            docker build -f ./Dockerfile -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
       - run:
           name: Archive Docker image
           command: docker save -o image.tar ${IMAGE_NAME}:sandbox-${DATESTAMP}
@@ -200,7 +202,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "12 2 6 * *"
+          cron: "18 2 6 * *"
           filters:
             branches:
               only: master
