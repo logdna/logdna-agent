@@ -77,6 +77,28 @@ jobs:
             docker push ${IMAGE_NAME}:${IMAGE_TAG}
             docker push ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
             docker push ${IMAGE_NAME}:latest
+  docker-upload:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+            IMAGE_TAG=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
+            echo "${IMAGE_TAG}"
+            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:latest
+            docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
+            docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
+            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+            docker push ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
+            docker push ${IMAGE_NAME}:latest
   ibm-registry:
     executor: docker-publisher
     steps:
@@ -90,7 +112,8 @@ jobs:
       - run:
           name: Publish Docker Image to IBM registry
           command: |
-            IMAGE_TAG=${CIRCLE_TAG}
+            IMAGE_TAG=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
+            echo "${IMAGE_TAG}"
             echo "${IBM_API_KEY}" | docker login -u iamapikey --password-stdin icr.io
             docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:${IMAGE_TAG}
             docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:latest
@@ -209,7 +232,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "40 22 6 * *"
+          cron: "51 22 6 * *"
           filters:
             branches:
               only: master
@@ -222,6 +245,9 @@ workflows:
           type: approval
           requires:
             - docker-hub
-      - ibm-registry:
+      - docker-upload:
           requires:
             - docker-approved
+      - ibm-registry:
+          requires:
+            - docker-upload
