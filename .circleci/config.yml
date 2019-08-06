@@ -62,21 +62,6 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: cat /tmp/workspace/env-vars >> $BASH_ENV
-      - setup_remote_docker
-      - run:
-          name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            IMAGE_TAG=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
-            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:latest
-            docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
-            docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
-            docker push ${IMAGE_NAME}:${IMAGE_TAG}
-            docker push ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
-            docker push ${IMAGE_NAME}:latest
   docker-upload:
     executor: docker-publisher
     steps:
@@ -127,9 +112,9 @@ jobs:
             fi
             echo "${IMAGE_TAG}"
             echo "${IBM_API_KEY}" | docker login -u iamapikey --password-stdin icr.io
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:${IMAGE_TAG}
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:latest
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:{IMAGE_TAG}-${DATESTAMP}
+            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:${IMAGE_TAG}
+            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:latest
+            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:{IMAGE_TAG}-${DATESTAMP}
             docker push icr.io/ext/logdna-agent:${IMAGE_TAG}
             docker push icr.io/ext/logdna-agent:latest
             docker push icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
@@ -244,7 +229,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "43 23 6 * *"
+          cron: "50 23 6 * *"
           filters:
             branches:
               only: master
