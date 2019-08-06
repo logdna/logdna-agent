@@ -3,7 +3,6 @@ executors:
   docker-publisher:
     environment:
       IMAGE_NAME: logdna/logdna-agent
-      DATESTAMP: $(date +%Y%m%d)
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
@@ -22,11 +21,14 @@ jobs:
     executor: docker-publisher
     steps:
       - checkout
+      - run: |
+          echo "export DATESTAMP=$(date +%Y%m%d)" > env-vars
+          echo "export MAJOR_VERSION=1" >> env-vars
+          cat env-vars >> ${BASH_ENV}
       - setup_remote_docker
       - run:
           name: Build Docker image
           command: |
-            echo "${IMAGE_NAME}"
             echo "${DATESTAMP}"
             docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
       - run:
@@ -36,11 +38,13 @@ jobs:
           root: .
           paths:
             - ./image.tar
+            - ./env-vars
   docker-hub:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
+      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -48,6 +52,7 @@ jobs:
       - run:
           name: Publish Docker Image to Docker Hub as Sandbox
           command: |
+            echo "${DATESTAMP}"
             echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
             docker push ${IMAGE_NAME}:sandbox-${DATESTAMP}
             docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=$SYSDIG_SECURE_TOKEN logdna/sysdigsecure
@@ -56,6 +61,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
+      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -76,6 +82,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
+      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -202,7 +209,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "24 2 6 * *"
+          cron: "46 2 6 * *"
           filters:
             branches:
               only: master
