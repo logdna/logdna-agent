@@ -3,6 +3,7 @@ executors:
   docker-publisher:
     environment:
       IMAGE_NAME: logdna/logdna-agent
+      DATESTAMP: date +%Y%m%d
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
@@ -22,7 +23,6 @@ jobs:
     steps:
       - checkout
       - run:
-          echo "export DATESTAMP=$(date +%Y%m%d)" > env-vars
           echo "export MAJOR_VERSION=1" >> env-vars
           cat env-vars >> ${BASH_ENV}
       - setup_remote_docker
@@ -43,7 +43,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
+      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -207,7 +207,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "0 1 6 * *"
+          cron: "0 2 6 * *"
           filters:
             branches:
               only: master
