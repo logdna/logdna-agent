@@ -21,7 +21,7 @@ jobs:
     executor: docker-publisher
     steps:
       - checkout
-      - run:
+      - run: |
           echo "export DATESTAMP=$(date +%Y%m%d)" > env-vars
           echo "export MAJOR_VERSION=1" >> env-vars
           cat env-vars >> ${BASH_ENV}
@@ -29,6 +29,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
+            echo "${DATESTAMP}"
             docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
       - run:
           name: Archive Docker image
@@ -51,10 +52,17 @@ jobs:
       - run:
           name: Publish Docker Image to Docker Hub as Sandbox
           command: |
+            echo "${DATESTAMP}"
             echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
             docker push ${IMAGE_NAME}:sandbox-${DATESTAMP}
             docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=$SYSDIG_SECURE_TOKEN logdna/sysdigsecure
   docker-approved:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
+  docker-upload:
     executor: docker-publisher
     steps:
       - attach_workspace:
@@ -68,7 +76,14 @@ jobs:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            IMAGE_TAG=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
+            TAG=${CIRCLE_TAG}
+            D_TAG="$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)"
+            if [ $(echo $TAG | wc -m) -lt 3 ]; then
+              IMAGE_TAG=${D_TAG}
+            else
+              IMAGE_TAG=${TAG}
+            fi
+            echo "${IMAGE_TAG}"
             docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:latest
             docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
             docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
@@ -88,11 +103,18 @@ jobs:
       - run:
           name: Publish Docker Image to IBM registry
           command: |
-            IMAGE_TAG=${CIRCLE_TAG}
+            TAG=${CIRCLE_TAG}
+            D_TAG="$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)"
+            if [ $(echo $TAG | wc -m) -lt 3 ]; then
+              IMAGE_TAG=${D_TAG}
+            else
+              IMAGE_TAG=${TAG}
+            fi
+            echo "${IMAGE_TAG}"
             echo "${IBM_API_KEY}" | docker login -u iamapikey --password-stdin icr.io
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:${IMAGE_TAG}
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:latest
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:{IMAGE_TAG}-${DATESTAMP}
+            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:${IMAGE_TAG}
+            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:latest
+            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
             docker push icr.io/ext/logdna-agent:${IMAGE_TAG}
             docker push icr.io/ext/logdna-agent:latest
             docker push icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
@@ -207,7 +229,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "0 1 6 * *"
+          cron: "0 1 7 * *"
           filters:
             branches:
               only: master
@@ -220,6 +242,9 @@ workflows:
           type: approval
           requires:
             - docker-hub
-      - ibm-registry:
+      - docker-upload:
           requires:
             - docker-approved
+      - ibm-registry:
+          requires:
+            - docker-upload
