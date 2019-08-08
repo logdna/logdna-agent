@@ -229,7 +229,7 @@ workflows:
   monthly-build:
     triggers:
       - schedule:
-          cron: "0 0 7 * *"
+          cron: "0 0 9 * *"
           filters:
             branches:
               only: master
