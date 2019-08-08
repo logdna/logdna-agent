@@ -20,6 +20,10 @@ pid_file="/var/run/$name.pid"
 stdout_log="/var/log/$name.log"
 conf_file="/etc/logdna.conf"
 
+if [ -f /etc/sysconfig/$name ]; then
+    . /etc/sysconfig/$name
+fi
+
 get_pid() {
     cat "$pid_file"
 }
