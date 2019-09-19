@@ -247,7 +247,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
 
             // merge into single var after all potential saveConfigs finished
-            config = Object.assign(config, parsedConfig);
+            config = Object.assign({}, config, parsedConfig);
 
             config.tags = process.env.LOGDNA_TAGS || config.tags;
 
