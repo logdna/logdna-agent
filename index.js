@@ -9,10 +9,11 @@ const macaddress = require('macaddress');
 const request = require('request');
 
 // Internal Modules
-const log = require('./lib/log');
-const distro = require('./lib/os-version');
 const connectionManager = require('./lib/connection-manager');
+const distro = require('./lib/os-version');
 const k8s = require('./lib/k8s');
+const log = require('./lib/log');
+const pkg = require('./package.json');
 const utils = require('./lib/utils');
 
 // Constants
@@ -21,19 +22,8 @@ const HOSTNAME_PATH = '/etc/logdna-hostname';
 
 // Variables
 var config = require('./lib/config');
-var pkg = require('./package.json');
 var processed;
 
-// Initializations
-if (os.platform() === 'linux') {
-    pkg.name += '-linux';
-} else if (os.platform() === 'win32') {
-    pkg.name += '-windows';
-} else if (os.platform() === 'darwin') {
-    pkg.name += '-mac';
-}
-
-config.UA = pkg.name + '/' + pkg.version;
 config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
 
 process.title = 'logdna-agent';
