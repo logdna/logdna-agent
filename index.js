@@ -250,9 +250,15 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 }
             }
 
-            distro((error, dist) => {
-                return cb(null, error ? {} : dist);
-            });
+            if (os.platform() !== 'win32') {
+                return distro((error, dist) => {
+                    return cb(null, error ? {} : dist);
+                });
+            } else {
+                return cb(null, {
+                    os: 'win32'
+                });
+            }
         }
         , (dist, cb) => {
             if (dist && dist.os) {
