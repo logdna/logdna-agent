@@ -24,8 +24,6 @@ const HOSTNAME_PATH = '/etc/logdna-hostname';
 var config = require('./lib/config');
 var processed;
 
-config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
-
 process.title = 'logdna-agent';
 program._name = 'logdna-agent';
 program
@@ -65,6 +63,8 @@ program
     .parse(process.argv);
 
 if ((os.platform() === 'win32' && require('is-administrator')()) || process.getuid() <= 0) {
+    config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
+    debug(config.CONF_FILE);
     async.waterfall([
         (cb) => {
             fs.access(config.CONF_FILE, (error) => {
