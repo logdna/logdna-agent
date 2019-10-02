@@ -36,7 +36,7 @@ program
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', utils.appender(), [])
-    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.split)
+    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.appender(), [])
     .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', utils.appender(), [])
     .option('-w, --winevent <winevent>', 'set Windows Event Log Names (only on Windows)', utils.appender(), [])
     .option('-s, --set [key=value]', 'set config variables', utils.appender(), [])
@@ -142,15 +142,15 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
 
             if (program.set && program.set.length > 0) {
-                for (var i = 0; i < program.set.length; i++) {
-                    var kvPair = utils.split(program.set[i], '=', false);
+                program.set.forEach((setOption) => {
+                    const kvPair = setOption.split('=');
                     if (kvPair.length === 2) {
                         parsedConfig[kvPair[0]] = kvPair[1];
-                        saveMessages.push('Config variable: ' + kvPair[0] + ' = ' + kvPair[1] + ' been saved to config.');
+                        saveMessages.push(`Config variable: ${kvPair[0]} = ${kvPair[1]} been saved to config.`);
                     } else {
-                        saveMessages.push('Unknown setting: ' + program.set[i] + '. Usage: -s [key=value]');
+                        saveMessages.push(`Unknown setting: ${setOption}. Usage: -s [key=value]`);
                     }
-                }
+                });
             }
 
             if (program.winevent && program.winevent.length > 0) {
