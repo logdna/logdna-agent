@@ -64,7 +64,7 @@ program
 
 if ((os.platform() === 'win32' && require('is-administrator')()) || process.getuid() <= 0) {
     config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
-    debug(config.CONF_FILE);
+    debug(`Path to Configuration File: ${config.CONF_FILE}`);
     async.waterfall([
         (cb) => {
             fs.access(config.CONF_FILE, (error) => {
