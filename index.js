@@ -10,7 +10,7 @@ const request = require('request');
 
 // Internal Modules
 const connectionManager = require('./lib/connection-manager');
-const distro = require('./lib/os-version');
+const getDistro = require('./lib/getDistro');
 const k8s = require('./lib/k8s');
 const pkg = require('./package.json');
 const utils = require('./lib/utils');
@@ -249,7 +249,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 }
             }
 
-            return distro(cb);
+            return getDistro(cb);
         }
         , (dist, cb) => {
             if (dist && dist.os) {
