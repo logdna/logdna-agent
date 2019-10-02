@@ -12,7 +12,6 @@ const request = require('request');
 const connectionManager = require('./lib/connection-manager');
 const distro = require('./lib/os-version');
 const k8s = require('./lib/k8s');
-const log = require('./lib/log');
 const pkg = require('./package.json');
 const utils = require('./lib/utils');
 
@@ -76,7 +75,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                     path: true
                 }, (error, parsedConfig) => {
                     if (error) {
-                        log(`Error in Parsing ${config.CONF_FILE}: ${error}`);
+                        utils.log(`Error in Parsing ${config.CONF_FILE}: ${error}`);
                     }
                     return cb(null, error ? {} : parsedConfig);
                 });
@@ -225,7 +224,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             if (saveMessages.length) {
                 return utils.saveConfig(parsedConfig, config.CONF_FILE, (error, success) => {
                     if (error) {
-                        return log(`Error while saving to: ${config.CONF_FILE}: ${error}`);
+                        return utils.log(`Error while saving to: ${config.CONF_FILE}: ${error}`);
                     }
 
                     saveMessages.forEach((message) => {
@@ -278,7 +277,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 }
                 macaddress.all((error, all) => {
                     if (error) {
-                        log(`Error in Getting MacAddress: ${error}`);
+                        utils.log(`Error in Getting MacAddress: ${error}`);
                     }
                     return cb(null, error ? {} : all);
                 });
@@ -304,7 +303,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
         }
 
-        log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
+        utils.log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
 
         if (config.platform && config.platform.indexOf('k8s') === 0) {
             k8s.init();
@@ -320,7 +319,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
 }
 
 process.on('uncaughtException', (err) => {
-    log('------------------------------------------------------------------');
-    log('Uncaught Error: ' + (err.stack || '').split('\r\n'));
-    log('------------------------------------------------------------------');
+    utils.log('------------------------------------------------------------------');
+    utils.log('Uncaught Error: ' + (err.stack || '').split('\r\n'));
+    utils.log('------------------------------------------------------------------');
 });
