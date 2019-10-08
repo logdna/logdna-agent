@@ -5,7 +5,7 @@ const assert = require('assert');
 const debug = require('debug')('logdna:test:lib:getDistro');
 
 // Internal Modules
-const getDistro = require('../../lib/getDistro');
+const getDistro = require('../../lib/get-distro');
 
 // Constants
 const testConfig = '../assets/test-getDistro.config';

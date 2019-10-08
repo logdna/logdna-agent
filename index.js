@@ -146,7 +146,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                     const kvPair = setOption.split('=');
                     if (kvPair.length === 2) {
                         parsedConfig[kvPair[0]] = kvPair[1];
-                        saveMessages.push(`Config variable: ${kvPair[0]} = ${kvPair[1]} been saved to config.`);
+                        saveMessages.push(`Config variable: ${kvPair[0]} = ${kvPair[1]} has been saved to config.`);
                     } else {
                         saveMessages.push(`Unknown setting: ${setOption}. Usage: -s [key=value]`);
                     }
@@ -295,7 +295,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
         }
 
-        utils.log(program._name + ' ' + pkg.version + ' started on ' + config.hostname + ' (' + config.ip + ')');
+        utils.log(`${program._name} ${pkg.version} started on ${config.hostname} (${config.ip})`);
 
         if (config.platform && config.platform.indexOf('k8s') === 0) {
             k8s.init();
