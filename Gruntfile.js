@@ -25,11 +25,13 @@ module.exports = function(grunt) {
             , fpm_pkg: 'fpm -s dir -t osxpkg -n logdna-agent -v ' + pkg.version + ' --license MIT --vendor \'Answerbook, Inc.\' --description \'LogDNA Agent for Mac\' --url http://logdna.com/ -m \'<help@logdna.com>\' --after-install ./scripts/mac-after-install --osxpkg-identifier-prefix com.logdna -f ./logdna-agent=/usr/local/bin/logdna-agent ./scripts/com.logdna.logdna-agent.plist=/Library/LaunchDaemons/com.logdna.logdna-agent.plist'
             , sign_pkg: 'productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-' + pkg.version + '.pkg logdna-agent.pkg'
             , choco: 'pushd .\\.builds\\windows & cpack'
+
         }, mochacli: {
             options: {
                 reporter: 'spec'
                 , bail: true
             }, all: ['test/**/*.js']
+
         }, copy: {
             nuspec: {
                 files: [{
@@ -56,6 +58,7 @@ module.exports = function(grunt) {
                     , dest: './.builds/windows/tools/verification.txt'
                 }]
             }
+
         }, eslint: {
             target: files
             , options: {

@@ -10,7 +10,7 @@ const request = require('request');
 
 // Internal Modules
 const connectionManager = require('./lib/connection-manager');
-const getDistro = require('./lib/getDistro');
+const getDistro = require('./lib/get-distro');
 const k8s = require('./lib/k8s');
 const pkg = require('./package.json');
 const utils = require('./lib/utils');
