@@ -36,10 +36,10 @@ program
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
     .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
     .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', utils.appender(), [])
-    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.appender(), [])
+    .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.appender(), false)
     .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', utils.appender(), [])
     .option('-w, --winevent <winevent>', 'set Windows Event Log Names (only on Windows)', utils.appender(), [])
-    .option('-s, --set [key=value]', 'set config variables', utils.appender(), [])
+    .option('-s, --set [key=value]', 'set config variables', utils.appender(), false)
     .on('--help', () => {
         console.log('  Examples:');
         console.log();
@@ -62,20 +62,20 @@ program
     .parse(process.argv);
 
 if ((os.platform() === 'win32' && require('is-administrator')()) || process.getuid() <= 0) {
-    config.CONF_FILE = program.config || config.DEFAULT_CONF_FILE;
-    debug(`Path to Configuration File: ${config.CONF_FILE}`);
+    let conf_file = program.config || config.DEFAULT_CONF_FILE;
+    debug(`Path to Configuration File: ${conf_file}`);
     async.waterfall([
         (cb) => {
-            fs.access(config.CONF_FILE, (error) => {
+            fs.access(conf_file, (error) => {
                 if (error) {
                     return cb(null, {});
                 }
 
-                return properties.parse(config.CONF_FILE, {
+                return properties.parse(conf_file, {
                     path: true
                 }, (error, parsedConfig) => {
                     if (error) {
-                        utils.log(`Error in Parsing ${config.CONF_FILE}: ${error}`);
+                        utils.log(`Error in Parsing ${conf_file}: ${error}`);
                     }
                     return cb(null, error ? {} : parsedConfig);
                 });
@@ -167,11 +167,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 if (typeof program.list === 'boolean') {
                     program.list = ['all'];
                 }
-                var conf = properties.parse(fs.readFileSync(config.CONF_FILE).toString());
+                var conf = properties.parse(fs.readFileSync(conf_file).toString());
                 const listResult = utils.pick2list(program.list, conf);
                 if (listResult.valid) {
                     var msg = utils.stringify(listResult.cfg);
-                    saveMessages.push(config.CONF_FILE + ':\n' + msg);
+                    saveMessages.push(conf_file + ':\n' + msg);
                 } else {
                     saveMessages.push(listResult.msg);
                 }
@@ -222,9 +222,9 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
 
             if (saveMessages.length) {
-                return utils.saveConfig(parsedConfig, config.CONF_FILE, (error, success) => {
+                return utils.saveConfig(parsedConfig, conf_file, (error, success) => {
                     if (error) {
-                        return utils.log(`Error while saving to: ${config.CONF_FILE}: ${error}`);
+                        return utils.log(`Error while saving to: ${conf_file}: ${error}`);
                     }
 
                     saveMessages.forEach((message) => {
