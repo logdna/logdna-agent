@@ -21,8 +21,8 @@ spec:
         - name: LOGDNA_AGENT_KEY
           valueFrom:
             secretKeyRef:
-              key: logdna-agent-key
               name: logdna-agent-key
+              key: logdna-agent-key
         - name: LOGDNA_PLATFORM
           value: k8s
         - name: USEJOURNALD
