@@ -16,6 +16,7 @@ const pkg = require('./package.json');
 const utils = require('./lib/utils');
 
 // Constants
+const DEFAULT_OS_PATH = '/etc/os-release';
 const HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
 const HOSTNAME_PATH = '/etc/logdna-hostname';
 
@@ -249,7 +250,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 }
             }
 
-            return getDistro(cb);
+            return getDistro(DEFAULT_OS_PATH, cb);
         }
         , (dist, cb) => {
             if (dist && dist.os) {
