@@ -33,7 +33,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
+      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -44,19 +44,19 @@ jobs:
             echo "${DATESTAMP}"
             echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
             docker push ${IMAGE_NAME}:sandbox-${DATESTAMP}
-            docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=$SYSDIG_SECURE_TOKEN logdna/sysdigsecure
+            docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=${SYSDIG_SECURE_TOKEN} logdna/sysdigsecure
   docker-approved:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
+      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
   docker-upload:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
+      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
       - setup_remote_docker
       - run:
           name: Load archived Docker image
@@ -84,7 +84,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
+      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
       - setup_remote_docker
       - run:
           name: Load archived Docker image
