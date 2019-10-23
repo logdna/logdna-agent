@@ -107,19 +107,34 @@ workflows:
       - image-build:
           filters:
             tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
       - docker-hub:
           requires:
             - image-build
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
       - docker-approved:
           type: approval
           requires:
             - docker-hub
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
       - ibm-registry:
           requires:
             - docker-approved
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
   monthly-build:
     triggers:
       - schedule:
