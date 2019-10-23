@@ -42,12 +42,6 @@ jobs:
             echo ${DOCKERHUB_PASS} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
             docker push ${IMAGE_NAME}:sandbox-${DATESTAMP}
             docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=${SYSDIG_SECURE_TOKEN} logdna/sysdigsecure
-  docker-approved:
-    executor: docker-publisher
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
   docker-upload:
     executor: docker-publisher
     steps:
@@ -118,18 +112,10 @@ workflows:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - docker-approved:
+      - ibm-registry:
           type: approval
           requires:
             - docker-hub
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
-            branches:
-              ignore: /.*/
-      - ibm-registry:
-          requires:
-            - docker-approved
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -147,13 +133,10 @@ workflows:
       - docker-hub:
           requires:
             - image-build
-      - docker-approved:
+      - docker-upload:
           type: approval
           requires:
             - docker-hub
-      - docker-upload:
-          requires:
-            - docker-approved
       - ibm-registry:
           requires:
             - docker-upload
