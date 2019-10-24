@@ -11,6 +11,7 @@ jobs:
     executor: docker-publisher
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Set Environment Variables
           command: |
@@ -23,7 +24,6 @@ jobs:
             echo "export IMAGE_TAG=${IMAGE_TAG}" >> env-vars
             echo "export DATESTAMP=$(date +%Y%m%d)" >> env-vars
             cat env-vars >> ${BASH_ENV} && source ${BASH_ENV}
-      - setup_remote_docker
       - run:
           name: Build Docker image
           command: docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
@@ -35,15 +35,15 @@ jobs:
           paths:
             - ./image.tar
             - ./env-vars
-  docker-hub:
+  docker-sysdig-scan:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
+      - setup_remote_docker
       - run:
           name: Set Environment Variables
           command: cat /tmp/workspace/env-vars >> ${BASH_ENV} && source ${BASH_ENV}
-      - setup_remote_docker
       - run:
           name: Authenticate to Docker Hub
           command: echo ${DOCKERHUB_PASS} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
@@ -56,15 +56,15 @@ jobs:
       - run:
           name: Scan Sandbox Image
           command: docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=${SYSDIG_SECURE_TOKEN} logdna/sysdigsecure
-  docker-upload:
+  docker-hub-upload:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
+      - setup_remote_docker
       - run:
           name: Set Environment Variables
           command: cat /tmp/workspace/env-vars >> ${BASH_ENV} && source ${BASH_ENV}
-      - setup_remote_docker
       - run:
           name: Authenticate to Docker Hub
           command: echo ${DOCKERHUB_PASS} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
@@ -79,13 +79,15 @@ jobs:
               docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:${TAG}
               docker push ${IMAGE_NAME}:${TAG}
             done
-  ibm-registry:
+  ibm-registry-upload:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
       - setup_remote_docker
+      - run:
+          name: Set Environment Variables
+          command: cat /tmp/workspace/env-vars >> ${BASH_ENV} && source ${BASH_ENV}
       - run:
           name: Authenticate to IBM Container Registry
           command: echo ${IBM_API_KEY} | docker login -u iamapikey --password-stdin icr.io
@@ -102,7 +104,7 @@ jobs:
             done
 workflows:
   version: 2
-  build-tags:
+  publish-image:
     jobs:
       - image-build:
           filters:
@@ -110,7 +112,7 @@ workflows:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - docker-hub:
+      - docker-sysdig-scan:
           requires:
             - image-build
           filters:
@@ -118,10 +120,18 @@ workflows:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - ibm-registry:
+      - docker-hub-upload:
+          requires:
+            - docker-sysdig-scan
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - ibm-registry-upload:
           type: approval
           requires:
-            - docker-hub
+            - docker-sysdig-scan
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -136,13 +146,13 @@ workflows:
               only: master
     jobs:
       - image-build
-      - docker-hub:
+      - docker-sysdig-scan:
           requires:
             - image-build
-      - docker-upload:
+      - docker-hub-upload:
           type: approval
           requires:
-            - docker-hub
-      - ibm-registry:
+            - docker-sysdig-scan
+      - ibm-registry-upload:
           requires:
-            - docker-upload
+            - docker-hub-upload
