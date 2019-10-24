@@ -14,7 +14,7 @@ jobs:
       - run:
           name: Set Environment Variables
           command: |
-            D_TAG=$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep "1." | tail -1)
+            D_TAG=$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep '1.' | tail -1)
             if [ $(echo ${CIRCLE_TAG} | wc -m) -lt 3 ]; then
               IMAGE_TAG=${D_TAG}
             else
