@@ -76,7 +76,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                     path: true
                 }, (error, parsedConfig) => {
                     if (error) {
-                        utils.log(`Error in Parsing ${conf_file}: ${error}`);
+                        utils.log(`error in parsing ${conf_file}: ${error}`, 'error');
                     }
                     return cb(null, error ? {} : parsedConfig);
                 });
@@ -225,7 +225,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             if (saveMessages.length) {
                 return utils.saveConfig(parsedConfig, conf_file, (error, success) => {
                     if (error) {
-                        return utils.log(`Error while saving to: ${conf_file}: ${error}`);
+                        return utils.log(`error while saving to: ${conf_file}: ${error}`, 'error');
                     }
 
                     saveMessages.forEach((message) => {
@@ -270,7 +270,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 }
                 macaddress.all((error, all) => {
                     if (error) {
-                        utils.log(`Error in Getting MacAddress: ${error}`);
+                        utils.log(`error in getting mac address: ${error}`, 'error');
                     }
                     return cb(null, error ? {} : all);
                 });
@@ -311,8 +311,4 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
     process.exit();
 }
 
-process.on('uncaughtException', (err) => {
-    utils.log('------------------------------------------------------------------');
-    utils.log('Uncaught Error: ' + (err.stack || '').split('\r\n'));
-    utils.log('------------------------------------------------------------------');
-});
+process.on('uncaughtException', (err) => utils.log('uncaught error: ' + (err.stack || '').split('\r\n'), 'error'));
