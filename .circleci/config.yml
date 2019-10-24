@@ -20,11 +20,8 @@ jobs:
             else
               IMAGE_TAG=${CIRCLE_TAG}
             fi
-            DATESTAMP=$(date +%Y%m%d)
-            TAGS=latest,${IMAGE_TAG},${IMAGE_TAG}-${DATESTAMP}
             echo "export IMAGE_TAG=${IMAGE_TAG}" >> env-vars
-            echo "export DATESTAMP=${DATESTAMP}" >> env-vars
-            echo "export TAGS=${TAGS}" >> env-vars
+            echo "export DATESTAMP=$(date +%Y%m%d)" >> env-vars
             cat env-vars >> ${BASH_ENV} && source ${BASH_ENV}
       - setup_remote_docker
       - run:
@@ -77,7 +74,7 @@ jobs:
       - run:
           name: Tag and Push Docker Image to Docker Hub
           command: |
-            IFS=',' && read -ra TAGS <<< ${TAGS}
+            TAGS=( latest ${IMAGE_TAG} ${IMAGE_TAG}-${DATESTAMP} )
             for TAG in ${TAGS[@]}; do
               docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:${TAG}
               docker push ${IMAGE_NAME}:${TAG}
@@ -98,7 +95,7 @@ jobs:
       - run:
           name: Tag and Push Docker Image to Docker Hub
           command: |
-            IFS=',' && read -ra TAGS <<< ${TAGS}
+            TAGS=( latest ${IMAGE_TAG} ${IMAGE_TAG}-${DATESTAMP} )
             for TAG in ${TAGS[@]}; do
               docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${ICR_IMAGE_NAME}:${TAG}
               docker push ${ICR_IMAGE_NAME}:${TAG}
