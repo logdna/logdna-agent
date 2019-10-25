@@ -2,8 +2,8 @@ version: 2.1
 executors:
   docker-publisher:
     environment:
-      IMAGE_NAME: logdna/logdna-agent
       ICR_IMAGE_NAME: icr.io/ext/logdna-agent
+      IMAGE_NAME: logdna/logdna-agent
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
@@ -15,14 +15,16 @@ jobs:
       - run:
           name: Set Environment Variables
           command: |
-            DOCKER_TAG=$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep '1.' | tail -1)
+            MAJOR_VERSION=1.
+            DOCKER_TAG=$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)
             if [[ ${CIRCLE_TAG} == 1.* ]]; then
               IMAGE_TAG=${CIRCLE_TAG}
             else
               IMAGE_TAG=${DOCKER_TAG}
             fi
-            echo "export IMAGE_TAG=${IMAGE_TAG}" >> env-vars
             echo "export DATESTAMP=$(date +%Y%m%d)" >> env-vars
+            echo "export IMAGE_TAG=${IMAGE_TAG}" >> env-vars
+            echo "export MAJOR_VERSION=${MAJOR_VERSION}" >> env-vars
             cat env-vars >> ${BASH_ENV} && source ${BASH_ENV}
       - run:
           name: Build Docker image
