@@ -8,12 +8,13 @@ const debug = require('debug')('logdna:test:lib:getDistro');
 const getDistro = require('../../lib/get-distro');
 
 // Constants
-const testConfig = '../assets/test-getDistro.config';
+const testConfig = 'test/assets/test-getDistro.config';
 
 describe('lib:getDistro', () => {
     it('Gets the correct Distro', () => {
         return getDistro(testConfig, (error, os) => {
             debug(os);
+            console.log(os);
             assert.equal(os.code, '14.04.4 LTS, Trusty Tahr');
             assert.equal(os.os, 'Ubuntu');
             assert.equal(os.release, '14.04');

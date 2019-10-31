@@ -4,7 +4,8 @@
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "./node_modules/.bin/grunt mochacli",
+    "lint": "./node_modules/.bin/grunt eslint"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
     "https-proxy-agent": "^2.1.0",
     "is-administrator": "^1.0.1",
     "macaddress": "^0.2.8",
+    "mocha": "^6.2.2",
     "properties": "^1.2.1",
     "request": "^2.71.0"
   },
