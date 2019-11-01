@@ -4,7 +4,8 @@
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "./node_modules/.bin/grunt mochacli",
+    "lint": "./node_modules/.bin/grunt eslint"
   },
   "repository": {
     "type": "git",

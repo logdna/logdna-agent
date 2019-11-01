@@ -8,7 +8,7 @@ const debug = require('debug')('logdna:test:lib:getDistro');
 const getDistro = require('../../lib/get-distro');
 
 // Constants
-const testConfig = '../assets/test-getDistro.config';
+const testConfig = 'test/assets/test-getDistro.config';
 
 describe('lib:getDistro', () => {
     it('Gets the correct Distro', () => {
