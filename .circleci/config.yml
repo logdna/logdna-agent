@@ -2,6 +2,7 @@ version: 2.1
 executors:
   docker-publisher:
     environment:
+      ICR_IMAGE_NAME: icr.io/ext/logdna-agent
       IMAGE_NAME: logdna/logdna-agent
     docker:
       - image: circleci/buildpack-deps:stretch
@@ -11,26 +12,31 @@ jobs:
       - image: circleci/node:10
     steps:
       - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Run Tests
-          command: ./node_modules/.bin/grunt test
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
   image-build:
     executor: docker-publisher
     steps:
       - checkout
-      - run: |
-          echo "export DATESTAMP=$(date +%Y%m%d)" > env-vars
-          echo "export MAJOR_VERSION=1" >> env-vars
-          cat env-vars >> ${BASH_ENV}
       - setup_remote_docker
       - run:
-          name: Build Docker image
+          name: Set Environment Variables
           command: |
-            echo "${DATESTAMP}"
-            docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
+            MAJOR_VERSION=1.
+            DOCKER_TAG=$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)
+            if [[ ${CIRCLE_TAG} == 1.* ]]; then
+              IMAGE_TAG=${CIRCLE_TAG}
+            else
+              IMAGE_TAG=${DOCKER_TAG}
+            fi
+            echo "export DATESTAMP=$(date +%Y%m%d)" >> env-vars
+            echo "export IMAGE_TAG=${IMAGE_TAG}" >> env-vars
+            echo "export MAJOR_VERSION=${MAJOR_VERSION}" >> env-vars
+            cat env-vars >> ${BASH_ENV} && source ${BASH_ENV}
+      - run:
+          name: Build Docker image
+          command: docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
       - run:
           name: Archive Docker image
           command: docker save -o image.tar ${IMAGE_NAME}:sandbox-${DATESTAMP}
@@ -39,193 +45,119 @@ jobs:
           paths:
             - ./image.tar
             - ./env-vars
-  docker-hub:
+  docker-sysdig-scan:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
-          name: Load archived Docker image
+          name: Set Environment Variables
+          command: cat /tmp/workspace/env-vars >> ${BASH_ENV} && source ${BASH_ENV}
+      - run:
+          name: Authenticate to Docker Hub
+          command: echo ${DOCKERHUB_PASS} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
+      - run:
+          name: Load Archived Docker image
           command: docker load -i /tmp/workspace/image.tar
       - run:
           name: Publish Docker Image to Docker Hub as Sandbox
-          command: |
-            echo "${DATESTAMP}"
-            echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            docker push ${IMAGE_NAME}:sandbox-${DATESTAMP}
-            docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=$SYSDIG_SECURE_TOKEN logdna/sysdigsecure
-  docker-approved:
+          command: docker push ${IMAGE_NAME}:sandbox-${DATESTAMP}
+      - run:
+          name: Scan Sandbox Image
+          command: docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=${SYSDIG_SECURE_TOKEN} logdna/sysdigsecure
+  docker-hub-upload:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
-  docker-upload:
-    executor: docker-publisher
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
-          name: Load archived Docker image
+          name: Set Environment Variables
+          command: cat /tmp/workspace/env-vars >> ${BASH_ENV} && source ${BASH_ENV}
+      - run:
+          name: Authenticate to Docker Hub
+          command: echo ${DOCKERHUB_PASS} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
+      - run:
+          name: Load Archived Docker image
           command: docker load -i /tmp/workspace/image.tar
       - run:
-          name: Publish Docker Image to Docker Hub
+          name: Tag and Push Docker Image to Docker Hub
           command: |
-            echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            TAG=${CIRCLE_TAG}
-            D_TAG="$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)"
-            if [ $(echo $TAG | wc -m) -lt 3 ]; then
-              IMAGE_TAG=${D_TAG}
-            else
-              IMAGE_TAG=${TAG}
-            fi
-            echo "${IMAGE_TAG}"
-            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:latest
-            docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
-            docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
-            docker push ${IMAGE_NAME}:${IMAGE_TAG}
-            docker push ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
-            docker push ${IMAGE_NAME}:latest
-  ibm-registry:
+            TAGS=( latest ${IMAGE_TAG} ${IMAGE_TAG}-${DATESTAMP} )
+            for TAG in ${TAGS[@]}; do
+              docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:${TAG}
+              docker push ${IMAGE_NAME}:${TAG}
+            done
+  ibm-registry-upload:
     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
       - setup_remote_docker
       - run:
-          name: Load archived Docker image
+          name: Set Environment Variables
+          command: cat /tmp/workspace/env-vars >> ${BASH_ENV} && source ${BASH_ENV}
+      - run:
+          name: Authenticate to IBM Container Registry
+          command: echo ${IBM_API_KEY} | docker login -u iamapikey --password-stdin icr.io
+      - run:
+          name: Load Archived Docker image
           command: docker load -i /tmp/workspace/image.tar
       - run:
-          name: Publish Docker Image to IBM registry
+          name: Tag and Push Docker Image to Docker Hub
           command: |
-            TAG=${CIRCLE_TAG}
-            D_TAG="$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)"
-            if [ $(echo $TAG | wc -m) -lt 3 ]; then
-              IMAGE_TAG=${D_TAG}
-            else
-              IMAGE_TAG=${TAG}
-            fi
-            echo "${IMAGE_TAG}"
-            echo "${IBM_API_KEY}" | docker login -u iamapikey --password-stdin icr.io
-            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:${IMAGE_TAG}
-            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:latest
-            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
-            docker push icr.io/ext/logdna-agent:${IMAGE_TAG}
-            docker push icr.io/ext/logdna-agent:latest
-            docker push icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
-  build_windows:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - run:
-          name: Check Tagged Push
-          command: |
-            NUSPEC_VERSION=$(cat scripts/windows/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
-            if [[ "${CIRCLE_TAG}" != "${NUSPEC_VERSION}" ]]; then
-              echo "There is mismatch:"
-              echo "  TAG_VERSION: ${CIRCLE_TAG}"
-              echo "  NUSPEC_VERSION: ${NUSPEC_VERSION}"
-              exit 1
-            fi
-      - run:
-          name: Install Dependencies - AWS CLI, Grunt CLI, and NEXE
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y python3 python-dev python3-dev \
-              build-essential libssl-dev libffi-dev \
-              libxml2-dev libxslt1-dev zlib1g-dev python-pip
-            sudo pip install --upgrade pip
-            sudo pip install awscli
-            sudo npm install -g nexe grunt-cli
-      - run:
-          name: Do Gruntfile Steps
-          command: |
-            VERSION=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
-            npm install
-            npm install grunt grunt-cli --save-dev
-            grunt lineremover && grunt eslint
-            nexe -i index.js -t win32-x86-8.11.3 -o scripts/windows/logdna-agent.exe
-            sha256sum scripts/windows/logdna-agent.exe
-            echo ${VERSION} >> scripts/windows/VERSION.txt
-            cp LICENSE.md scripts/windows/LICENSE.txt
-            sed -i "s|logdna-agent.latest.zip|logdna-agent.${VERSION}.zip|" scripts/windows/VERIFICATION.txt
-            mkdir -p .builds/windows/tools/
-            cp scripts/windows/*.ps1 scripts/windows/*.txt scripts/windows/logdna-agent.exe .builds/windows/tools
-            cp scripts/windows/logdna-agent.nuspec .builds/windows
-            zip -r logdna-agent.${VERSION}.zip .builds/windows
-            zip -r logdna-agent.latest.zip .builds/windows
-            aws s3 cp logdna-agent.${VERSION}.zip s3://repo.logdna.com/win/logdna-agent.${VERSION}.zip
-            aws s3 cp logdna-agent.latest.zip s3://repo.logdna.com/win/logdna-agent.latest.zip
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./scripts/windows/VERSION.txt
-            - ./logdna-agent.latest.zip
-  push_to_choco:
-    docker:
-      - image: linuturk/mono-choco
-    steps:
-      - attach_workspace:
-          at: .
-      - run: apt-get update && apt-get install -y unzip curl
-      - run:
-          name: Prepare NuPKG and Push to Chocolatey
-          command: |
-            VERSION=$(cat ./scripts/windows/VERSION.txt)
-            unzip logdna-agent.latest.zip && cd .builds/windows
-            sed -i 's/tools\\/tools\//g' ./logdna-agent.nuspec
-            choco pack logdna-agent.nuspec 2>/dev/null
-            choco push -v -y -f --api-key=${CHOCO_API_KEY} ./logdna-agent.${VERSION}.nupkg 2>/dev/null
+            TAGS=( latest ${IMAGE_TAG} ${IMAGE_TAG}-${DATESTAMP} )
+            for TAG in ${TAGS[@]}; do
+              docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${ICR_IMAGE_NAME}:${TAG}
+              docker push ${ICR_IMAGE_NAME}:${TAG}
+            done
 workflows:
   version: 2
-  build_windows:
+  test:
+    jobs:
+      - test
+  publish-image:
     jobs:
       - test:
           filters:
             tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - build_windows:
+      - image-build:
           requires:
             - test
           filters:
             tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - push_to_choco:
-          requires:
-            - build_windows
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
-            branches:
-              ignore: /.*/
-  build-tags:
-    jobs:
-      - image-build:
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
-            branches:
-              ignore: /.*/
-      - docker-hub:
+      - docker-sysdig-scan:
           requires:
             - image-build
-      - docker-approved:
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - docker-hub-upload:
+          requires:
+            - docker-sysdig-scan
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - ibm-registry-upload:
           type: approval
           requires:
-            - docker-hub
-      - ibm-registry:
-          requires:
-            - docker-approved
+            - docker-sysdig-scan
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
   monthly-build:
     triggers:
       - schedule:
@@ -234,17 +166,17 @@ workflows:
             branches:
               only: master
     jobs:
-      - image-build
-      - docker-hub:
+      - test
+      - image-build:
+          requires:
+            - test
+      - docker-sysdig-scan:
           requires:
             - image-build
-      - docker-approved:
+      - docker-hub-upload:
           type: approval
           requires:
-            - docker-hub
-      - docker-upload:
+            - docker-sysdig-scan
+      - ibm-registry-upload:
           requires:
-            - docker-approved
-      - ibm-registry:
-          requires:
-            - docker-upload
+            - docker-hub-upload
