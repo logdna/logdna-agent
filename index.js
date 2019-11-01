@@ -255,6 +255,8 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         , (dist, cb) => {
             if (dist && dist.os) {
                 config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
+                config.DEFAULT_REQ_HEADERS['user-agent'] += ` (${dist.name && dist.name.toLowerCase() || dist.os})`;
+                config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] += ` (${dist.name && dist.name.toLowerCase() || dist.os})`;
             }
 
             return request(config.AWS_INSTANCE_CHECK_URL, {
