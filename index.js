@@ -252,9 +252,12 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
 
             return getDistro(DEFAULT_OS_PATH, cb);
         }
-        , (dist, cb) => {
-            if (dist && dist.os) {
-                config.osdist = dist.os + (dist.release ? ' ' + dist.release : '');
+        , (distro, cb) => {
+            if (distro && distro.os) {
+                config.osdist = distro.os + (distro.release ? ' ' + distro.release : '');
+                const distroInfo = distro.name && distro.name.toLowerCase() || distro.os;
+                config.DEFAULT_REQ_HEADERS['user-agent'] += ` (${distroInfo})`;
+                config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] += ` (${distroInfo})`;
             }
 
             return request(config.AWS_INSTANCE_CHECK_URL, {
