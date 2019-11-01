@@ -64,7 +64,7 @@ module.exports = function(grunt) {
             target: files
             , options: {
                 configFile: '.eslintrc'
-                , fix: true
+                , fix: false
             }
         }
     });
