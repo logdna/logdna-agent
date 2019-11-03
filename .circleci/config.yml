@@ -71,8 +71,8 @@ jobs:
               --description ${DESCRIPTION}\
               --url ${URL}\
               --maintainer ${MAINTAINER}\
-              --before-remove ./scripts/before-remove\
-              --after-upgrade ./scripts/after-upgrade\
+              --before-remove ./.build/scripts/before-remove\
+              --after-upgrade ./.build/scripts/after-upgrade\
               --force --deb-no-default-config-files\
                 ./.build/logdna-agent=/usr/bin/logdna-agent\
                 ./.build/scripts/init-script=/etc/init.d/logdna-agent\
@@ -90,8 +90,8 @@ jobs:
               --description ${DESCRIPTION}\
               --url ${URL}\
               --maintainer ${MAINTAINER}\
-              --before-remove ./scripts/before-remove\
-              --after-upgrade ./scripts/after-upgrade\
+              --before-remove ./.build/scripts/before-remove\
+              --after-upgrade ./.build/scripts/after-upgrade\
               --force\
                 ./.build/logdna-agent=/usr/bin/logdna-agent\
                 ./.build/scripts/init-script=/etc/init.d/logdna-agent\
