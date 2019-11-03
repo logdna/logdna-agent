@@ -51,7 +51,8 @@ jobs:
           command: |
             npm install -g nexe
             gem install --no-ri --no-rdoc fpm
-            mkdir .build
+            mkdir -p .build/scripts
+            cp ./scripts/linux/* .build/scripts/
       - run:
           name: Build Executable
           command: nexe -i index.js -o .build/logdna-agent -t linux-x64-8.3.0
@@ -71,9 +72,9 @@ jobs:
               --before-remove ./scripts/before-remove\
               --after-upgrade ./scripts/after-upgrade\
               --force --deb-no-default-config-files\
-                ./logdna-agent=/usr/bin/logdna-agent\
-                ./scripts/init-script=/etc/init.d/logdna-agent\
-                ./scripts/logrotate=/etc/logrotate.d/logdna-agent
+                ./.build/logdna-agent=/usr/bin/logdna-agent\
+                ./.build/scripts/init-script=/etc/init.d/logdna-agent\
+                ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
       - run:
           name: Package for RedHat
           command: |
@@ -90,9 +91,9 @@ jobs:
               --before-remove ./scripts/before-remove\
               --after-upgrade ./scripts/after-upgrade\
               --force\
-                ./logdna-agent=/usr/bin/logdna-agent\
-                ./scripts/init-script=/etc/init.d/logdna-agent\
-                ./scripts/logrotate=/etc/logrotate.d/logdna-agent
+                ./.build/logdna-agent=/usr/bin/logdna-agent\
+                ./.build/scripts/init-script=/etc/init.d/logdna-agent\
+                ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
   image-build:
     executor: docker-publisher
     steps:
