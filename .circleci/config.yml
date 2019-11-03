@@ -6,15 +6,93 @@ executors:
       IMAGE_NAME: logdna/logdna-agent
     docker:
       - image: circleci/buildpack-deps:stretch
+  linux-publisher:
+    environment:
+      DEBIAN: deb
+      DESCRIPTION: LogDNA Agent for Linux
+      INPUT_TYPE: dir
+      LICENSE: MIT
+      MAINTAINER: support@logdna.com
+      NAME: logdna-agent
+      REDHAT: rpm
+      URL: http://logdna.com/
+      VENDOR: LogDNA, Inc.
+    docker:
+      - image: circleci/node:8.3.0
+      - image: circleci/ruby
 jobs:
   test:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:8.3.0
     steps:
       - checkout
       - run: npm install
       - run: npm run lint
       - run: npm run test
+  linux-build:
+    executor: linux-publisher
+    steps:
+      - checkout
+      - run:
+          name: Check Tagged Version
+          command: |
+            TAG_VERSION=$(git tag --sort=-creatordate | head -n 1)
+            PKG_VERSION=$(cat package.json | grep version | cut -d':' -f2 | cut -d '"' -f2)
+            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" || "${TAG_VERSION}" != "${CIRCLE_TAG}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${TAG_VERSION}"
+              echo "  PKG_VERSION: ${PKG_VERSION}"
+              exit 1
+            fi
+            echo "export VERSION=${CIRCLE_TAG}" >> ${BASH_ENV}
+            source ${BASH_ENV}
+      - run:
+          name: Install Dependencies
+          command: |
+            npm install -g nexe
+            gem install --no-ri --no-rdoc fpm
+            mkdir .build
+      - run:
+          name: Build Executable
+          command: nexe -i index.js -o .build/logdna-agent -t linux-x64-8.3.0
+      - run:
+          name: Package for Debian
+          command: |
+            fpm \
+              --input-type ${INPUT_TYPE}\
+              --output-type ${DEBIAN}\
+              --name ${NAME}\
+              --version ${VERSION}\
+              --license ${LICENSE}\
+              --vendor ${VENDOR}\
+              --description ${DESCRIPTION}\
+              --url ${URL}\
+              --maintainer ${MAINTAINER}\
+              --before-remove ./scripts/before-remove\
+              --after-upgrade ./scripts/after-upgrade\
+              --force --deb-no-default-config-files\
+                ./logdna-agent=/usr/bin/logdna-agent\
+                ./scripts/init-script=/etc/init.d/logdna-agent\
+                ./scripts/logrotate=/etc/logrotate.d/logdna-agent
+      - run:
+          name: Package for RedHat
+          command: |
+            fpm \
+              --input-type ${INPUT_TYPE}\
+              --output-type ${REDHAT}\
+              --name ${NAME}\
+              --version ${VERSION}\
+              --license ${LICENSE}\
+              --vendor ${VENDOR}\
+              --description ${DESCRIPTION}\
+              --url ${URL}\
+              --maintainer ${MAINTAINER}\
+              --before-remove ./scripts/before-remove\
+              --after-upgrade ./scripts/after-upgrade\
+              --force\
+                ./logdna-agent=/usr/bin/logdna-agent\
+                ./scripts/init-script=/etc/init.d/logdna-agent\
+                ./scripts/logrotate=/etc/logrotate.d/logdna-agent
   image-build:
     executor: docker-publisher
     steps:
