@@ -4,6 +4,7 @@ executors:
     environment:
       ICR_IMAGE_NAME: icr.io/ext/logdna-agent
       IMAGE_NAME: logdna/logdna-agent
+      MAJOR_VERSION: 1.
     docker:
       - image: circleci/buildpack-deps:stretch
   linux-publisher:
@@ -13,6 +14,7 @@ executors:
       INPUT_TYPE: dir
       LICENSE: MIT
       MAINTAINER: support@logdna.com
+      MAJOR_VERSION: 1.
       NAME: logdna-agent
       REDHAT: rpm
       URL: http://logdna.com/
@@ -38,7 +40,7 @@ jobs:
           command: |
             TAG_VERSION=$(git tag --sort=-creatordate | head -n 1)
             PKG_VERSION=$(cat package.json | grep version | cut -d':' -f2 | cut -d '"' -f2)
-            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" || "${TAG_VERSION}" != "${CIRCLE_TAG}" ]]; then
+            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" || "${TAG_VERSION}" != "${CIRCLE_TAG}" || ${CIRCLE_TAG} != ${MAJOR_VERSION}* ]]; then
               echo "There is mismatch:"
               echo "  TAG_VERSION: ${TAG_VERSION}"
               echo "  PKG_VERSION: ${PKG_VERSION}"
@@ -102,16 +104,14 @@ jobs:
       - run:
           name: Set Environment Variables
           command: |
-            MAJOR_VERSION=1.
             DOCKER_TAG=$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)
-            if [[ ${CIRCLE_TAG} == 1.* ]]; then
+            if [[ ${CIRCLE_TAG} == ${MAJOR_VERSION}* ]]; then
               IMAGE_TAG=${CIRCLE_TAG}
             else
               IMAGE_TAG=${DOCKER_TAG}
             fi
             echo "export DATESTAMP=$(date +%Y%m%d)" >> env-vars
             echo "export IMAGE_TAG=${IMAGE_TAG}" >> env-vars
-            echo "export MAJOR_VERSION=${MAJOR_VERSION}" >> env-vars
             cat env-vars >> ${BASH_ENV} && source ${BASH_ENV}
       - run:
           name: Build Docker image
