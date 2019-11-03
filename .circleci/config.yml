@@ -96,6 +96,11 @@ jobs:
                 ./.build/logdna-agent=/usr/bin/logdna-agent\
                 ./.build/scripts/init-script=/etc/init.d/logdna-agent\
                 ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./logdna-agent_${VERSION}_amd64.${DEBIAN}
+            - ./logdna-agent_${VERSION}_amd64.${REDHAT}
   image-build:
     executor: docker-publisher
     steps:
@@ -196,6 +201,22 @@ workflows:
   test:
     jobs:
       - test
+  publish-linux:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - linux-build:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
   publish-image:
     jobs:
       - test:
