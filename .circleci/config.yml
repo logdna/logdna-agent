@@ -50,9 +50,9 @@ jobs:
       - run:
           name: Install Dependencies
           command: |
-            npm install -g nexe
-            apt-get install ruby ruby-dev rubygems build-essential
-            gem install --no-ri --no-rdoc fpm
+            sudo npm install -g nexe
+            sudo apt-get install ruby ruby-dev rubygems build-essential
+            sudo gem install --no-ri --no-rdoc fpm
       - run:
           name: Prepare Folders and Files
           command: |
