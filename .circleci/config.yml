@@ -21,7 +21,6 @@ executors:
       VENDOR: LogDNA, Inc.
     docker:
       - image: circleci/node:8.3.0
-      - image: circleci/ruby
 jobs:
   test:
     docker:
@@ -52,7 +51,11 @@ jobs:
           name: Install Dependencies
           command: |
             npm install -g nexe
+            apt-get install ruby ruby-dev rubygems build-essential
             gem install --no-ri --no-rdoc fpm
+      - run:
+          name: Prepare Folders and Files
+          command: |
             mkdir -p .build/scripts
             cp ./scripts/linux/* .build/scripts/
       - run:
