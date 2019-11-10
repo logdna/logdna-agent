@@ -4,17 +4,106 @@ executors:
     environment:
       ICR_IMAGE_NAME: icr.io/ext/logdna-agent
       IMAGE_NAME: logdna/logdna-agent
+      MAJOR_VERSION: 1.
     docker:
       - image: circleci/buildpack-deps:stretch
+  linux-publisher:
+    environment:
+      DEBIAN: deb
+      DESCRIPTION: LogDNA Agent for Linux
+      INPUT_TYPE: dir
+      LICENSE: MIT
+      MAINTAINER: support@logdna.com
+      MAJOR_VERSION: 1.
+      NAME: logdna-agent
+      REDHAT: rpm
+      URL: http://logdna.com/
+      VENDOR: LogDNA, Inc.
+    docker:
+      - image: circleci/node:8.3.0
 jobs:
   test:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:8.3.0
     steps:
       - checkout
       - run: npm install
       - run: npm run lint
       - run: npm run test
+  linux-build:
+    executor: linux-publisher
+    steps:
+      - checkout
+      - run:
+          name: Check Tagged Version
+          command: |
+            TAG_VERSION=$(git tag --sort=-creatordate | head -n 1)
+            PKG_VERSION=$(cat package.json | grep version | cut -d':' -f2 | cut -d '"' -f2)
+            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" || "${TAG_VERSION}" != "${CIRCLE_TAG}" || ${CIRCLE_TAG} != ${MAJOR_VERSION}* ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${TAG_VERSION}"
+              echo "  PKG_VERSION: ${PKG_VERSION}"
+              exit 1
+            fi
+            echo "export VERSION=${CIRCLE_TAG}" >> ${BASH_ENV}
+            source ${BASH_ENV}
+      - run:
+          name: Install Dependencies
+          command: |
+            sudo npm install -g nexe
+            sudo apt-get install ruby ruby-dev rubygems build-essential
+            sudo gem install --no-ri --no-rdoc fpm
+      - run:
+          name: Prepare Folders and Files
+          command: |
+            mkdir -p .build/scripts
+            cp ./scripts/linux/* .build/scripts/
+      - run:
+          name: Build Executable
+          command: nexe -i index.js -o .build/logdna-agent -t linux-x64-8.3.0
+      - run:
+          name: Package for Debian
+          command: |
+            fpm \
+              --input-type ${INPUT_TYPE}\
+              --output-type ${DEBIAN}\
+              --name ${NAME}\
+              --version ${VERSION}\
+              --license ${LICENSE}\
+              --vendor ${VENDOR}\
+              --description ${DESCRIPTION}\
+              --url ${URL}\
+              --maintainer ${MAINTAINER}\
+              --before-remove ./.build/scripts/before-remove\
+              --after-upgrade ./.build/scripts/after-upgrade\
+              --force --deb-no-default-config-files\
+                ./.build/logdna-agent=/usr/bin/logdna-agent\
+                ./.build/scripts/init-script=/etc/init.d/logdna-agent\
+                ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
+      - run:
+          name: Package for RedHat
+          command: |
+            fpm \
+              --input-type ${INPUT_TYPE}\
+              --output-type ${REDHAT}\
+              --name ${NAME}\
+              --version ${VERSION}\
+              --license ${LICENSE}\
+              --vendor ${VENDOR}\
+              --description ${DESCRIPTION}\
+              --url ${URL}\
+              --maintainer ${MAINTAINER}\
+              --before-remove ./.build/scripts/before-remove\
+              --after-upgrade ./.build/scripts/after-upgrade\
+              --force\
+                ./.build/logdna-agent=/usr/bin/logdna-agent\
+                ./.build/scripts/init-script=/etc/init.d/logdna-agent\
+                ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./logdna-agent_${VERSION}_amd64.${DEBIAN}
+            - ./logdna-agent_${VERSION}_amd64.${REDHAT}
   image-build:
     executor: docker-publisher
     steps:
@@ -23,16 +112,14 @@ jobs:
       - run:
           name: Set Environment Variables
           command: |
-            MAJOR_VERSION=1.
             DOCKER_TAG=$(wget -q https://registry.hub.docker.com/v1/repositories/logdna/logdna-agent/tags -O - | jq -r '.[] | .name' | awk '!/-/ && /\./ { print $1}' | grep ${MAJOR_VERSION} | tail -1)
-            if [[ ${CIRCLE_TAG} == 1.* ]]; then
+            if [[ ${CIRCLE_TAG} == ${MAJOR_VERSION}* ]]; then
               IMAGE_TAG=${CIRCLE_TAG}
             else
               IMAGE_TAG=${DOCKER_TAG}
             fi
             echo "export DATESTAMP=$(date +%Y%m%d)" >> env-vars
             echo "export IMAGE_TAG=${IMAGE_TAG}" >> env-vars
-            echo "export MAJOR_VERSION=${MAJOR_VERSION}" >> env-vars
             cat env-vars >> ${BASH_ENV} && source ${BASH_ENV}
       - run:
           name: Build Docker image
@@ -117,6 +204,22 @@ workflows:
   test:
     jobs:
       - test
+  publish-linux:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - linux-build:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
   publish-image:
     jobs:
       - test:
