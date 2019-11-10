@@ -29,13 +29,13 @@ program._name = 'logdna-agent';
 program
     .version(pkg.version, '-v, --version')
     .description('This agent collect and ship logs for processing. Defaults to /var/log if run without parameters.')
-    .option('-c, --config <file>', 'uses alternate config file (default: ' + config.DEFAULT_CONF_FILE + ')')
+    .option('-c, --config <file>', `uses alternate config file (default: ${config.DEFAULT_CONF_FILE})`)
     .option('-k, --key <key>', 'sets your LogDNA Ingestion Key in the config')
     .option('-d, --logdir <dir>', 'adds log directories to config, supports glob patterns', utils.appender(), [])
     .option('-f, --logfile <file>', 'adds log files to config', utils.appender(), [])
     .option('-e, --exclude <file>', 'exclude files from logdir', utils.appender(), [])
     .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
-    .option('-n, --hostname <hostname>', 'uses alternate hostname (default: ' + os.hostname().replace('.ec2.internal', '') + ')')
+    .option('-n, --hostname <hostname>', `uses alternate hostname (default: ${os.hostname().replace('.ec2.internal', '')})`)
     .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', utils.appender(), [])
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.appender(), false)
     .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', utils.appender(), [])
@@ -158,7 +158,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 if (os.platform() === 'win32') {
                     processed = utils.processOption(program.winevent, parsedConfig.winevent, true);
                     parsedConfig.winevent = processed.values;
-                    saveMessages.push('Windows Events: ' + processed.diff + ' been saved to config.');
+                    saveMessages.push(`Windows Events: ${processed.diff} been saved to config.`);
                 } else {
                     saveMessages.push('-w is only available for Windows.');
                 }
@@ -172,7 +172,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 const listResult = utils.pick2list(program.list, conf);
                 if (listResult.valid) {
                     var msg = utils.stringify(listResult.cfg);
-                    saveMessages.push(conf_file + ':\n' + msg);
+                    saveMessages.push(`${conf_file}:\n${msg}`);
                 } else {
                     saveMessages.push(listResult.msg);
                 }
@@ -187,19 +187,19 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             if (program.logdir && program.logdir.length > 0) {
                 processed = utils.processOption(program.logdir, parsedConfig.logdir);
                 parsedConfig.logdir = processed.values;
-                saveMessages.push('Log Directories: ' + processed.diff + ' been saved to config.');
+                saveMessages.push(`Log Directories: ${processed.diff} been saved to config.`);
             }
 
             if (program.logfile && program.logfile.length > 0) {
                 processed = utils.processOption(program.logfile, parsedConfig.logdir);
                 parsedConfig.logdir = processed.values;
-                saveMessages.push('Log Files: ' + processed.diff + ' been saved to config.');
+                saveMessages.push(`Log Files: ${processed.diff} been saved to config.`);
             }
 
             if (program.exclude && program.exclude.length > 0) {
                 processed = utils.processOption(program.exclude, parsedConfig.exclude);
                 parsedConfig.exclude = processed.values;
-                saveMessages.push('Exclusions: ' + processed.diff + ' been saved to config.');
+                saveMessages.push(`Exclusions: ${processed.diff} been saved to config.`);
             }
 
             if (program.excludeRegex) {
@@ -208,18 +208,18 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 if (parsedConfig.exclude_regex.substring(0, 1) === '/' && parsedConfig.exclude_regex.substring(parsedConfig.exclude_regex.length - 1) === '/') {
                     parsedConfig.exclude_regex = parsedConfig.exclude_regex.substring(1, parsedConfig.exclude_regex.length - 1);
                 }
-                saveMessages.push('Exclude pattern: /' + parsedConfig.exclude_regex + '/ been saved to config.');
+                saveMessages.push(`Exclude pattern: /${parsedConfig.exclude_regex}/ been saved to config.`);
             }
 
             if (program.hostname) {
                 parsedConfig.hostname = program.hostname;
-                saveMessages.push('Hostname: ' + parsedConfig.hostname + ' has been saved to config.');
+                saveMessages.push(`Hostname: ${parsedConfig.hostname} has been saved to config.`);
             }
 
             if (program.tags && program.tags.length > 0) {
                 processed = utils.processOption(program.tags, parsedConfig.tags);
                 parsedConfig.tags = processed.values;
-                saveMessages.push('Tags: ' + processed.diff + ' been saved to config.');
+                saveMessages.push(`Tags: ${processed.diff} been saved to config.`);
             }
 
             if (saveMessages.length) {
@@ -243,7 +243,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
 
             if (process.env.LOGDNA_PLATFORM) {
                 config.platform = process.env.LOGDNA_PLATFORM;
-                config.tags = config.tags ? config.tags + ',' + config.platform : config.platform;
+                config.tags = config.tags ? `${config.tags},${config.platform}` : config.platform;
 
                 if (config.platform.indexOf('k8s') === 0) {
                     config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
@@ -254,7 +254,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         }
         , (distro, cb) => {
             if (distro && distro.os) {
-                config.osdist = distro.os + (distro.release ? ' ' + distro.release : '');
+                config.osdist = `${distro.os}${(distro.release ? ' ' + distro.release : '')}`;
                 const distroInfo = distro.name && distro.name.toLowerCase() || distro.os;
                 config.DEFAULT_REQ_HEADERS['user-agent'] += ` (${distroInfo})`;
                 config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] += ` (${distroInfo})`;
@@ -314,4 +314,4 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
     process.exit();
 }
 
-process.on('uncaughtException', (err) => utils.log('uncaught error: ' + (err.stack || '').split('\r\n'), 'error'));
+process.on('uncaughtException', (err) => utils.log(`uncaught error: ${(err.stack || '').split('\r\n')}`, 'error'));
