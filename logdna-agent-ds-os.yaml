@@ -1,23 +1,23 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  creationTimestamp: null
-  generation: 4
+  name: logdna-agent
   labels:
     app: logdna-agent
-  name: logdna-agent
 spec:
   selector:
     matchLabels:
       app: logdna-agent
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: logdna-agent
     spec:
       containers:
-      - env:
+      - name: logdna-agent
+        image: logdna/logdna-agent:latest
+        imagePullPolicy: Always
+        env:
         - name: LOGDNA_AGENT_KEY
           valueFrom:
             secretKeyRef:
@@ -27,58 +27,53 @@ spec:
           value: k8s
         - name: USEJOURNALD
           value: files
-        #- name: LOGDNA_TAGS
-        #  value: production,cluster1,othertags
-        image: logdna/logdna-agent:latest
-        imagePullPolicy: Always
-        name: logdna-agent
+        # - name: LOGDNA_TAGS
+        #   value: production,cluster1,othertags
         resources:
+          requests:
+            cpu: 20m
           limits:
             memory: 500Mi
         securityContext:
           privileged: true
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /var/log
-          name: varlog
-        - mountPath: /var/lib/docker/containers
-          name: varlibdockercontainers
+        - name: varlog
+          mountPath: /var/log
+        - name: vardata
+          mountPath: /var/data
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
           readOnly: true
-        - mountPath: /mnt
-          name: mnt
+        - name: mnt
+          mountPath: /mnt
           readOnly: true
-        - mountPath: /var/run/docker.sock
-          name: docker
-        - mountPath: /etc/os-release
-          name: osrelease
-        - mountPath: /etc/logdna-hostname
-          name: logdnahostname
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
+        - name: docker
+          mountPath: /var/run/docker.sock
+        - name: osrelease
+          mountPath: /etc/os-release
+        - name: logdnahostname
+          mountPath: /etc/logdna-hostname
       serviceAccount: logdna-agent
       serviceAccountName: logdna-agent
-      terminationGracePeriodSeconds: 30
       volumes:
-      - hostPath:
+      - name: varlog
+        hostPath:
           path: /var/log
-        name: varlog
-      - hostPath:
+      - name: vardata
+        hostPath:
+          path: /var/data
+      - name: varlibdockercontainers
+        hostPath:
           path: /var/lib/docker/containers
-        name: varlibdockercontainers
-      - hostPath:
+      - name: mnt
+        hostPath:
           path: /mnt
-        name: mnt
-      - hostPath:
+      - name: docker
+        hostPath:
           path: /var/run/docker.sock
-        name: docker
-      - hostPath:
+      - name: osrelease
+        hostPath:
           path: /etc/os-release
-        name: osrelease
-      - hostPath:
+      - name: logdnahostname
+        hostPath:
           path: /etc/hostname
-        name: logdnahostname
-  updateStrategy:
-    type: OnDelete
