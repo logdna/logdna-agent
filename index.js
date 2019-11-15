@@ -1,22 +1,21 @@
 // External Modules
 const async = require('async');
 const debug = require('debug')('logdna:index');
-const program = require('commander');
-const os = require('os');
 const fs = require('fs');
-const properties = require('properties');
+const getos = require('getos');
 const macaddress = require('macaddress');
+const os = require('os');
+const program = require('commander');
+const properties = require('properties');
 const request = require('request');
 
 // Internal Modules
 const connectionManager = require('./lib/connection-manager');
-const getDistro = require('./lib/get-distro');
 const k8s = require('./lib/k8s');
 const pkg = require('./package.json');
 const utils = require('./lib/utils');
 
 // Constants
-const DEFAULT_OS_PATH = '/etc/os-release';
 const HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
 const HOSTNAME_PATH = '/etc/logdna-hostname';
 
@@ -228,38 +227,27 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                         return utils.log(`error while saving to: ${conf_file}: ${error}`, 'error');
                     }
 
-                    saveMessages.forEach((message) => {
-                        console.log(message);
-                    });
-
+                    saveMessages.forEach((message) => { console.log(message); });
                     process.exit(0);
                 });
             }
 
             // merge into single var after all potential saveConfigs finished
             config = Object.assign({}, config, parsedConfig);
-
             config.tags = process.env.LOGDNA_TAGS || config.tags;
-
             if (process.env.LOGDNA_PLATFORM) {
                 config.platform = process.env.LOGDNA_PLATFORM;
                 config.tags = config.tags ? `${config.tags},${config.platform}` : config.platform;
-
                 if (config.platform.indexOf('k8s') === 0) {
                     config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
                 }
             }
 
-            return getDistro(DEFAULT_OS_PATH, cb);
+            return getos(cb);
         }
         , (distro, cb) => {
-            if (distro && distro.os) {
-                config.osdist = `${distro.os}${(distro.release ? ' ' + distro.release : '')}`;
-                const distroInfo = distro.name && distro.name.toLowerCase() || distro.os;
-                config.DEFAULT_REQ_HEADERS['user-agent'] += ` (${distroInfo})`;
-                config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] += ` (${distroInfo})`;
-            }
-
+            config.userAgent = `${pkg.name}/${pkg.version} ${(distro.dist || distro.os).replace(/Linux| /g, '')}`;
+            if (distro.release) { config.userAgent += `/${distro.release}`; }
             return request(config.AWS_INSTANCE_CHECK_URL, {
                 timeout: 1000
                 , json: true
@@ -285,11 +273,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             for (var i = 0; i < ifaces.length; i++) {
                 if (
                     all[ifaces[i]].ipv4 && (
-                        all[ifaces[i]].ipv4.indexOf('10.') === 0 ||
-                        all[ifaces[i]].ipv4.indexOf('172.1') === 0 ||
-                        all[ifaces[i]].ipv4.indexOf('172.2') === 0 ||
-                        all[ifaces[i]].ipv4.indexOf('172.3') === 0 ||
-                        all[ifaces[i]].ipv4.indexOf('192.168.') === 0
+                        all[ifaces[i]].ipv4.startsWith('10.') ||
+                        all[ifaces[i]].ipv4.startsWith('172.1') ||
+                        all[ifaces[i]].ipv4.startsWith('172.2') ||
+                        all[ifaces[i]].ipv4.startsWith('172.3') ||
+                        all[ifaces[i]].ipv4.startsWith('192.168.')
                     )
                 ) {
                     config.mac = all[ifaces[i]].mac;
@@ -299,10 +287,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
         }
 
-        utils.log(`${program._name} ${pkg.version} started on ${config.hostname} (${config.ip})`);
-
-        if (config.platform && config.platform.indexOf('k8s') === 0) {
-            k8s.init();
+        utils.log(`${program._name}/${pkg.version} started on ${config.hostname} (${config.ip})`);
+        if (config.platform && config.platform.startsWith('k8s')) { k8s.init(); }
+        if (config.userAgent) {
+            config.DEFAULT_REQ_HEADERS['user-agent'] = config.userAgent;
+            config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] = config.userAgent;
         }
 
         debug('connecting to log server');
