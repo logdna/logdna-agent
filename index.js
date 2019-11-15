@@ -273,11 +273,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             for (var i = 0; i < ifaces.length; i++) {
                 if (
                     all[ifaces[i]].ipv4 && (
-                        all[ifaces[i]].ipv4.indexOf('10.') === 0 ||
-                        all[ifaces[i]].ipv4.indexOf('172.1') === 0 ||
-                        all[ifaces[i]].ipv4.indexOf('172.2') === 0 ||
-                        all[ifaces[i]].ipv4.indexOf('172.3') === 0 ||
-                        all[ifaces[i]].ipv4.indexOf('192.168.') === 0
+                        all[ifaces[i]].ipv4.startsWith('10.') ||
+                        all[ifaces[i]].ipv4.startsWith('172.1') ||
+                        all[ifaces[i]].ipv4.startsWith('172.2') ||
+                        all[ifaces[i]].ipv4.startsWith('172.3') ||
+                        all[ifaces[i]].ipv4.startsWith('192.168.')
                     )
                 ) {
                     config.mac = all[ifaces[i]].mac;
@@ -288,7 +288,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         }
 
         utils.log(`${program._name}/${pkg.version} started on ${config.hostname} (${config.ip})`);
-        if (config.platform && config.platform.indexOf('k8s') === 0) { k8s.init(); }
+        if (config.platform && config.platform.startsWith('k8s')) { k8s.init(); }
         if (config.userAgent) {
             config.DEFAULT_REQ_HEADERS['user-agent'] = config.userAgent;
             config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] = config.userAgent;
