@@ -1,13 +1,13 @@
 // External Modules
 const async = require('async');
 const debug = require('debug')('logdna:index');
-const program = require('commander');
-const os = require('os');
 const fs = require('fs');
-const properties = require('properties');
-const macaddress = require('macaddress');
-const request = require('request');
 const getos = require('getos');
+const macaddress = require('macaddress');
+const os = require('os');
+const program = require('commander');
+const properties = require('properties');
+const request = require('request');
 
 // Internal Modules
 const connectionManager = require('./lib/connection-manager');
