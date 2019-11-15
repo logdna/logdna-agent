@@ -229,23 +229,17 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                         return utils.log(`error while saving to: ${conf_file}: ${error}`, 'error');
                     }
 
-                    saveMessages.forEach((message) => {
-                        console.log(message);
-                    });
-
+                    saveMessages.forEach((message) => { console.log(message); });
                     process.exit(0);
                 });
             }
 
             // merge into single var after all potential saveConfigs finished
             config = Object.assign({}, config, parsedConfig);
-
             config.tags = process.env.LOGDNA_TAGS || config.tags;
-
             if (process.env.LOGDNA_PLATFORM) {
                 config.platform = process.env.LOGDNA_PLATFORM;
                 config.tags = config.tags ? `${config.tags},${config.platform}` : config.platform;
-
                 if (config.platform.indexOf('k8s') === 0) {
                     config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S;
                 }
@@ -254,8 +248,8 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             return getos(cb);
         }
         , (distro, cb) => {
-            config.sysname = (distro.dist || distro.os).replace(/Linux| /g, '');
-            config.sysversion = distro.release;
+            config.userAgent = `${pkg.name}/${pkg.version} ${(distro.dist || distro.os).replace(/Linux| /g, '')}`;
+            if (distro.release) { config.userAgent += `/${distro.release}`; }
             return request(config.AWS_INSTANCE_CHECK_URL, {
                 timeout: 1000
                 , json: true
@@ -295,10 +289,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
         }
 
-        utils.log(`${program._name} ${pkg.version} started on ${config.hostname} (${config.ip})`);
-
-        if (config.platform && config.platform.indexOf('k8s') === 0) {
-            k8s.init();
+        utils.log(`${program._name}/${pkg.version} started on ${config.hostname} (${config.ip})`);
+        if (config.platform && config.platform.indexOf('k8s') === 0) { k8s.init(); }
+        if (config.userAgent) {
+            config.DEFAULT_REQ_HEADERS['user-agent'] = config.userAgent;
+            config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] = config.userAgent;
         }
 
         debug('connecting to log server');
