@@ -7,6 +7,7 @@ const fs = require('fs');
 const properties = require('properties');
 const macaddress = require('macaddress');
 const request = require('request');
+const getos = require('getos');
 
 // Internal Modules
 const connectionManager = require('./lib/connection-manager');
@@ -250,9 +251,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 }
             }
 
-            return getDistro(DEFAULT_OS_PATH, cb);
+            return getos(cb);
         }
         , (distro, cb) => {
+            config.sysname = (distro.dist || distro.os).replace(/Linux| /g, '');
+            config.sysversion = distro.release;
             return request(config.AWS_INSTANCE_CHECK_URL, {
                 timeout: 1000
                 , json: true
