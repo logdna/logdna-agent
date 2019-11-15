@@ -11,13 +11,11 @@ const getos = require('getos');
 
 // Internal Modules
 const connectionManager = require('./lib/connection-manager');
-const getDistro = require('./lib/get-distro');
 const k8s = require('./lib/k8s');
 const pkg = require('./package.json');
 const utils = require('./lib/utils');
 
 // Constants
-const DEFAULT_OS_PATH = '/etc/os-release';
 const HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
 const HOSTNAME_PATH = '/etc/logdna-hostname';
 
