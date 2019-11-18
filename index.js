@@ -246,8 +246,10 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             return getos(cb);
         }
         , (distro, cb) => {
-            config.userAgent = `${pkg.name}/${pkg.version} ${(distro.dist || distro.os).replace(/Linux| /g, '')}`;
-            if (distro.release) { config.userAgent += `/${distro.release}`; }
+            config.package = `${pkg.name}/${pkg.version}`;
+            config.distro = `${(distro.dist || distro.os).replace(/Linux| /g, '')}`;
+            if (distro.release) { config.distro += `/${distro.release}`; }
+            config.userAgent = `${config.package} (${config.distro})`;
             return request(config.AWS_INSTANCE_CHECK_URL, {
                 timeout: 1000
                 , json: true
@@ -287,7 +289,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
         }
 
-        utils.log(`${program._name}/${pkg.version} started on ${config.hostname} (${config.ip})`);
+        utils.log(`${config.package} started on ${config.hostname} (${config.ip})`);
         if (config.platform && config.platform.startsWith('k8s')) { k8s.init(); }
         if (config.userAgent) {
             config.DEFAULT_REQ_HEADERS['user-agent'] = config.userAgent;
