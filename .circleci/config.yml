@@ -10,17 +10,8 @@ executors:
   linux-publisher:
     environment:
       ANSIBLE_HOST_KEY_CHECKING: False
-      DEBIAN: deb
-      DESCRIPTION: LogDNA Agent for Linux
-      INPUT_TYPE: dir
-      LICENSE: MIT
-      MAINTAINER: support@logdna.com
       MAJOR_VERSION: 1.
-      NAME: logdna-agent
-      REDHAT: rpm
       TERRAFORM_STATE_ROOT: .
-      URL: http://logdna.com/
-      VENDOR: LogDNA, Inc.
     docker:
       - image: circleci/node:12.13.0
 jobs:
@@ -31,7 +22,7 @@ jobs:
       - checkout
       - run: npm install
       - run: npm run lint
-      - run: npm run test
+      - run: npm run unittest
   linux-build:
     executor: linux-publisher
     steps:
@@ -50,62 +41,13 @@ jobs:
             echo "export VERSION=${CIRCLE_TAG}" >> ${BASH_ENV}
             source ${BASH_ENV}
       - run:
-          name: Install Dependencies
-          command: |
-            sudo npm install -g nexe
-            sudo apt-get install -y ruby ruby-dev rubygems build-essential rpm
-            sudo gem install --no-ri --no-rdoc fpm
-      - run:
-          name: Prepare Folders and Files
-          command: |
-            mkdir -p .build/scripts
-            cp ./scripts/linux/* .build/scripts/
-      - run:
-          name: Build Executable
-          command: nexe -i index.js -o .build/logdna-agent -t linux-x64-12.13.0
-      - run:
-          name: Package for Debian
-          command: |
-            fpm \
-              --input-type ${INPUT_TYPE}\
-              --output-type ${DEBIAN}\
-              --name ${NAME}\
-              --version ${VERSION}\
-              --license ${LICENSE}\
-              --vendor ${VENDOR}\
-              --description ${DESCRIPTION}\
-              --url ${URL}\
-              --maintainer ${MAINTAINER}\
-              --before-remove ./.build/scripts/before-remove\
-              --after-upgrade ./.build/scripts/after-upgrade\
-              --force --deb-no-default-config-files\
-                ./.build/logdna-agent=/usr/bin/logdna-agent\
-                ./.build/scripts/init-script=/etc/init.d/logdna-agent\
-                ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
-      - run:
-          name: Package for RedHat
-          command: |
-            fpm \
-              --input-type ${INPUT_TYPE}\
-              --output-type ${REDHAT}\
-              --name ${NAME}\
-              --version ${VERSION}\
-              --license ${LICENSE}\
-              --vendor ${VENDOR}\
-              --description ${DESCRIPTION}\
-              --url ${URL}\
-              --maintainer ${MAINTAINER}\
-              --before-remove ./.build/scripts/before-remove\
-              --after-upgrade ./.build/scripts/after-upgrade\
-              --force\
-                ./.build/logdna-agent=/usr/bin/logdna-agent\
-                ./.build/scripts/init-script=/etc/init.d/logdna-agent\
-                ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
+          name: Build Linux
+          command: npm run build.linux
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-agent_${VERSION}_amd64.${DEBIAN}
-            - ./logdna-agent-${VERSION}-1.x86_64.${REDHAT}
+            - ./logdna-agent_${VERSION}_amd64.deb
+            - ./logdna-agent-${VERSION}-1.x86_64.rpm
   ansible-test:
     executor: linux-publisher
     steps:
