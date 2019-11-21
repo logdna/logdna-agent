@@ -9,6 +9,7 @@ executors:
       - image: circleci/buildpack-deps:stretch
   linux-publisher:
     environment:
+      ANSIBLE_HOST_KEY_CHECKING: False
       DEBIAN: deb
       DESCRIPTION: LogDNA Agent for Linux
       INPUT_TYPE: dir
@@ -17,14 +18,15 @@ executors:
       MAJOR_VERSION: 1.
       NAME: logdna-agent
       REDHAT: rpm
+      TERRAFORM_STATE_ROOT: .
       URL: http://logdna.com/
       VENDOR: LogDNA, Inc.
     docker:
-      - image: circleci/node:8.3.0
+      - image: circleci/node:12.13.0
 jobs:
   test:
     docker:
-      - image: circleci/node:8.3.0
+      - image: circleci/node:12.13.0
     steps:
       - checkout
       - run: npm install
@@ -60,7 +62,7 @@ jobs:
             cp ./scripts/linux/* .build/scripts/
       - run:
           name: Build Executable
-          command: nexe -i index.js -o .build/logdna-agent -t linux-x64-8.3.0
+          command: nexe -i index.js -o .build/logdna-agent -t linux-x64-12.13.0
       - run:
           name: Package for Debian
           command: |
@@ -103,7 +105,46 @@ jobs:
           root: .
           paths:
             - ./logdna-agent_${VERSION}_amd64.${DEBIAN}
-            - ./logdna-agent_${VERSION}_amd64.${REDHAT}
+            - ./logdna-agent-${VERSION}-1.x86_64.${REDHAT}
+  ansible-test:
+    executor: linux-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Install Dependencies
+          command: |
+            sudo apt-get update -y
+            sudo apt-get install -y virtualenv software-properties-common python-pip
+            sudo apt-add-repository -y ppa:ansible/ansible
+            sudo apt-get update -y
+            sudo apt-get install -y ansible
+      - run:
+          name: Checkout Scripts
+          command: git clone https://${GITHUB_TOKEN}@github.com/answerbook/logdna-agent-ansible.git
+      - run:
+          name: Setup Ansible
+          command: |
+            cd logdna-agent-ansible
+            virtualenv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            eval $(ssh-agent)
+            chmod 600 ssh_keys/id_rsa.agent-testing
+            ssh-add ssh_keys/id_rsa.agent-testing
+            cp ../*.deb logdna-agent-ansible/files/
+            cp ../*.rpm logdna-agent-ansible/files/
+      - run:
+          name: Install Agent
+          command: cd logdna-agent-ansible && ansible-playbook -l ubuntu*:centos-7:debian-9:rhel* -i hosts install_agent.yml
+      - run:
+          name: Fakelog Generator
+          command: cd logdna-agent-ansible && ansible-playbook -l ubuntu*:centos-7:debian-9:rhel* -i hosts install_agent.yml
+      - run:
+          name: Run PyTests
+          command: |
+            cd logdna-agent-ansible
+            py.test -n 4 --force-ansible --ansible-inventory=hosts --connection=ansible -v tests --sudo --cache-clear --hosts rhel-7,ubuntu-1604,debian-9,centos-7,ubuntu-1804
   image-build:
     executor: docker-publisher
     steps:
