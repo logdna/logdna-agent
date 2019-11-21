@@ -17,7 +17,7 @@ sudo gem install --no-ri --no-rdoc fpm
 
 # Step 2: Prepare Folders and Files
 mkdir -p .build/scripts
-cp ./scripts/linux/* .build/scripts/
+cp ./scripts/linux/files/* .build/scripts/
 
 # Step 3: Compile and Build Executable
 nexe -i index.js -o .build/logdna-agent -t linux-${ARCH}-${NODE_VERSION}

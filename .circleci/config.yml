@@ -22,7 +22,7 @@ jobs:
       - checkout
       - run: npm install
       - run: npm run lint
-      - run: npm run unittest
+      - run: npm run test.unit
   linux-build:
     executor: linux-publisher
     steps:
