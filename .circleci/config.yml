@@ -10,7 +10,6 @@ executors:
   linux-publisher:
     environment:
       ANSIBLE_HOST_KEY_CHECKING: False
-      MAJOR_VERSION: 1.
       TERRAFORM_STATE_ROOT: .
     docker:
       - image: circleci/node:12.13.0

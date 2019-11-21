@@ -1,7 +1,7 @@
 #!/bin/bash
 # Assuming it is running on Debian
 
-# Variables:
+# Variables
 ARCH=x64
 DEBIAN=deb
 INPUT_TYPE=dir
