@@ -71,3 +71,7 @@ spec:
       - name: logdnahostname
         hostPath:
           path: /etc/hostname
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 100%
