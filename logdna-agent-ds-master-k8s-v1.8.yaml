@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: logdna-agent
@@ -13,9 +13,11 @@ spec:
       labels:
         app: logdna-agent
     spec:
+      tolerations:
+      - operator: Exists
       containers:
       - name: logdna-agent
-        image: logdna/logdna-agent-v2:stable
+        image: logdna/logdna-agent:latest
         imagePullPolicy: Always
         env:
         - name: LOGDNA_AGENT_KEY
@@ -25,13 +27,13 @@ spec:
               key: logdna-agent-key
         - name: LOGDNA_PLATFORM
           value: k8s
-        - name: LOGDNA_TAGS
-          value: agent-v2
+        # - name: LOGDNA_TAGS
+        #   value: production,cluster1,othertags
         resources:
           requests:
             cpu: 20m
           limits:
-            memory: 300Mi
+            memory: 500Mi
         volumeMounts:
         - name: varlog
           mountPath: /var/log
