@@ -149,7 +149,7 @@ workflows:
   test:
     jobs:
       - test.unit
-  publish-linux:
+  publish.linux:
     jobs:
       - test.unit:
           filters:
