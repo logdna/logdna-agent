@@ -251,7 +251,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             if (distro.release) { config.distro += `/${distro.release}`; }
             config.userAgent = `${config.package} (${config.distro})`;
             if (config.platform) { config.userAgent += ` ${config.platform}`; }
-            
+
             return request(config.AWS_INSTANCE_CHECK_URL, {
                 timeout: 1000
                 , json: true

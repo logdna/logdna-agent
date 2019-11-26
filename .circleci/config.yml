@@ -7,103 +7,48 @@ executors:
       MAJOR_VERSION: 1.
     docker:
       - image: circleci/buildpack-deps:stretch
-  linux-publisher:
-    environment:
-      DEBIAN: deb
-      DESCRIPTION: LogDNA Agent for Linux
-      INPUT_TYPE: dir
-      LICENSE: MIT
-      MAINTAINER: support@logdna.com
-      MAJOR_VERSION: 1.
-      NAME: logdna-agent
-      REDHAT: rpm
-      URL: http://logdna.com/
-      VENDOR: LogDNA, Inc.
-    docker:
-      - image: circleci/node:8.3.0
 jobs:
-  test:
+  test-unit:
     docker:
-      - image: circleci/node:8.3.0
+      - image: circleci/node:12.13.0
     steps:
       - checkout
       - run: npm install
       - run: npm run lint
-      - run: npm run test
-  linux-build:
-    executor: linux-publisher
+      - run: npm run test.unit
+  build-linux:
+    docker:
+      - image: circleci/node:12.13.0
     steps:
       - checkout
-      - run:
-          name: Check Tagged Version
-          command: |
-            TAG_VERSION=$(git tag --sort=-creatordate | head -n 1)
-            PKG_VERSION=$(cat package.json | grep version | cut -d':' -f2 | cut -d '"' -f2)
-            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" || "${TAG_VERSION}" != "${CIRCLE_TAG}" || ${CIRCLE_TAG} != ${MAJOR_VERSION}* ]]; then
-              echo "There is mismatch:"
-              echo "  TAG_VERSION: ${TAG_VERSION}"
-              echo "  PKG_VERSION: ${PKG_VERSION}"
-              exit 1
-            fi
-            echo "export VERSION=${CIRCLE_TAG}" >> ${BASH_ENV}
-            source ${BASH_ENV}
-      - run:
-          name: Install Dependencies
-          command: |
-            sudo npm install -g nexe
-            sudo apt-get install ruby ruby-dev rubygems build-essential
-            sudo gem install --no-ri --no-rdoc fpm
-      - run:
-          name: Prepare Folders and Files
-          command: |
-            mkdir -p .build/scripts
-            cp ./scripts/linux/* .build/scripts/
-      - run:
-          name: Build Executable
-          command: nexe -i index.js -o .build/logdna-agent -t linux-x64-8.3.0
-      - run:
-          name: Package for Debian
-          command: |
-            fpm \
-              --input-type ${INPUT_TYPE}\
-              --output-type ${DEBIAN}\
-              --name ${NAME}\
-              --version ${VERSION}\
-              --license ${LICENSE}\
-              --vendor ${VENDOR}\
-              --description ${DESCRIPTION}\
-              --url ${URL}\
-              --maintainer ${MAINTAINER}\
-              --before-remove ./.build/scripts/before-remove\
-              --after-upgrade ./.build/scripts/after-upgrade\
-              --force --deb-no-default-config-files\
-                ./.build/logdna-agent=/usr/bin/logdna-agent\
-                ./.build/scripts/init-script=/etc/init.d/logdna-agent\
-                ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
-      - run:
-          name: Package for RedHat
-          command: |
-            fpm \
-              --input-type ${INPUT_TYPE}\
-              --output-type ${REDHAT}\
-              --name ${NAME}\
-              --version ${VERSION}\
-              --license ${LICENSE}\
-              --vendor ${VENDOR}\
-              --description ${DESCRIPTION}\
-              --url ${URL}\
-              --maintainer ${MAINTAINER}\
-              --before-remove ./.build/scripts/before-remove\
-              --after-upgrade ./.build/scripts/after-upgrade\
-              --force\
-                ./.build/logdna-agent=/usr/bin/logdna-agent\
-                ./.build/scripts/init-script=/etc/init.d/logdna-agent\
-                ./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
+      - run: npm run test.version
+      - run: npm run build.linux
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-agent_${VERSION}_amd64.${DEBIAN}
-            - ./logdna-agent_${VERSION}_amd64.${REDHAT}
+            - ./logdna-agent_${VERSION}_amd64.deb
+            - ./logdna-agent-${VERSION}-1.x86_64.rpm
+  test-linux:
+    docker:
+      - image: circleci/python:3
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: npm run test.version
+      - run: npm run test.linux
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./logdna-agent_${VERSION}_amd64.deb
+            - ./logdna-agent-${VERSION}-1.x86_64.rpm
+  deploy-linux:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: npm run test.version
+      - run: npm run deploy.linux
   image-build:
     executor: docker-publisher
     steps:
@@ -203,18 +148,35 @@ workflows:
   version: 2
   test:
     jobs:
-      - test
+      - test-unit
   publish-linux:
     jobs:
-      - test:
+      - test-unit:
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - linux-build:
+      - build-linux:
           requires:
-            - test
+            - test-unit
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - test-linux:
+          requires:
+            - build-linux
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - deploy-linux:
+          type: approval
+          requires:
+            - test-linux
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -222,7 +184,7 @@ workflows:
               ignore: /.*/
   publish-image:
     jobs:
-      - test:
+      - test-unit:
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -230,7 +192,7 @@ workflows:
               ignore: /.*/
       - image-build:
           requires:
-            - test
+            - test-unit
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -245,6 +207,7 @@ workflows:
             branches:
               ignore: /.*/
       - docker-hub-upload:
+          type: approval
           requires:
             - docker-sysdig-scan
           filters:
@@ -269,10 +232,10 @@ workflows:
             branches:
               only: master
     jobs:
-      - test
+      - test-unit
       - image-build:
           requires:
-            - test
+            - test-unit
       - docker-sysdig-scan:
           requires:
             - image-build
