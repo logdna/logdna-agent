@@ -8,7 +8,7 @@ executors:
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
-  test.unit:
+  test-unit:
     docker:
       - image: circleci/node:12.13.0
     steps:
@@ -16,7 +16,7 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm run test.unit
-  build.linux:
+  build-linux:
     docker:
       - image: circleci/node:12.13.0
     steps:
@@ -28,7 +28,7 @@ jobs:
           paths:
             - ./logdna-agent_${VERSION}_amd64.deb
             - ./logdna-agent-${VERSION}-1.x86_64.rpm
-  test.linux:
+  test-linux:
     docker:
       - image: circleci/python:3
     steps:
@@ -41,7 +41,7 @@ jobs:
           paths:
             - ./logdna-agent_${VERSION}_amd64.deb
             - ./logdna-agent-${VERSION}-1.x86_64.rpm
-  deploy.linux:
+  deploy-linux:
     docker:
       - image: circleci/golang:1.12
     steps:
@@ -148,35 +148,35 @@ workflows:
   version: 2
   test:
     jobs:
-      - test.unit
-  publish.linux:
+      - test-unit
+  publish-linux:
     jobs:
-      - test.unit:
+      - test-unit:
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - build.linux:
+      - build-linux:
           requires:
-            - test.unit
+            - test-unit
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - test.linux:
+      - test-linux:
           requires:
-            - build.linux
+            - build-linux
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - deploy.linux:
+      - deploy-linux:
           type: approval
           requires:
-            - test.linux
+            - test-linux
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -184,7 +184,7 @@ workflows:
               ignore: /.*/
   publish-image:
     jobs:
-      - test.unit:
+      - test-unit:
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -232,10 +232,10 @@ workflows:
             branches:
               only: master
     jobs:
-      - test.unit
+      - test-unit
       - image-build:
           requires:
-            - test.unit
+            - test-unit
       - docker-sysdig-scan:
           requires:
             - image-build
