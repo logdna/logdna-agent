@@ -7,14 +7,8 @@ executors:
       MAJOR_VERSION: 1.
     docker:
       - image: circleci/buildpack-deps:stretch
-  linux-publisher:
-    environment:
-      ANSIBLE_HOST_KEY_CHECKING: False
-      TERRAFORM_STATE_ROOT: .
-    docker:
-      - image: circleci/node:12.13.0
 jobs:
-  test:
+  test.unit:
     docker:
       - image: circleci/node:12.13.0
     steps:
@@ -22,7 +16,7 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm run test.unit
-  linux-build:
+  build.linux:
     docker:
       - image: circleci/node:12.13.0
     steps:
@@ -34,7 +28,7 @@ jobs:
           paths:
             - ./logdna-agent_${VERSION}_amd64.deb
             - ./logdna-agent-${VERSION}-1.x86_64.rpm
-  ansible-test:
+  test.linux:
     docker:
       - image: circleci/python:3
     steps:
@@ -47,6 +41,14 @@ jobs:
           paths:
             - ./logdna-agent_${VERSION}_amd64.deb
             - ./logdna-agent-${VERSION}-1.x86_64.rpm
+  deploy.linux:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: npm run test.version
+      - run: npm run deploy.linux
   image-build:
     executor: docker-publisher
     steps:
@@ -146,26 +148,35 @@ workflows:
   version: 2
   test:
     jobs:
-      - test
+      - test.unit
   publish-linux:
     jobs:
-      - test:
+      - test.unit:
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - linux-build:
+      - build.linux:
           requires:
-            - test
+            - test.unit
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - ansible-test:
+      - test.linux:
           requires:
-            - linux-build
+            - build.linux
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - deploy.linux:
+          type: approval
+          requires:
+            - test.linux
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -173,7 +184,7 @@ workflows:
               ignore: /.*/
   publish-image:
     jobs:
-      - test:
+      - test.unit:
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -196,6 +207,7 @@ workflows:
             branches:
               ignore: /.*/
       - docker-hub-upload:
+          type: approval
           requires:
             - docker-sysdig-scan
           filters:
@@ -220,10 +232,10 @@ workflows:
             branches:
               only: master
     jobs:
-      - test
+      - test.unit
       - image-build:
           requires:
-            - test
+            - test.unit
       - docker-sysdig-scan:
           requires:
             - image-build
