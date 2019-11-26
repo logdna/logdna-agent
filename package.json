@@ -6,6 +6,7 @@
   "scripts": {
     "build.linux": "bash ./scripts/linux/build.sh",
     "lint": "./node_modules/.bin/grunt eslint",
+    "test.linux": "bash ./scripts/linux/test.sh",
     "test.unit": "./node_modules/.bin/grunt mochacli",
     "test.version": "bash ./scripts/etc/version.sh"
   },
