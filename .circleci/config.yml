@@ -163,6 +163,14 @@ workflows:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
+      - ansible-test:
+          requires:
+            - linux-build
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
   publish-image:
     jobs:
       - test:
