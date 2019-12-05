@@ -69,6 +69,10 @@ jobs:
 #          paths:
 #            - ./logdna-agent_1.6.2_amd64.deb
 #            - ./logdna-agent-1.6.2-1.x86_64.rpm
+  approve-linux:
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
   deploy-linux:
     docker:
       - image: circleci/golang:1.12
@@ -209,11 +213,19 @@ workflows:
 #              only: /[0-9]+\.[0-9]+\.[0-9]+/
 #            branches:
 #              ignore: /.*/
-      - deploy-linux:
+      - approve-linux:
           type: approval
           requires:
-#            - test-linux
             - build-linux
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - deploy-linux:
+          requires:
+#            - test-linux
+            - approve-linux
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
