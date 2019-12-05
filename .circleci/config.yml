@@ -35,9 +35,8 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: npm install --production
-      - run: npm run test.version
-      - run: npm run test.linux
+      - run: bash ./scripts/etc/version.sh
+      - run: bash ./scripts/linux/test.sh
       - persist_to_workspace:
           root: .
           paths:
@@ -49,9 +48,8 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: npm install --production
-      - run: npm run test.version
-      - run: npm run deploy.linux
+      - run: bash ./scripts/etc/version.sh
+      - run: bash ./scripts/linux/deploy.sh
   image-build:
     executor: docker-publisher
     steps:
