@@ -91,11 +91,12 @@ jobs:
             go get -u github.com/tcnksm/ghr
             # Step 2:
             ghr \
-              -n "LogDNA Agent v${VERSION}" \
+              -n "LogDNA Agent v1.6.2" \
               -t ${GITHUB_TOKEN} \
               -u logdna \
               -r logdna-agent \
-              -draft ${VERSION} /tmp/workspace/logdna-agent_${VERSION}*
+              -draft \
+              1.6.2 /tmp/workspace/logdna-agent_${VERSION}*
   image-build:
     executor: docker-publisher
     steps:
