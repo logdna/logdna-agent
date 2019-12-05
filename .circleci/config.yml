@@ -44,6 +44,7 @@ jobs:
             # Step 1: Install Dependencies
             sudo apt-get install -y virtualenv
             git clone https://${GITHUB_TOKEN}@github.com/answerbook/logdna-agent-ansible.git
+            cp logdna-agent_1.6.2_amd64.deb logdna-agent-1.6.2-1.x86_64.rpm logdna-agent-ansible/files/
             # Step 2: Create a Virtual Environment for Ansible
             cd logdna-agent-ansible
             virtualenv venv
@@ -52,8 +53,6 @@ jobs:
             eval $(ssh-agent)
             chmod 600 ssh_keys/id_rsa.agent-testing
             ssh-add ssh_keys/id_rsa.agent-testing
-            cp ../*.deb logdna-agent-ansible/files/
-            cp ../*.rpm logdna-agent-ansible/files/
             # Step 3: Install LogDNA Agent onto Hosts
             ansible-playbook -l ubuntu*:centos-7:debian-9:rhel* -i hosts install_agent.yml
             # Step 4: Test Sending Logs thru LogDNA Agent on Hosts
