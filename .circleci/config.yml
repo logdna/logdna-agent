@@ -27,8 +27,8 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-agent_${VERSION}_amd64.deb
-            - ./logdna-agent-${VERSION}-1.x86_64.rpm
+            - ./*_${VERSION}_amd64.deb
+            - ./*-${VERSION}-1.x86_64.rpm
   test-linux:
     docker:
       - image: circleci/python:3
@@ -41,8 +41,8 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-agent_${VERSION}_amd64.deb
-            - ./logdna-agent-${VERSION}-1.x86_64.rpm
+            - ./*_${VERSION}_amd64.deb
+            - ./*-${VERSION}-1.x86_64.rpm
   deploy-linux:
     docker:
       - image: circleci/golang:1.12
