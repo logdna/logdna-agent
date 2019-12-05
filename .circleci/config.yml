@@ -24,13 +24,11 @@ jobs:
       - run: npm install --production
       - run: npm run test.version
       - run: npm run build.linux
-      - run: ls -a .
-      - run: ls -a .build
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-agent_${VERSION}_amd64.deb
-            - ./logdna-agent-${VERSION}-1.x86_64.rpm
+            - ./logdna-agent_1.6.2_amd64.deb
+            - ./logdna-agent-1.6.2-1.x86_64.rpm
   test-linux:
     docker:
       - image: circleci/python:3
@@ -43,8 +41,8 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-agent_${VERSION}_amd64.deb
-            - ./logdna-agent-${VERSION}-1.x86_64.rpm
+            - ./logdna-agent_1.6.2_amd64.deb
+            - ./logdna-agent-1.6.2-1.x86_64.rpm
   deploy-linux:
     docker:
       - image: circleci/golang:1.12
