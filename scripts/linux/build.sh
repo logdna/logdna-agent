@@ -60,4 +60,5 @@ fpm \
 		./scripts/init-script=/etc/init.d/logdna-agent \
 		./scripts/logrotate=/etc/logrotate.d/logdna-agent
 
+cp *.deb *.rpm ../
 popd > /dev/null 2>&1 || return
