@@ -44,7 +44,7 @@ jobs:
             # Step 1: Install Dependencies
             sudo apt-get install -y virtualenv
             git clone https://${GITHUB_TOKEN}@github.com/answerbook/logdna-agent-ansible.git
-            cp logdna-agent_1.6.2_amd64.deb logdna-agent-1.6.2-1.x86_64.rpm logdna-agent-ansible/files/
+            cp /tmp/workspace/logdna-agent_1.6.2_amd64.deb /tmp/workspace/logdna-agent-1.6.2-1.x86_64.rpm logdna-agent-ansible/files/
             # Step 2: Create a Virtual Environment for Ansible
             cd logdna-agent-ansible
             virtualenv venv
