@@ -24,8 +24,8 @@ jobs:
       - run: npm install --production
       - run: npm run test.version
       - run: npm run build.linux
-      - run: ll -a .
-      - run: ll -a .build
+      - run: ls -a .
+      - run: ls -a .build
       - persist_to_workspace:
           root: .
           paths:
