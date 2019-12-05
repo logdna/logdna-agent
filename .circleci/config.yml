@@ -13,7 +13,7 @@ jobs:
       - image: circleci/node:12.13.0
     steps:
       - checkout
-      - run: npm install --production
+      - run: npm install
       - run: npm run lint
       - run: npm run test.unit
   build-linux:
