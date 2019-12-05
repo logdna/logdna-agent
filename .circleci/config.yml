@@ -13,7 +13,7 @@ jobs:
       - image: circleci/node:12.13.0
     steps:
       - checkout
-      - run: npm install
+      - run: npm install --production
       - run: npm run lint
       - run: npm run test.unit
   build-linux:
@@ -21,6 +21,7 @@ jobs:
       - image: circleci/node:12.13.0
     steps:
       - checkout
+      - run: npm install --production
       - run: npm run test.version
       - run: npm run build.linux
       - persist_to_workspace:
@@ -34,6 +35,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
+      - run: npm install --production
       - run: npm run test.version
       - run: npm run test.linux
       - persist_to_workspace:
@@ -47,6 +49,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
+      - run: npm install --production
       - run: npm run test.version
       - run: npm run deploy.linux
   image-build:
