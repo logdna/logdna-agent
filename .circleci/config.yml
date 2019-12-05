@@ -90,7 +90,12 @@ jobs:
             # Step 1: Install Dependencies
             go get -u github.com/tcnksm/ghr
             # Step 2:
-            ghr -n "LogDNA Agent v${VERSION}" -draft ${VERSION} /tmp/workspace/logdna-agent_${VERSION}*
+            ghr \
+              -n "LogDNA Agent v${VERSION}" \
+              -t ${GITHUB_TOKEN} \
+              -u logdna \
+              -r logdna-agent \
+              -draft ${VERSION} /tmp/workspace/logdna-agent_${VERSION}*
   image-build:
     executor: docker-publisher
     steps:
