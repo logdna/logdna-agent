@@ -24,6 +24,8 @@ jobs:
       - run: npm install --production
       - run: npm run test.version
       - run: npm run build.linux
+      - run: ll -a .
+      - run: ll -a .build
       - persist_to_workspace:
           root: .
           paths:
@@ -38,8 +40,6 @@ jobs:
       - run: npm install --production
       - run: npm run test.version
       - run: npm run test.linux
-      - run: ll -a .
-      - run: ll -a .build
       - persist_to_workspace:
           root: .
           paths:
