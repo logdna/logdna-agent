@@ -21,6 +21,8 @@ cp ./scripts/linux/files/* .build/scripts/
 
 # Step 3: Compile and Build Executable
 nexe -i index.js -o .build/logdna-agent -t linux-${ARCH}-${NODE_VERSION}
+pushd . > /dev/null 2>&1
+cd .build
 
 # Step 4: Debian Packaging
 fpm \
@@ -33,12 +35,12 @@ fpm \
 	--description "LogDNA Agent for Linux" \
 	--url "http://logdna.com/" \
 	--maintainer "support@logdna.com" \
-	--before-remove ./.build/scripts/before-remove \
-	--after-upgrade ./.build/scripts/after-upgrade \
+	--before-remove ./scripts/before-remove \
+	--after-upgrade ./scripts/after-upgrade \
 	--force --deb-no-default-config-files \
-		./.build/logdna-agent=/usr/bin/logdna-agent \
-		./.build/scripts/init-script=/etc/init.d/logdna-agent \
-		./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
+		./logdna-agent=/usr/bin/logdna-agent \
+		./scripts/init-script=/etc/init.d/logdna-agent \
+		./scripts/logrotate=/etc/logrotate.d/logdna-agent
 
 # Step 5: RedHat Packaging
 fpm \
@@ -51,9 +53,11 @@ fpm \
 	--description "LogDNA Agent for Linux" \
 	--url "http://logdna.com/" \
 	--maintainer "support@logdna.com" \
-	--before-remove ./.build/scripts/before-remove \
-	--after-upgrade ./.build/scripts/after-upgrade \
+	--before-remove ./scripts/before-remove \
+	--after-upgrade ./scripts/after-upgrade \
 	--force \
-		./.build/logdna-agent=/usr/bin/logdna-agent \
-		./.build/scripts/init-script=/etc/init.d/logdna-agent \
-		./.build/scripts/logrotate=/etc/logrotate.d/logdna-agent
+		./logdna-agent=/usr/bin/logdna-agent \
+		./scripts/init-script=/etc/init.d/logdna-agent \
+		./scripts/logrotate=/etc/logrotate.d/logdna-agent
+
+popd > /dev/null 2>&1 || return

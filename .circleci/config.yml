@@ -38,11 +38,13 @@ jobs:
       - run: npm install --production
       - run: npm run test.version
       - run: npm run test.linux
+      - run: ll -a .
+      - run: ll -a .build
       - persist_to_workspace:
           root: .
           paths:
-            - ./*_${VERSION}_amd64.deb
-            - ./*-${VERSION}-1.x86_64.rpm
+            - ./logdna-agent_${VERSION}_amd64.deb
+            - ./logdna-agent-${VERSION}-1.x86_64.rpm
   deploy-linux:
     docker:
       - image: circleci/golang:1.12
