@@ -54,9 +54,9 @@ jobs:
             chmod 600 ssh_keys/id_rsa.agent-testing
             ssh-add ssh_keys/id_rsa.agent-testing
             # Step 3: Install LogDNA Agent onto Hosts
-            ansible-playbook -l ubuntu*:centos-7:debian-9:rhel* -i hosts install_agent.yml
+            ansible-playbook -i hosts install_agent.yml
             # Step 4: Test Sending Logs thru LogDNA Agent on Hosts
-            ansible-playbook -l ubuntu*:centos-7:debian-9:rhel* -i hosts generate_fakelogs.yml
+            ansible-playbook -i hosts generate_fakelogs.yml
             # Step 5: Analyze the Results
             py.test \
               -n 4 \
