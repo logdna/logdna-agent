@@ -35,8 +35,52 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: bash ./scripts/etc/version.sh
-      - run: bash ./scripts/linux/test.sh
+      - run:
+          name: Do Version Check
+          command: |
+            # Gather Both Given Versions
+            TAG_VERSION=$(git tag --sort=-creatordate | head -n 1)
+            PKG_VERSION=$(cat package.json | grep "\"version\"" | cut -d':' -f2 | cut -d '"' -f2)
+            # Check and Fail if No Match
+            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${TAG_VERSION}"
+              echo "  PKG_VERSION: ${PKG_VERSION}"
+              exit 1
+            fi
+            # Export VERSION if Successful
+            echo "export VERSION=${TAG_VERSION}" >> ${BASH_ENV}
+            source ${BASH_ENV}
+      - run:
+          name: Run Ansible Tests
+          command: |
+            # Variables
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            export TERRAFORM_STATE_ROOT=.
+            # Step 1: Install Dependencies
+            sudo apt-get install -y virtualenv
+            git clone https://${GITHUB_TOKEN}@github.com/answerbook/logdna-agent-ansible.git
+            # Step 2: Create a Virtual Environment for Ansible
+            cd logdna-agent-ansible
+            virtualenv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            eval $(ssh-agent)
+            chmod 600 ssh_keys/id_rsa.agent-testing
+            ssh-add ssh_keys/id_rsa.agent-testing
+            cp ../*.deb logdna-agent-ansible/files/
+            cp ../*.rpm logdna-agent-ansible/files/
+            # Step 3: Install LogDNA Agent onto Hosts
+            ansible-playbook -l ubuntu*:centos-7:debian-9:rhel* -i hosts install_agent.yml
+            # Step 4: Test Sending Logs thru LogDNA Agent on Hosts
+            ansible-playbook -l ubuntu*:centos-7:debian-9:rhel* -i hosts generate_fakelogs.yml
+            # Step 5: Analyze the Results
+            py.test \
+              -n 4 \
+              --force-ansible --ansible-inventory=hosts \
+              --connection=ansible \
+              -v tests \
+              --sudo --cache-clear --hosts rhel-7,ubuntu-1604,debian-9,centos-7,ubuntu-1804
       - persist_to_workspace:
           root: .
           paths:
@@ -48,8 +92,32 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: bash ./scripts/etc/version.sh
-      - run: bash ./scripts/linux/deploy.sh
+      - run:
+          name: Do Version Check
+          command: |
+            # Gather Both Given Versions
+            TAG_VERSION=$(git tag --sort=-creatordate | head -n 1)
+            PKG_VERSION=$(cat package.json | grep "\"version\"" | cut -d':' -f2 | cut -d '"' -f2)
+            # Check and Fail if No Match
+            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${TAG_VERSION}"
+              echo "  PKG_VERSION: ${PKG_VERSION}"
+              exit 1
+            fi
+            # Export VERSION if Successful
+            echo "export VERSION=${TAG_VERSION}" >> ${BASH_ENV}
+            source ${BASH_ENV}
+      - run:
+          name: Publish to GitHub Releases
+          command: |
+            # Variables
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            export TERRAFORM_STATE_ROOT=.
+            # Step 1: Install Dependencies
+            go get -u github.com/tcnksm/ghr
+            # Step 2:
+            ghr -n "LogDNA Agent v${VERSION}" -draft ${VERSION} logdna-agent_${VERSION}*
   image-build:
     executor: docker-publisher
     steps:
