@@ -96,7 +96,7 @@ jobs:
               -u logdna \
               -r logdna-agent \
               -draft \
-              1.6.2 /tmp/workspace/logdna-agent_${VERSION}*
+              1.6.2 /tmp/workspace/
   image-build:
     executor: docker-publisher
     steps:
