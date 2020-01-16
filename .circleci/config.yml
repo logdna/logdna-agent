@@ -106,6 +106,12 @@ jobs:
       - run:
           name: Scan Sandbox Image
           command: docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=${SYSDIG_SECURE_TOKEN} logdna/sysdigsecure
+  approve-docker-image:
+    executor: docker-publisher
+    steps:
+      - attach_workspace: 
+          at: /tmp/workspace  
+      - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
   docker-hub-upload:
     executor: docker-publisher
     steps:
@@ -214,10 +220,18 @@ workflows:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - docker-hub-upload:
+      - approve-docker-image:
           type: approval
           requires:
             - docker-sysdig-scan
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - docker-hub-upload:
+          requires:
+            - approve-docker-image
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -247,10 +261,13 @@ workflows:
       - docker-sysdig-scan:
           requires:
             - image-build
-      - docker-hub-upload:
+      - approve-docker-image:
           type: approval
           requires:
             - docker-sysdig-scan
+      - docker-hub-upload:
+          requires:
+            - approve-docker-image
       - ibm-registry-upload:
           requires:
             - docker-hub-upload
