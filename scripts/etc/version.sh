@@ -2,7 +2,7 @@
 
 # Gather Both Given Versions
 TAG_VERSION=$(git tag --sort=-creatordate | head -n 1)
-PKG_VERSION=$(cat package.json | grep "\"version\"" | cut -d':' -f2 | cut -d '"' -f2)
+PKG_VERSION=$(grep "\"version\"" package.json | cut -d'"' -f4)
 
 # Check and Fail if No Match
 if [[ "${TAG_VERSION}" != "${PKG_VERSION}" ]]; then
