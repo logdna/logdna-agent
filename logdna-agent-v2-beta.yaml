@@ -13,8 +13,8 @@ spec:
       labels:
         app: logdna-agent
     spec:
-      containers:
       serviceAccountName: logdna-agent
+      containers:
       - name: logdna-agent
         image: logdna/logdna-agent:2.1.8-beta
         imagePullPolicy: Always
