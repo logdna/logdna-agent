@@ -3,7 +3,6 @@ const async = require('async');
 const debug = require('debug')('logdna:index');
 const fs = require('fs');
 const getos = require('getos');
-const macaddress = require('macaddress');
 const os = require('os');
 const program = require('commander');
 const properties = require('properties');
@@ -256,8 +255,8 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 timeout: 1000
                 , json: true
             }, (error, response, body) => {
-                return cb(err, body);
-            }
+                return cb(error, body);
+            });
         }
     ], (error, responseBody) => {
         if (responseBody) {
@@ -279,7 +278,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
         })[0];
 
         if (networkInterface.mac) { config.mac = networkInterface.mac; }
-        if (networkInterface.ip) { config.ip = networkInterface.ip; }
+        if (networkInterface.address) { config.ip = networkInterface.address; }
 
         utils.log(`${config.package} started on ${config.hostname} (${config.ip})`);
         if (config.platform && config.platform.startsWith('k8s')) { k8s.init(); }
