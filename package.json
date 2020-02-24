@@ -22,26 +22,26 @@
   },
   "homepage": "https://github.com/logdna/logdna-agent",
   "dependencies": {
-    "agentkeepalive": "^2.1.1",
-    "async": "^1.5.2",
-    "commander": "^2.20.0",
-    "debug": "^2.2.0",
-    "file-queue": "^0.2.1",
-    "getos": "^2.4.0",
-    "glob": "^7.0.3",
+    "agentkeepalive": "^4.1.0",
+    "async": "^3.2.0",
+    "commander": "^4.1.1",
+    "debug": "^4.1.1",
+    "file-queue": "^0.3.0",
+    "getos": "^3.1.4",
+    "glob": "^7.1.6",
     "is-administrator": "^1.0.1",
-    "macaddress": "^0.2.8",
+    "macaddress": "^0.2.9",
     "properties": "^1.2.1",
-    "request": "^2.71.0"
+    "request": "^2.88.2"
   },
   "devDependencies": {
-    "grunt": "^1.0.3",
+    "grunt": "^1.0.4",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-eslint": "^20.0.0",
-    "grunt-exec": "^0.4.6",
+    "grunt-eslint": "^22.0.0",
+    "grunt-exec": "^3.0.0",
     "grunt-line-remover": "0.0.2",
-    "grunt-mocha-cli": "^4.0.0",
-    "load-grunt-tasks": "^3.4.0",
-    "rimraf": "^2.5.2"
+    "grunt-mocha-cli": "^5.0.0",
+    "load-grunt-tasks": "^5.1.0",
+    "rimraf": "^3.0.2"
   }
 }
