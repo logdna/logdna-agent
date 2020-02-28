@@ -24,7 +24,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm run lint
+      - run: npm run test.lint
       - run: npm run test.unit
   build-linux:
     docker:
