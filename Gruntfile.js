@@ -1,37 +1,20 @@
-var pkg = require('./package.json');
-var grunt = require('grunt');
-var path = require('path');
-var os = require('os');
+const pkg = require('./package.json');
+const grunt = require('grunt');
+const os = require('os');
 
 require('load-grunt-tasks')(grunt);
 
-module.exports = function(grunt) {
-    var files = ['./*.js', 'lib/**/*.js', 'test/**/*.js'];
-    var buildOutputFile = os.platform() !== 'win32' ? 'logdna-agent' : 'logdna-agent.exe';
+module.exports = (grunt) => {
+    const buildOutputFile = os.platform() !== 'win32' ? 'logdna-agent' : 'logdna-agent.exe';
 
     grunt.initConfig({
-        lineremover: {
-            nukebrowser: {
-                files: {
-                    'node_modules/ws/package.json': path.join('node_modules', 'ws', 'package.json')
-                }, options: {
-                    exclusionPattern: /browser/
-                }
-            }
-
-        }, exec: {
+        exec: {
             nexe: { cmd: `nexe -i index.js -o ${buildOutputFile} -f -t ~/tmp -r 8.3.0`, maxBuffer: 20000 * 1024 }
             , fpm_rpm: `fpm -s dir -t rpm -n logdna-agent -v ${pkg.version} --license MIT --vendor 'LogDNA, Inc.' --description 'LogDNA Agent for Debian' --url http://logdna.com/ -m '<support@logdna.com>' --before-remove ./scripts/linux/files/before-remove --after-upgrade ./scripts/linux/files/after-upgrade -f ./logdna-agent=/usr/bin/logdna-agent ./scripts/linux/files/init-script=/etc/init.d/logdna-agent ./scripts/linux/files/logrotate=/etc/logrotate.d/logdna-agent`
             , fpm_deb: `fpm -s dir -t deb -n logdna-agent -v ${pkg.version} --license MIT --vendor 'LogDNA, Inc.' --description 'LogDNA Agent for RedHat' --url http://logdna.com/ -m '<support@logdna.com>' --before-remove ./scripts/linux/files/before-remove --after-upgrade ./scripts/linux/files/after-upgrade -f --deb-no-default-config-files ./logdna-agent=/usr/bin/logdna-agent ./scripts/linux/files/init-script=/etc/init.d/logdna-agent ./scripts/linux/files/logrotate=/etc/logrotate.d/logdna-agent`
             , fpm_pkg: `fpm -s dir -t osxpkg -n logdna-agent -v ${pkg.version} --license MIT --vendor 'LogDNA, Inc.' --description 'LogDNA Agent for Darwin' --url http://logdna.com/ -m '<support@logdna.com>' --after-install ./scripts/macOS/mac-after-install --osxpkg-identifier-prefix com.logdna -f ./logdna-agent=/usr/local/bin/logdna-agent ./scripts/macOS/com.logdna.logdna-agent.plist=/Library/LaunchDaemons/com.logdna.logdna-agent.plist`
             , sign_pkg: `productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-${pkg.version}.pkg logdna-agent.pkg`
             , choco: 'pushd .\\.builds\\windows & cpack'
-
-        }, mochacli: {
-            options: {
-                reporter: 'spec'
-                , bail: true
-            }, all: ['test/**/*.js']
 
         }, copy: {
             nuspec: {
@@ -60,22 +43,13 @@ module.exports = function(grunt) {
                 }]
             }
 
-        }, eslint: {
-            target: files
-            , options: {
-                configFile: '.eslintrc'
-                , fix: false
-            }
         }
     });
 
-    grunt.registerTask('test', ['mochacli', 'eslint']);
-    grunt.registerTask('validate', ['eslint']);
-    grunt.registerTask('build', ['lineremover', 'exec:nexe']);
-    grunt.registerTask('linux', ['build', 'exec:fpm_rpm', 'exec:fpm_deb']);
-    grunt.registerTask('mac', ['build', 'exec:fpm_pkg', 'exec:sign_pkg']);
+    grunt.registerTask('linux', ['exec:nexe', 'exec:fpm_rpm', 'exec:fpm_deb']);
+    grunt.registerTask('mac', ['exec:nexe', 'exec:fpm_pkg', 'exec:sign_pkg']);
     grunt.registerTask('windows', [
-        'build'
+        'exec:nexe'
         , 'copy:nuspec'
         , 'copy:winexe'
         , 'copy:windowsScripts'

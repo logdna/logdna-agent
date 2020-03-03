@@ -1,7 +1,6 @@
 /* globals describe, it, beforeEach, after */
 
 // External Modules
-const assert = require('assert');
 const async = require('async');
 const debug = require('debug')('logdna:test:lib:file-utilities');
 const fs = require('fs');
@@ -14,7 +13,7 @@ const fileUtilities = require('../../lib/file-utilities');
 const utils = require('../../lib/utils');
 
 // Constants
-const configPath = './test/assets/testconfig.config';
+const configPath = './__test__/assets/testconfig.config';
 const tempDir = '.temp';
 
 describe('lib:file-utilities', () => {
@@ -28,7 +27,7 @@ describe('lib:file-utilities', () => {
         });
     });
 
-    after(() => {
+    afterAll(() => {
         return rimraf(tempDir, () => {
             return debug('Cleaned');
         });
@@ -48,9 +47,10 @@ describe('lib:file-utilities', () => {
                 fs.writeFileSync(testFile, 'arbitraryData\n');
             });
 
-            fileUtilities.getFiles({}, tempDir, (err, array) => {
+            fileUtilities.getFiles({}, tempDir, (error, array) => {
                 debug(array);
-                assert.equal(array.length, testFiles.length, 'Expected to find all log files');
+                expect(array.length).toEqual(testFiles.length);
+                expect(error).toBe(null);
             });
         });
 
@@ -65,9 +65,10 @@ describe('lib:file-utilities', () => {
                 fs.writeFileSync(testFile, 'arbitraryData\n');
             });
 
-            fileUtilities.getFiles({}, tempDir, (err, array) => {
+            fileUtilities.getFiles({}, tempDir, (error, array) => {
                 debug(array);
-                assert.equal(array.length, 0, 'Expected to find no log files');
+                expect(array.length).toEqual(0);
+                expect(error).toBe(null);
             });
         });
 
@@ -81,9 +82,10 @@ describe('lib:file-utilities', () => {
                 fs.writeFileSync(testFile, 'arbitraryData\n');
             });
 
-            fileUtilities.getFiles({}, path.join(tempDir, '*.txt'), (err, array) => {
+            fileUtilities.getFiles({}, path.join(tempDir, '*.txt'), (error, array) => {
                 debug(array);
-                assert.equal(array.length, 1, 'Expected to find only 1 log file, not recursive');
+                expect(array.length).toEqual(1);
+                expect(error).toBe(null);
             });
         });
 
@@ -99,9 +101,10 @@ describe('lib:file-utilities', () => {
                 fs.writeFileSync(testFile, 'arbitraryData\n');
             });
 
-            fileUtilities.getFiles({}, path.join(tempDir, '**', '*.txt'), (err, array) => {
+            fileUtilities.getFiles({}, path.join(tempDir, '**', '*.txt'), (error, array) => {
                 debug(array);
-                assert.equal(array.length, 2, 'Expected to find 2 log files, recursive');
+                expect(array.length).toEqual(2);
+                expect(error).toBe(null);
             });
         });
     });
@@ -115,9 +118,9 @@ describe('lib:file-utilities', () => {
             const xs = func('z');
 
             debug(xs);
-            assert(xs[0], 'x');
-            assert(xs[1], 'y');
-            assert(xs[2], 'z');
+            expect(xs[0]).toEqual('x');
+            expect(xs[1]).toEqual('y');
+            expect(xs[2]).toEqual('z');
         });
     });
 
@@ -134,8 +137,8 @@ describe('lib:file-utilities', () => {
                     path: true
                 }, cb);
             }], (error, config) => {
-                assert.ok(config.key);
-                assert.equal(config.autoupdate, 0);
+                expect(config.key).toBeDefined();
+                expect(config.autoupdate).toEqual(0);
             });
         });
     });

@@ -3,7 +3,6 @@ const async = require('async');
 const debug = require('debug')('logdna:index');
 const fs = require('fs');
 const getos = require('getos');
-const macaddress = require('macaddress');
 const os = require('os');
 const program = require('commander');
 const properties = require('properties');
@@ -255,41 +254,31 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             return request(config.AWS_INSTANCE_CHECK_URL, {
                 timeout: 1000
                 , json: true
-            }, (err, res, body) => {
-                if (res && res.statusCode && body) {
-                    config.awsid = body.instanceId;
-                    config.awsregion = body.region;
-                    config.awsaz = body.availabilityZone;
-                    config.awsami = body.imageId;
-                    config.awstype = body.instanceType;
-                }
-                macaddress.all((error, all) => {
-                    if (error) {
-                        utils.log(`error in getting mac address: ${error}`, 'error');
-                    }
-                    return cb(null, error ? {} : all);
-                });
+            }, (error, response, body) => {
+                return cb(error, body);
             });
         }
-    ], (error, all) => {
-        if (all) {
-            var ifaces = Object.keys(all);
-            for (var i = 0; i < ifaces.length; i++) {
-                if (
-                    all[ifaces[i]].ipv4 && (
-                        all[ifaces[i]].ipv4.startsWith('10.') ||
-                        all[ifaces[i]].ipv4.startsWith('172.1') ||
-                        all[ifaces[i]].ipv4.startsWith('172.2') ||
-                        all[ifaces[i]].ipv4.startsWith('172.3') ||
-                        all[ifaces[i]].ipv4.startsWith('192.168.')
-                    )
-                ) {
-                    config.mac = all[ifaces[i]].mac;
-                    config.ip = all[ifaces[i]].ipv4 || all[ifaces[i]].ipv6;
-                    break;
-                }
-            }
+    ], (error, responseBody) => {
+        if (responseBody) {
+            config.awsid = responseBody.instanceId;
+            config.awsregion = responseBody.region;
+            config.awsaz = responseBody.availabilityZone;
+            config.awsami = responseBody.imageId;
+            config.awstype = responseBody.instanceType;
         }
+
+        const networkInterface = Object.values(os.networkInterfaces()).reduce((networkData, interfaces) => {
+            interfaces.forEach(interface => networkData.push(interface));
+            return networkData;
+        }, []).filter((interface) => {
+            return interface.family && interface.family === 'IPv4' && interface.mac && interface.address && (
+                interface.address.startsWith('10.') ||
+                interface.address.startsWith('172.') ||
+                interface.address.startsWith('192.168.'));
+        })[0];
+
+        if (networkInterface.mac) { config.mac = networkInterface.mac; }
+        if (networkInterface.address) { config.ip = networkInterface.address; }
 
         utils.log(`${config.package} started on ${config.hostname} (${config.ip})`);
         if (config.platform && config.platform.startsWith('k8s')) { k8s.init(); }

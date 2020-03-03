@@ -24,7 +24,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm run lint
+      - run: npm run test.lint
       - run: npm run test.unit
   build-linux:
     docker:
@@ -54,14 +54,11 @@ jobs:
       - run:
           name: Publish to GitHub Releases
           command: |
-            # Variables
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            export TERRAFORM_STATE_ROOT=.
             # Step 1: Install Dependencies
             go get -u github.com/tcnksm/ghr
             # Step 2:
             ghr \
-              -n "LogDNA Agent v1.6.2" \
+              -n "LogDNA Agent ${CIRCLE_TAG}" \
               -t ${GITHUB_TOKEN} \
               -u logdna \
               -r logdna-agent \
