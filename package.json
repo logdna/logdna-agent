@@ -4,12 +4,8 @@
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
-    "build.linux": "bash ./scripts/linux/build.sh",
-    "deploy.linux": "bash ./scripts/linux/deploy.sh",
-    "test.lint": "./node_modules/.bin/eslint -c .eslintrc *.js **/*.js",
-    "test.linux": "bash ./scripts/linux/test.sh",
-    "test.unit": "./node_modules/.bin/jest",
-    "test.version": "bash ./scripts/etc/version.sh"
+    "lint": "./node_modules/.bin/eslint -c .eslintrc *.js **/*.js",
+    "unit": "./node_modules/.bin/jest"
   },
   "repository": {
     "type": "git",
