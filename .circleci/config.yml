@@ -228,6 +228,12 @@ workflows:
           filters:
             branches:
               only: master
+      - slack/approval-notification:
+          webhook: ${SLACK_WEBHOOK}
+          message: "Deploy pending approval: https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID"
+          channel: "CU50G97PW" # Optional: If set, overrides webhook's default channel setting
+          requires:
+          - docker-sysdig-scan
     jobs:
       - test-unit
       - image-build:
