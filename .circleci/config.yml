@@ -17,6 +17,8 @@ executors:
       MAJOR_VERSION: 1.
     docker:
       - image: circleci/buildpack-deps:stretch
+orbs:
+  slack: circleci/slack@3.4.2
 jobs:
   test-unit:
     docker:
