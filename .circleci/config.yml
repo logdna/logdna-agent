@@ -17,6 +17,8 @@ executors:
       MAJOR_VERSION: 1.
     docker:
       - image: circleci/buildpack-deps:stretch
+orbs:
+  slack: circleci/slack@3.4.2
 jobs:
   test:
     docker:
@@ -144,6 +146,12 @@ workflows:
           requires:
             - image-build
           filters: *tagged_build_filters
+      - slack/approval-notification:
+          webhook: ${SLACK_WEBHOOK}
+          message: "Deploy pending approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+          channel: "${SLACK_INTEGRATION_NOTIFICATION_CHANNEL_KEY}" # Optional: If set, overrides webhook's default channel setting
+          requires:
+          - docker-sysdig-scan
       - approve-docker-image:
           type: approval
           requires:
@@ -173,6 +181,12 @@ workflows:
       - docker-sysdig-scan:
           requires:
             - image-build
+      - slack/approval-notification:
+          webhook: ${SLACK_WEBHOOK}
+          message: "Deploy pending approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+          channel: "${SLACK_INTEGRATION_NOTIFICATION_CHANNEL_KEY}" # Optional: If set, overrides webhook's default channel setting
+          requires:
+          - docker-sysdig-scan
       - approve-docker-image:
           type: approval
           requires:
