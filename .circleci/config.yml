@@ -152,6 +152,7 @@ workflows:
           channel: "${SLACK_INTEGRATION_NOTIFICATION_CHANNEL_KEY}" # Optional: If set, overrides webhook's default channel setting
           requires:
           - docker-sysdig-scan
+          filters: *tagged_build_filters
       - approve-docker-image:
           type: approval
           requires:
