@@ -17,6 +17,10 @@ executors:
       MAJOR_VERSION: 1.
     docker:
       - image: circleci/buildpack-deps:stretch
+parameters:
+  run_monthly_build:
+    type: boolean
+    default: false
 orbs:
   slack: circleci/slack@3.4.2
 jobs:
@@ -80,8 +84,8 @@ jobs:
   approve-docker-image:
     executor: docker-publisher
     steps:
-      - attach_workspace: 
-          at: /tmp/workspace  
+      - attach_workspace:
+          at: /tmp/workspace
       - run: cat /tmp/workspace/env-vars >> ${BASH_ENV}
   docker-hub-upload:
     executor: docker-publisher
@@ -147,6 +151,7 @@ workflows:
             - image-build
           filters: *tagged_build_filters
       - slack/approval-notification:
+          name: approval-notification
           webhook: ${SLACK_WEBHOOK}
           message: "Deploy pending approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
           channel: "${SLACK_INTEGRATION_NOTIFICATION_CHANNEL_KEY}" # Optional: If set, overrides webhook's default channel setting
@@ -174,7 +179,7 @@ workflows:
           filters:
             branches:
               only: master
-    jobs:
+    jobs: &monthly-build
       - test
       - image-build:
           requires:
@@ -198,3 +203,6 @@ workflows:
       - ibm-registry-upload:
           requires:
             - docker-hub-upload
+  monthly-build-manual:
+    when: << pipeline.parameters.run_monthly_build >>
+    jobs: *monthly-build
