@@ -92,6 +92,19 @@ grunt build
 
 This takes a bit of time and will output a binary at `./logdna-agent` (or `.\logdna-agent.exe` if on Windows). For the initial build, majority of time will be spent building node.js. Subsequent builds will be much faster as node.js would've already been built.
 
+### Docker
+
+To create the binary for Linux via Docker, run:
+
+    docker build -t logdna-agent-build -f linux-build.Dockerfile .
+
+`logdna-agent` will be available in the `/usr/local/bin` directory. To copy the
+binary to your local machine, run:
+
+    docker create -ti --name logdna-dummy logdna-agent-build sh
+    docker cp logdna-dummy:/coreos-installer .
+    docker rm -f logdna-dummy
+
 ## Packaging
 
 ### Linux
