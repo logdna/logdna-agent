@@ -176,6 +176,60 @@ Notes:
 * This uses `JOURNALD=files`, you may need to change this if you have changed OpenShift logging configuration.
 * This has been tested on OpenShift 3.5-11
 
+## Fedora CoreOS Logging
+
+If you're using a docker-less containerized (e.g. podman) operating system like
+Fedora CoreOS where logs are forwarded to journald, you will be unable to use
+logspout (if your OS does use Docker, refer to [LogDNA LogSpout][1] for
+instructions on how to set that up).
+
+You can run logdna-agent inside a container to read from journald with a few
+modifications. First, you'll need to set up systemd inside the container so
+that it can read from `journalctl`. Note that due to the systemd dependency,
+you may have some difficulties starting from a base image like Alpine. Instead,
+try starting from a distribution such as Debian or CentOS. The following
+assumes that you're starting from the Ubuntu based image provided by LogDNA.
+
+In your Containerfile, install systemd:
+
+    FROM logdna/logdna-agent
+
+    # Install systemd so we can read logs via journalctl
+    RUN apt-get update \
+        && apt-get install -y --no-install-recommends systemd \
+        && rm -rf /var/lib/apt/lists/*
+
+Next, you need to ensure the `USEJOURNALD` environment variable is set. If set
+to `files`, the agent will read from journald and forward the logs. The agent
+can be configured either in your image or entrypoint.
+
+By default the agent will read logs from the `/var/log`. These logs won't be
+very useful since they'll be referencing the container and not the host. You
+cannot omit `logdir` since the agent will still read from `/var/log` if
+`logdir` is missing from the configuration. Instead, to disable reading from
+files, set `logdir` to an empty directory (e.g. `/usr/src`).
+
+Finally, mount `/var/log/journal` inside the container so the agent can use
+`journalctl` to read logs. An example systemd service configuration could look
+like the following:
+
+    [Unit]
+    Description=LogDNA Forwarder
+    After=network-online.target
+    Wants=network-online.target
+
+    [Service]
+    Restart=on-failure
+    ExecStartPre=-/bin/podman kill logdna
+    ExecStartPre=-/bin/podman rm logdna
+    ExecStartPre=/bin/podman pull my-custom/logdna-agent
+    ExecStart=/bin/podman run -v /var/log/journal:/var/log/journal:z --name logdna my-custom/logdna-agent
+
+    [Install]
+    WantedBy=multi-user.target
+
+[1]: https://github.com/logdna/logspout
+
 ## Windows Logging
 The LogDNA agent can be installed through Chocolatey. You will need:
 * Windows PowerShell v3+ (not PowerShell Core aka PowerShell 6 yet)
