@@ -1,8 +1,11 @@
 *.Dockerfile
+*.md
 .circleci
 .dockerignore
+.eslintrc
 .git
 Dockerfile
 logdna-agent
+logdna-agent.exe
 node_modules
 package-lock.json
