@@ -3,3 +3,6 @@
 .dockerignore
 .git
 Dockerfile
+logdna-agent
+node_modules
+package-lock.json

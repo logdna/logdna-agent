@@ -102,7 +102,7 @@ To create the binary for Linux via Docker, run:
 binary to your local machine, run:
 
     docker create -ti --name logdna-dummy logdna-agent-build sh
-    docker cp logdna-dummy:/coreos-installer .
+    docker cp logdna-dummy:/usr/local/bin/logdna-agent .
     docker rm -f logdna-dummy
 
 ## Packaging

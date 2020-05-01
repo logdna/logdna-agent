@@ -1,27 +1,37 @@
-FROM centos:7
+FROM ubuntu:18.04
 
-# Install node.js development environment
-RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash - \
-    && yum install -y nodejs \
-    && npm install -g grunt-cli
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        wget
+
+# Install nodejs
+RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash \
+    && export NVM_DIR="$HOME/.nvm" \
+    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
+    && nvm install 12.9.1 \
+    && nvm use node \
+    && ln -s $(which node) /usr/local/bin/node \
+    && ln -s $(which npm) /usr/local/bin/npm
 
 # Install nexe to package the LogDNA agent as a native executable with the
 # node.js runtime bundled
-RUN npm install -g nexe@1.1.2
-
-# Install build tools
-RUN yum groupinstall -y "Development Tools"
+RUN npm install -g nexe \
+    && export NVM_DIR="$HOME/.nvm" \
+    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
+    && nvm use node \
+    && ln -s $(which nexe) /usr/local/bin/nexe
 
 # Install npm dependencies
 COPY package.json /logdna-agent/package.json
 WORKDIR /logdna-agent
 RUN npm install
 
-# Now build the package
+# Build the package
 COPY . /logdna-agent
-RUN grunt exec:nexe
+RUN nexe index.js
 
 # Test that the package is usable
-FROM alpine
+FROM ubuntu:18.04
 COPY --from=0 /logdna-agent/logdna-agent /usr/local/bin
 RUN logdna-agent --help

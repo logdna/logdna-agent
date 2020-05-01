@@ -43,6 +43,7 @@ node_modules
 # Some extra data
 package-lock.json
 *~
+logdna-agent
 
 # WebStorm config
 .idea
