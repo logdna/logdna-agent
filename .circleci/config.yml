@@ -8,95 +8,14 @@ executors:
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
-  test-unit:
+  test:
     docker:
       - image: circleci/node:12.13.0
     steps:
       - checkout
       - run: npm install
       - run: npm run lint
-      - run: npm run test.unit
-  build-linux:
-    docker:
-      - image: circleci/node:12.13.0
-    steps:
-      - checkout
-      - run: npm install --production
-      - run: npm run test.version
-      - run: npm run build.linux
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./logdna-agent_1.6.2_amd64.deb
-            - ./logdna-agent-1.6.2-1.x86_64.rpm
-#  test-linux:
-#    docker:
-#      - image: circleci/python:3
-#    steps:
-#      - attach_workspace:
-#          at: /tmp/workspace
-#      - run:
-#          name: Run Ansible Tests
-#          command: |
-#            # Variables
-#            export ANSIBLE_HOST_KEY_CHECKING=False
-#            export TERRAFORM_STATE_ROOT=.
-#            # Step 1: Install Dependencies
-#            sudo apt-get install -y virtualenv
-#            git clone https://${GITHUB_TOKEN}@github.com/answerbook/logdna-agent-ansible.git
-#            cp /tmp/workspace/logdna-agent_1.6.2_amd64.deb /tmp/workspace/logdna-agent-1.6.2-1.x86_64.rpm logdna-agent-ansible/files/
-#            # Step 2: Create a Virtual Environment for Ansible
-#            cd logdna-agent-ansible
-#            virtualenv venv
-#            . venv/bin/activate
-#            pip install -r requirements.txt
-#            eval $(ssh-agent)
-#            chmod 600 ssh_keys/id_rsa.agent-testing
-#            ssh-add ssh_keys/id_rsa.agent-testing
-#            # Step 3: Install LogDNA Agent onto Hosts
-#            ansible-playbook -i hosts install_agent.yml
-#            # Step 4: Test Sending Logs thru LogDNA Agent on Hosts
-#            ansible-playbook -i hosts generate_fakelogs.yml
-#            # Step 5: Analyze the Results
-#            py.test \
-#              -n 4 \
-#              --force-ansible --ansible-inventory=hosts \
-#              --connection=ansible \
-#              -v tests \
-#              --sudo --cache-clear --hosts rhel-7,ubuntu-1604,debian-9,centos-7,ubuntu-1804
-#      - persist_to_workspace:
-#          root: .
-#          paths:
-#            - ./logdna-agent_1.6.2_amd64.deb
-#            - ./logdna-agent-1.6.2-1.x86_64.rpm
-  approve-linux:
-    docker:
-      - image: circleci/golang:1.12
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-  deploy-linux:
-    docker:
-      - image: circleci/golang:1.12
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - run:
-          name: Publish to GitHub Releases
-          command: |
-            # Variables
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            export TERRAFORM_STATE_ROOT=.
-            # Step 1: Install Dependencies
-            go get -u github.com/tcnksm/ghr
-            # Step 2:
-            ghr \
-              -n "LogDNA Agent v1.6.2" \
-              -t ${GITHUB_TOKEN} \
-              -u logdna \
-              -r logdna-agent \
-              -draft \
-              1.6.2 /tmp/workspace/
+      - run: npm run test
   image-build:
     executor: docker-publisher
     steps:
@@ -196,52 +115,10 @@ workflows:
   version: 2
   test:
     jobs:
-      - test-unit
-  publish-linux:
-    jobs:
-      - test-unit:
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
-            branches:
-              ignore: /.*/
-      - build-linux:
-          requires:
-            - test-unit
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
-            branches:
-              ignore: /.*/
-#      - test-linux:
-#          requires:
-#            - build-linux
-#          filters:
-#            tags:
-#              only: /[0-9]+\.[0-9]+\.[0-9]+/
-#            branches:
-#              ignore: /.*/
-      - approve-linux:
-          type: approval
-          requires:
-            - build-linux
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
-            branches:
-              ignore: /.*/
-      - deploy-linux:
-          requires:
-#            - test-linux
-            - approve-linux
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
-            branches:
-              ignore: /.*/
+      - test
   publish-image:
     jobs:
-      - test-unit:
+      - test:
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -249,7 +126,7 @@ workflows:
               ignore: /.*/
       - image-build:
           requires:
-            - test-unit
+            - test
           filters:
             tags:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
@@ -289,10 +166,10 @@ workflows:
             branches:
               only: master
     jobs:
-      - test-unit
+      - test
       - image-build:
           requires:
-            - test-unit
+            - test
       - docker-sysdig-scan:
           requires:
             - image-build
