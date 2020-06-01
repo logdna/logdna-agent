@@ -1,13 +1,34 @@
-var pkg = require('./package.json');
-var grunt = require('grunt');
-var path = require('path');
-var os = require('os');
+/*
+ * The following packages should be installed in the following way:
+ * npm install -g nexe grunt grunt-contrib-copy grunt-curl grunt-exec grunt-line-remover grunt-zip load-grunt-tasks
+*/
+
+let pkg = require('./package.json');
+let grunt = require('grunt');
+let path = require('path');
+let os = require('os');
 
 require('load-grunt-tasks')(grunt);
 
 module.exports = function(grunt) {
-    var files = ['./*.js', 'lib/**/*.js', 'test/**/*.js'];
-    var buildOutputFile = os.platform() !== 'win32' ? 'logdna-agent' : 'logdna-agent.exe';
+    const execOutputPath = `./bin/${os.platform() !== 'win32' ? 'logdna-agent' : 'logdna-agent.exe'}`;
+    const nodeVersion = '10.17.0';
+    const fpm = {
+        input_type: 'dir'
+        , output_type: {
+            debian: 'deb'
+            , redhat: 'rpm'
+            , darwin: 'osxpkg'
+        }, name: 'logdna-agent'
+        , version: pkg.version
+        , license: 'MIT'
+        , vendor: '"LogDNA, Inc."'
+        , description: {
+            linux: '"LogDNA Agent for Linux"'
+            , darwin: '"LogDNA Agent for OSX"'
+        }, url: 'https://logdna.com'
+        , maintainer: 'support@logdna.com'
+    };
 
     grunt.initConfig({
         lineremover: {
@@ -20,18 +41,59 @@ module.exports = function(grunt) {
             }
 
         }, exec: {
-            nexe: { cmd: `nexe -i index.js -o ${buildOutputFile} -f -t ~/tmp -r 8.3.0`, maxBuffer: 20000 * 1024 }
-            , fpm_rpm: `fpm -s dir -t rpm -n logdna-agent -v ${pkg.version} --license MIT --vendor 'Answerbook, Inc.' --description 'LogDNA Agent for Linux' --url http://logdna.com/ -m '<help@logdna.com>' --before-remove ./build/before-remove --after-upgrade ./build/after-upgrade -f ./logdna-agent=/usr/bin/logdna-agent ./build/init-script=/etc/init.d/logdna-agent ./build/logrotate=/etc/logrotate.d/logdna-agent`
-            , fpm_deb: `fpm -s dir -t deb -n logdna-agent -v ${pkg.version} --license MIT --vendor 'Answerbook, Inc.' --description 'LogDNA Agent for Linux' --url http://logdna.com/ -m '<help@logdna.com>' --before-remove ./build/before-remove --after-upgrade ./build/after-upgrade -f --deb-no-default-config-files ./logdna-agent=/usr/bin/logdna-agent ./build/init-script=/etc/init.d/logdna-agent ./build/logrotate=/etc/logrotate.d/logdna-agent`
-            , fpm_pkg: `fpm -s dir -t osxpkg -n logdna-agent -v ${pkg.version} --license MIT --vendor 'Answerbook, Inc.' --description 'LogDNA Agent for Mac' --url http://logdna.com/ -m '<help@logdna.com>' --after-install ./build/mac-after-install --osxpkg-identifier-prefix com.logdna -f ./logdna-agent=/usr/local/bin/logdna-agent ./build/com.logdna.logdna-agent.plist=/Library/LaunchDaemons/com.logdna.logdna-agent.plist`
-            , sign_pkg: `productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-${pkg.version}.pkg logdna-agent.pkg`
+            nexe: {
+                cmd: `nexe -i index.js -o ${execOutputPath} -ftr ${nodeVersion}`
+                , maxBuffer: 20000 * 1024
+            }, fpm_debian: `fpm \
+                --input-type ${fpm.input_type} \
+                --output-type ${fpm.output_type.debian} \
+                --name ${fpm.name} \
+                --version ${fpm.version} \
+                --license  ${fpm.license} \
+                --vendor ${fpm.vendor} \
+                --description ${fpm.description.linux} \
+                --maintainer ${fpm.maintainer} \
+                --before-remove ./build/linux/before-remove \
+                --after-upgrade ./build/linux/after-upgrade \
+                -f --deb-no-default-config-files \
+                    ${execOutputPath}=/usr/bin/logdna-agent \
+                    ./build/linux/init-script=/etc/init.d/logdna-agent \
+                    ./build/linux/logrotate=/etc/logrotate.d/logdna-agent`
+            , fpm_redhat: `fpm \
+                --input-type ${fpm.input_type} \
+                --output-type ${fpm.output_type.redhat} \
+                --name ${fpm.name} \
+                --version ${fpm.version} \
+                --license  ${fpm.license} \
+                --vendor ${fpm.vendor} \
+                --description ${fpm.description.linux} \
+                --maintainer ${fpm.maintainer} \
+                --before-remove ./build/linux/before-remove \
+                --after-upgrade ./build/linux/after-upgrade \
+                -f \
+                    ${execOutputPath}=/usr/bin/logdna-agent \
+                    ./build/linux/init-script=/etc/init.d/logdna-agent \
+                    ./build/linux/logrotate=/etc/logrotate.d/logdna-agent`
+            , fpm_darwin: `fpm \
+                --input-type ${fpm.input_type} \
+                --output-type ${fpm.output_type.darwin} \
+                --name ${fpm.name} \
+                --version ${fpm.version} \
+                --license  ${fpm.license} \
+                --vendor ${fpm.vendor} \
+                --description ${fpm.description.linux} \
+                --maintainer ${fpm.maintainer} \
+                --osxpkg-identifier-prefix com.logdna \
+                --after-install ./build/darwin/mac-after-install \
+                -f \
+                    ${execOutputPath}=/usr/local/bin/logdna-agent \
+                    ./build/darwin/com.logdna.logdna-agent.plist=/Library/LaunchDaemons/com.logdna.logdna-agent.plist`
+            , copy_debian: `mkdir -p pkg && cp -f logdna-agent*${fpm.version}*.deb ./pkg/logdna-agent.deb`
+            , copy_redhat: `mkdir -p pkg && cp -f logdna-agent*${fpm.version}*.rpm ./pkg/logdna-agent.rpm`
+            , copy_darwin: `mkdir -p pkg && cp -f logdna-agent*${fpm.version}*.pkg ./pkg/logdna-agent.pkg`
+            , sign_pkg: `productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-${fpm.version}.pkg ./pkg/logdna-agent.pkg`
+            , verify_pkg: 'spctl --assess --type install -v ./pkg/logdna-agent.pkg'
             , choco: 'pushd .\\.builds\\windows & cpack'
-
-        }, mochacli: {
-            options: {
-                reporter: 'spec'
-                , bail: true
-            }, all: ['test/**/*.js']
 
         }, copy: {
             nuspec: {
@@ -60,25 +122,16 @@ module.exports = function(grunt) {
                 }]
             }
 
-        }, eslint: {
-            target: files
-            , options: {
-                configFile: '.eslintrc'
-                , fix: false
-            }
         }
     });
 
-    grunt.registerTask('test', ['mochacli', 'eslint']);
-    grunt.registerTask('validate', ['eslint']);
     grunt.registerTask('build', ['lineremover', 'exec:nexe']);
-    grunt.registerTask('linux', ['build', 'exec:fpm_rpm', 'exec:fpm_deb']);
-    grunt.registerTask('mac', ['build', 'exec:fpm_pkg', 'exec:sign_pkg']);
-    grunt.registerTask('windows', [
-        'build'
-        , 'copy:nuspec'
-        , 'copy:winexe'
-        , 'copy:windowsScripts'
-        , 'exec:choco'
-    ]);
+    grunt.registerTask('windows', ['build', 'copy:nuspec', 'copy:winexe', 'copy:windowsScripts', 'exec:choco']);
+    // NEW
+    grunt.registerTask('debian', ['build', 'exec:fpm_debian', 'exec:copy_debian']);
+    grunt.registerTask('redhat', ['build', 'exec:fpm_redhat', 'exec:copy_redhat']);
+    grunt.registerTask('darwin', ['build', 'exec:fpm_darwin', 'exec:sign_pkg', 'exec:verify_pkg']);
+    // OLD
+    grunt.registerTask('linux', ['build', 'exec:fpm_redhat', 'exec:fpm_debian']);
+    grunt.registerTask('mac', ['build', 'exec:fpm_darwin', 'exec:sign_pkg']);
 };
