@@ -5,10 +5,15 @@ logs
 # builds
 .build
 .builds
+bin
+pkg
 logdna-agent.exe
 tmp
 **/*.deb
 **/*.rpm
+**/*.pkg
+**/*.nupkg
+
 
 # Test directory
 .temp
