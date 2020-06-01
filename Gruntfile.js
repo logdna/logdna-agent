@@ -79,9 +79,8 @@ module.exports = function(grunt) {
                 -f \
                     ${execOutputPath}=/usr/local/bin/logdna-agent \
                     ./build/darwin/com.logdna.logdna-agent.plist=/Library/LaunchDaemons/com.logdna.logdna-agent.plist`
-            , copy_debian: `mkdir -p pkg && cp -f logdna-agent*${fpm.version}*.deb ./pkg/logdna-agent.deb`
-            , copy_redhat: `mkdir -p pkg && cp -f logdna-agent*${fpm.version}*.rpm ./pkg/logdna-agent.rpm`
-            , copy_darwin: `mkdir -p pkg && cp -f logdna-agent*${fpm.version}*.pkg ./pkg/logdna-agent.pkg`
+            , copy_debian: `mkdir -p pkg && cp -f logdna-agent*${fpm.version}*.deb ./pkg/logdna-agent-unsigned.deb`
+            , copy_redhat: `mkdir -p pkg && cp -f logdna-agent*${fpm.version}*.rpm ./pkg/logdna-agent-unsigned.rpm`
             , sign_pkg: `productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-${fpm.version}.pkg ./pkg/logdna-agent.pkg`
             , verify_pkg: 'spctl --assess --type install -v ./pkg/logdna-agent.pkg'
             , choco: 'pushd .\\.builds\\windows & cpack'
