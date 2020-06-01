@@ -4,7 +4,7 @@ ARGARG CA_CERTIFICATES_VERSION=20170717~16.04.2
 ARG CURL_VERSION=7.*
 ARG NODE_VERSION=10.17.0
 
-COPY scripts/logdna.gpg /etc/
+COPY build/logdna.gpg /etc/
 
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.url="https://logdna.com"
