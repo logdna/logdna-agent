@@ -31,16 +31,7 @@ module.exports = function(grunt) {
     };
 
     grunt.initConfig({
-        lineremover: {
-            nukebrowser: {
-                files: {
-                    'node_modules/ws/package.json': path.join('node_modules', 'ws', 'package.json')
-                }, options: {
-                    exclusionPattern: /browser/
-                }
-            }
-
-        }, exec: {
+        exec: {
             nexe: {
                 cmd: `nexe -i index.js -o ${execOutputPath} -ftr ${nodeVersion}`
                 , maxBuffer: 20000 * 1024
@@ -125,7 +116,7 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('build', ['lineremover', 'exec:nexe']);
+    grunt.registerTask('build', ['exec:nexe']);
     grunt.registerTask('windows', ['build', 'copy:nuspec', 'copy:winexe', 'copy:windowsScripts', 'exec:choco']);
     // NEW
     grunt.registerTask('debian', ['build', 'exec:fpm_debian', 'exec:copy_debian']);

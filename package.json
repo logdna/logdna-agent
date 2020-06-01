@@ -40,7 +40,6 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-curl": "^2.5.1",
     "grunt-exec": "^3.0.0",
-    "grunt-line-remover": "0.0.2",
     "grunt-zip": "^0.18.2",
     "guid": "0.0.12",
     "load-grunt-tasks": "^5.1.0",
