@@ -1,21 +1,17 @@
 {
   "name": "logdna-agent",
-  "version": "1.6.2",
+  "version": "1.6.4",
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
-    "build.linux": "bash ./scripts/linux/build.sh",
-    "deploy.linux": "bash ./scripts/linux/deploy.sh",
-    "lint": "./node_modules/.bin/grunt eslint",
-    "test.linux": "bash ./scripts/linux/test.sh",
-    "test.unit": "./node_modules/.bin/grunt mochacli",
-    "test.version": "bash ./scripts/etc/version.sh"
+    "lint": "./node_modules/.bin/eslint -c .eslintrc lib/**/*.js index.js",
+    "test": "./node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/logdna/logdna-agent.git"
   },
-  "author": "",
+  "author": "LogDNA, Inc.",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/logdna/logdna-agent/issues"
@@ -39,18 +35,9 @@
     "node-windows": "^0.1.11"
   },
   "devDependencies": {
-    "grunt": "^1.0.3",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-curl": "^2.2.0",
-    "grunt-eslint": "^20.0.0",
-    "grunt-exec": "^0.4.6",
-    "grunt-line-remover": "0.0.2",
-    "grunt-mocha-cli": "^4.0.0",
-    "grunt-zip": "^0.17.1",
+    "eslint": "^7.1.0",
     "guid": "0.0.12",
-    "load-grunt-tasks": "^3.4.0",
-    "require-uncached": "^1.0.2",
-    "rimraf": "^2.5.2",
-    "skeemas": "^1.2.2"
+    "mocha": "^7.2.0",
+    "rimraf": "^2.5.2"
   }
 }
