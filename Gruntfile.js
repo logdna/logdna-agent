@@ -1,6 +1,6 @@
 /*
  * The following packages should be installed in the following way:
- * npm install -g nexe grunt grunt-contrib-copy grunt-curl grunt-exec grunt-line-remover grunt-zip load-grunt-tasks
+ * npm install -g nexe
 */
 
 let pkg = require('./package.json');
