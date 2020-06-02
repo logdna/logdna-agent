@@ -12,7 +12,7 @@ require('load-grunt-tasks')(grunt);
 
 module.exports = function(grunt) {
     const execOutputPath = `./bin/${os.platform() !== 'win32' ? 'logdna-agent' : 'logdna-agent.exe'}`;
-    const nodeVersion = '10.17.0';
+    const nodeVersion = '8.3.0';
     const fpm = {
         input_type: 'dir'
         , output_type: {
