@@ -11,7 +11,7 @@ LABEL org.label-schema.docker.cmd="docker run logdna/logdna-agent:latest"
 
 COPY lib/ ./lib/
 COPY index.js ./index.js
-COPY package.json./package.json
+COPY package.json ./package.json
 
 RUN npm install --production
 
