@@ -29,6 +29,11 @@ jobs:
       - image: circleci/node:12.13.0
     steps:
       - checkout
+      - run:
+          name: Add Credentials to ~/.npmrc
+          command: |
+            echo "//npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}" > ~/.npmrc &&
+            echo "@answerbook:registry=https://npm.pkg.github.com/" >> ~/.npmrc
       - run: npm install
       - run: npm run lint
       - run: npm run unit

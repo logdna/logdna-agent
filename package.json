@@ -4,7 +4,7 @@
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
-    "lint": "./node_modules/.bin/eslint -c .eslintrc *.js **/*.js",
+    "lint": "eslint index.js lib/**/*.js",
     "unit": "./node_modules/.bin/jest"
   },
   "repository": {
@@ -30,12 +30,22 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
+    "@answerbook/eslint-config-logdna": "^4.0.0",
+    "eslint": "^7.2.0",
     "grunt": "^1.0.4",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-exec": "^3.0.0",
     "jest": "^25.1.0",
     "load-grunt-tasks": "^5.1.0",
     "rimraf": "^3.0.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@answerbook/eslint-config-logdna"
+    ],
+    "ignorePatterns": [
+      "node_modules/"
+    ]
   }
 }

@@ -19,8 +19,8 @@ const HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g;
 const HOSTNAME_PATH = '/etc/logdna-hostname';
 
 // Variables
-var config = require('./lib/config');
-var processed;
+let config = require('./lib/config');
+let processed;
 
 process.title = 'logdna-agent';
 program._name = 'logdna-agent';
@@ -133,7 +133,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 parsedConfig.exclude = parsedConfig.exclude.split(',');
             }
 
-            var saveMessages = [];
+            let saveMessages = [];
 
             if (program.key) {
                 parsedConfig.key = program.key;
@@ -166,10 +166,10 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 if (typeof program.list === 'boolean') {
                     program.list = ['all'];
                 }
-                var conf = properties.parse(fs.readFileSync(conf_file).toString());
+                let conf = properties.parse(fs.readFileSync(conf_file).toString());
                 const listResult = utils.pick2list(program.list, conf);
                 if (listResult.valid) {
-                    var msg = utils.stringify(listResult.cfg);
+                    let msg = utils.stringify(listResult.cfg);
                     saveMessages.push(`${conf_file}:\n${msg}`);
                 } else {
                     saveMessages.push(listResult.msg);
@@ -231,7 +231,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 });
             }
 
-            // merge into single var after all potential saveConfigs finished
+            // merge into single let after all potential saveConfigs finished
             config = Object.assign({}, config, parsedConfig);
             config.tags = process.env.LOGDNA_TAGS || config.tags;
             if (process.env.LOGDNA_PLATFORM) {
