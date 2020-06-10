@@ -37,7 +37,6 @@ program
     .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', utils.appender(), [])
     .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.appender(), false)
     .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', utils.appender(), [])
-    .option('-w, --winevent <winevent>', 'set Windows Event Log Names (only on Windows)', utils.appender(), [])
     .option('-s, --set [key=value]', 'set config variables', utils.appender(), false)
     .on('--help', () => {
         console.log('  Examples:');
@@ -51,7 +50,6 @@ program
         console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log');
         console.log('    $ logdna-agent -t production                                       # tags');
         console.log('    $ logdna-agent -t staging,2ndtag');
-        console.log('    $ logdna-agent -w System                                           # Windows System event logs (all providers)');
         console.log('    $ logdna-agent -l tags,key,logdir                                  # show specific config parameters');
         console.log('    $ logdna-agent -l                                                  # show all');
         console.log('    $ logdna-agent -u tags,logdir                                      # unset specific entries from config');
@@ -150,16 +148,6 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                         saveMessages.push(`Unknown setting: ${setOption}. Usage: -s [key=value]`);
                     }
                 });
-            }
-
-            if (program.winevent && program.winevent.length > 0) {
-                if (os.platform() === 'win32') {
-                    processed = utils.processOption(program.winevent, parsedConfig.winevent, true);
-                    parsedConfig.winevent = processed.values;
-                    saveMessages.push(`Windows Events: ${processed.diff} been saved to config.`);
-                } else {
-                    saveMessages.push('-w is only available for Windows.');
-                }
             }
 
             if (program.list) {
