@@ -163,14 +163,11 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
             }
 
             if (program.list) {
-                if (typeof program.list === 'boolean') {
-                    program.list = ['all'];
-                }
-                let conf = properties.parse(fs.readFileSync(conf_file).toString());
+                if (typeof program.list === 'boolean') { program.list = ['all']; }
+                const conf = properties.parse(fs.readFileSync(conf_file).toString());
                 const listResult = utils.pick2list(program.list, conf);
                 if (listResult.valid) {
-                    let msg = utils.stringify(listResult.cfg);
-                    saveMessages.push(`${conf_file}:\n${msg}`);
+                    saveMessages.push(`${conf_file}:\n${utils.stringify(listResult.cfg)}`);
                 } else {
                     saveMessages.push(listResult.msg);
                 }
@@ -231,7 +228,7 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 });
             }
 
-            // merge into single let after all potential saveConfigs finished
+            // merge into single variable after all potential saveConfigs finished
             config = Object.assign({}, config, parsedConfig);
             config.tags = process.env.LOGDNA_TAGS || config.tags;
             if (process.env.LOGDNA_PLATFORM) {
@@ -277,8 +274,10 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 interface.address.startsWith('192.168.'));
         })[0];
 
-        if (networkInterface.mac) { config.mac = networkInterface.mac; }
-        if (networkInterface.address) { config.ip = networkInterface.address; }
+        if (networkInterface) {
+            if (networkInterface.mac) { config.mac = networkInterface.mac; }
+            if (networkInterface.address) { config.ip = networkInterface.address; }
+        }
 
         utils.log(`${config.package} started on ${config.hostname} (${config.ip})`);
         if (config.platform && config.platform.startsWith('k8s')) { k8s.init(); }
