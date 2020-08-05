@@ -2,13 +2,20 @@
 logs
 *.log
 
+# dependencies
+node_modules
+
 # builds
 .build
 .builds
-logdna-agent.exe
 tmp
+
+# packages
 **/*.deb
 **/*.rpm
+**/*.exe
+**/*.nupkg
+**/*.pkg
 
 # Test directory
 .temp
@@ -24,21 +31,8 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 
-# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
 # node-waf configuration
 .lock-wscript
-
-# Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
-
-# Dependency directory
-# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
-node_modules
-./logdna-agent
-*.pkg
-*.tgz
 
 # Some extra data
 package-lock.json
