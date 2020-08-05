@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>logdna-agent</id>
+    <title>LogDNA Agent for Windows</title>
+    <version>1.6.3</version>
+    <authors>smusali,leeliu</authors>
+    <owners>leeliu</owners>
+    <summary>LogDNA Agent for Windows</summary>
+    <version>1.6.3</version>
+    <authors>smusali,leeliu</authors>
+    <owners>leeliu</owners>
+    <summary>LogDNA Agent for Windows</summary>
+    <description>LogDNA Collector Agent Streaming File and Event Logs to LogDNA.</description>
+    <projectUrl>https://logdna.com/</projectUrl>
+    <projectSourceUrl>https://github.com/logdna/logdna-agent</projectSourceUrl>
+    <packageSourceUrl>https://github.com/logdna/logdna-agent</packageSourceUrl>
+    <docsUrl>https://github.com/logdna/logdna-agent</docsUrl>
+    <bugTrackerUrl>https://github.com/logdna/logdna-agent/issues</bugTrackerUrl>
+    <tags>logdna-agent winevent tail logging devops logdna</tags>
+    <copyright>Copyright 2020 LogDNA, Inc.</copyright>
+    <licenseUrl>https://github.com/logdna/logdna-agent/blob/master/LICENSE.md</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://github.com/logdna/artwork/raw/master/ld-logo-square-480.png</iconUrl>
+    <releaseNotes>LogDNA Agent for Windows</releaseNotes>
+    <dependencies>
+      <dependency id="nssm" version="2.24.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

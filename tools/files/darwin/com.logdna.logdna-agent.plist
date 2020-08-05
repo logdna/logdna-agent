@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>Disabled</key>
+        <true/>
+        <key>KeepAlive</key>
+        <true/>
+        <key>Label</key>
+        <string>com.logdna.logdna-agentd</string>
+        <key>ProgramArguments</key>
+        <array>
+                <string>/usr/local/bin/logdna-agent</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>StandardErrorPath</key>
+        <string>/Library/Logs/logdna-agent.log</string>
+        <key>StandardOutPath</key>
+        <string>/Library/Logs/logdna-agent.log</string>
+</dict>
+</plist>

@@ -9,7 +9,7 @@ LABEL org.label-schema.vcs-url="https://github.com/logdna/logdna-agent"
 LABEL org.label-schema.vendor="LogDNA Inc."
 LABEL org.label-schema.docker.cmd="docker run logdna/logdna-agent:latest"
 
-COPY logdna.gpg /etc/	
+COPY tools/files/logdna.gpg /etc/	
 
 RUN echo "deb http://repo.logdna.com stable main" > /etc/apt/sources.list.d/logdna.list && \	
     apt-key add /etc/logdna.gpg && \	
