@@ -277,8 +277,10 @@ if ((os.platform() === 'win32' && require('is-administrator')()) || process.getu
                 interface.address.startsWith('192.168.'));
         })[0];
 
-        if (networkInterface.mac) { config.mac = networkInterface.mac; }
-        if (networkInterface.address) { config.ip = networkInterface.address; }
+        if (networkInterface) {
+            if (networkInterface.mac) { config.mac = networkInterface.mac; }
+            if (networkInterface.address) { config.ip = networkInterface.address; }
+        }
 
         utils.log(`${config.package} started on ${config.hostname} (${config.ip})`);
         if (config.platform && config.platform.startsWith('k8s')) { k8s.init(); }

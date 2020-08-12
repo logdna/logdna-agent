@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix globbing issue [#126](https://github.com/logdna/logdna-agent/pull/126)
 - Fix configuration-related bugs [#130](https://github.com/logdna/logdna-agent/pull/130)
+- Make sure to check `networkInterface` is defined [#185](https://github.com/logdna/logdna-agent/pull/185)
 
 ## [1.6.1] - July 19, 2019
 ### Added
