@@ -4,7 +4,7 @@
   "description": "LogDNA Collector Agent",
   "main": "index.js",
   "scripts": {
-    "lint": "./node_modules/.bin/eslint -c .eslintrc *.js **/*.js",
+    "lint": "eslint .",
     "unit": "./node_modules/.bin/jest"
   },
   "repository": {
@@ -17,6 +17,19 @@
     "url": "https://github.com/logdna/logdna-agent/issues"
   },
   "homepage": "https://github.com/logdna/logdna-agent",
+  "eslintConfig": {
+    "root": true,
+    "ignorePatterns": [
+      "node_modules/",
+      "coverage/"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2019
+    },
+    "rules": {
+      "node/no-deprecated-api": 0
+    }
+  },
   "dependencies": {
     "agentkeepalive": "^4.1.0",
     "async": "^3.2.0",
@@ -30,7 +43,9 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
+    "eslint": "^7.6.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-sensible": "^2.2.0",
     "grunt": "^1.0.4",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-exec": "^3.0.0",
