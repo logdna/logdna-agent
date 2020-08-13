@@ -30,8 +30,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm run lint
-      - run: npm run unit
+      - run: npm run test
   image-build:
     executor: docker-publisher
     steps:

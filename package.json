@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "unit": "./node_modules/.bin/jest"
+    "pretest": "npm run lint",
+    "test": "tap"
   },
   "repository": {
     "type": "git",
@@ -49,8 +50,7 @@
     "grunt": "^1.0.4",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-exec": "^3.0.0",
-    "jest": "^25.1.0",
     "load-grunt-tasks": "^5.1.0",
-    "rimraf": "^3.0.2"
+    "tap": "^14.10.8"
   }
 }
