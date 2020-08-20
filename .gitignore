@@ -3,9 +3,12 @@ logs
 *.log
 
 # builds
+.build
 .builds
 logdna-agent.exe
 tmp
+**/*.deb
+**/*.rpm
 
 # Test directory
 .temp

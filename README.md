@@ -176,6 +176,15 @@ Notes:
 * This uses `JOURNALD=files`, you may need to change this if you have changed OpenShift logging configuration.
 * This has been tested on OpenShift 3.5-11
 
+## Windows Logging
+The LogDNA agent can be installed through Chocolatey. You will need:
+* Windows PowerShell v3+ (not PowerShell Core aka PowerShell 6 yet)
+* Windows 7+/Windows 2003+ (Server Core also, but not Windows Nano Server)
+* .NET Framework 4.x+
+
+For more details, view our [Windows Agent docs](https://docs.logdna.com/docs/windows-logging)
+
+
 ### LogDNA Pay-per-gig Pricing
 
 Our [paid plans](https://logdna.com/pricing/) start at $1.50/GB per month. Pay only for what you use, with no fixed data buckets. All paid plans include all features.
