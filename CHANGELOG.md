@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.6.5] - August 21, 2020
 ### Changed
 - Update internal logging [#164](https://github.com/logdna/logdna-agent/pull/164)
 
@@ -231,7 +233,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor agent code
 - Lint & Style Validations
 
-[Unreleased]: https://github.com/logdna/logdna-agent/compare/1.6.2...HEAD
+[Unreleased]: https://github.com/logdna/logdna-agent/compare/1.6.5...HEAD
+[1.6.5]: https://github.com/logdna/logdna-agent/compare/1.6.2...1.6.5
 [1.6.2]: https://github.com/logdna/logdna-agent/compare/1.6.1...1.6.2
 [1.6.1]: https://github.com/logdna/logdna-agent/compare/1.5.6...1.6.1
 [1.5.6]: https://github.com/logdna/logdna-agent/compare/1.5.5...1.5.6
