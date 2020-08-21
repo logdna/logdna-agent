@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix stringification issue on handling 207 [#152](https://github.com/logdna/logdna-agent/pull/152)
 - Fix memory leak issue [#157](https://github.com/logdna/logdna-agent/pull/157)
+- Make sure `process.getuid` doesn't get called on `Windows` [#188](https://github.com/logdna/logdna-agent/pull/188)
 
 ## [1.6.2] - December 5, 2019
 ### Added

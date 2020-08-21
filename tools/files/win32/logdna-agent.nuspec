@@ -8,10 +8,6 @@
     <authors>smusali,leeliu</authors>
     <owners>leeliu</owners>
     <summary>LogDNA Agent for Windows</summary>
-    <version>1.6.3</version>
-    <authors>smusali,leeliu</authors>
-    <owners>leeliu</owners>
-    <summary>LogDNA Agent for Windows</summary>
     <description>LogDNA Collector Agent Streaming File and Event Logs to LogDNA.</description>
     <projectUrl>https://logdna.com/</projectUrl>
     <projectSourceUrl>https://github.com/logdna/logdna-agent</projectSourceUrl>

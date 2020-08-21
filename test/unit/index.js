@@ -6,8 +6,6 @@ const fs = require('fs')
 const {test} = require('tap')
 const {loadConfig, commander} = require('../../index.js')
 
-const uid = 0
-
 test('Commander help output', (t) => {
   commander.outputHelp((help) => {
     t.match(help, /^Usage: logdna-agent \[options\]/, 'Help menu printed')
@@ -23,7 +21,7 @@ test('loadConfig() settings based on user input', async (t) => {
   t.test('Errors if no key is found', (tt) => {
     loadConfig({
       config: configFile
-    }, uid)
+    })
 
     setTimeout(() => {
       fs.stat(configFile, (err) => {
@@ -42,7 +40,7 @@ test('loadConfig() settings based on user input', async (t) => {
     , hostname: 'myMachine'
     }
 
-    loadConfig(input, uid)
+    loadConfig(input)
 
     // The callback is not exposed.  We have to wait for the file to be written to.
     setTimeout(() => {
@@ -64,7 +62,7 @@ test('loadConfig() settings based on user input', async (t) => {
     , logdir: logs
     }
 
-    loadConfig(input, uid)
+    loadConfig(input)
 
     setTimeout(() => {
       const contents = (fs.readFileSync(configFile, 'utf8')).split('\n').sort()
@@ -91,7 +89,7 @@ test('loadConfig() settings based on user input', async (t) => {
     , tags
     }
 
-    loadConfig(input, uid)
+    loadConfig(input)
 
     setTimeout(() => {
       const contents = (fs.readFileSync(configFile, 'utf8')).split('\n')
@@ -128,7 +126,7 @@ test('loadConfig() settings based on user input', async (t) => {
     loadConfig({
       config: configFile
     , unset: ['set1']
-    }, uid)
+    })
 
     setTimeout(() => {
       const contents = (fs.readFileSync(configFile, 'utf8')).split('\n')
@@ -148,7 +146,7 @@ test('loadConfig() settings based on user input', async (t) => {
     loadConfig({
       config: configFile
     , unset: ['all']
-    }, uid)
+    })
 
     setTimeout(() => {
       const contents = (fs.readFileSync(configFile, 'utf8'))
@@ -167,7 +165,7 @@ test('loadConfig() hostname decisions', async (t) => {
     , key: 'abc123'
     }
 
-    loadConfig(input, uid)
+    loadConfig(input)
 
     // The callback is not exposed.  We have to wait for the file to be written to.
     setTimeout(() => {
@@ -211,7 +209,7 @@ test('Process options through commander', (t) => {
   ]
 
   commander.parse(input)
-  loadConfig(commander, uid)
+  loadConfig(commander)
 
   setTimeout(() => {
     const contents = (fs.readFileSync(configFile, 'utf8')).split('\n').sort()
