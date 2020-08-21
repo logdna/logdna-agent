@@ -64,7 +64,7 @@ commander
   })
 
 function loadConfig(program, uid) {
-  if ((os.platform() === 'win32' && require('is-administrator')()) || uid <= 0) {
+  if (program.config || (os.platform() === 'win32' && require('is-administrator')()) || uid <= 0) {
     const conf_file = program.config || config.DEFAULT_CONF_FILE
     debug(`Path to Configuration File: ${conf_file}`)
     async.waterfall([
