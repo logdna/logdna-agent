@@ -52,7 +52,8 @@ cd ../.pkg
 mv ../.build/logdna-agent-${VERSION}.pkg logdna-agent-${VERSION}-unsigned.pkg
 productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-${VERSION}-unsigned.pkg logdna-agent-${VERSION}.pkg
 SHA256CHECKSUM=$(shasum -a 256 logdna-agent-${VERSION}.pkg | cut -d' ' -f1)
-sed "s/$(cat ../tools/files/darwin/logdna-agent.rb | grep sha256 | cut -d"'" -f2)/${SHA256CHECKSUM}/" ../tools/files/darwin/logdna-agent.rb > logdna-agent.rb
+OLDSHA256CHECKSUM=$(cat ../tools/files/darwin/logdna-agent.rb | grep sha256 | cut -d"'" -f2)
+sed "s/${OLDSHA256CHECKSUM}/${SHA256CHECKSUM}/" ../tools/files/darwin/logdna-agent.rb > logdna-agent.rb
 cd ..
 
 # STEP 4: RELEASE
