@@ -11,7 +11,7 @@ const properties = require('properties')
 const request = require('request')
 
 // Internal Modules
-const connectionManager = require('./lib/connection-manager')
+const connectionManager = require('./lib/connection-manager.js')
 const k8s = require('./lib/k8s')
 const pkg = require('./package.json')
 const utils = require('./lib/utils')
@@ -21,7 +21,7 @@ const HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g
 const HOSTNAME_PATH = '/etc/logdna-hostname'
 
 // Variables
-var config = require('./lib/config')
+let config = require('./lib/config.js')
 var processed
 
 const commander = new Command()
@@ -235,8 +235,15 @@ function loadConfig(program) {
       }
 
       // merge into single var after all potential saveConfigs finished
-      config = {...config, ...parsedConfig}
-      config.tags = process.env.LOGDNA_TAGS || config.tags
+      config = {
+        ...config
+      , ...parsedConfig
+      , tags: process.env.LOGDNA_TAGS || config.tags
+      , flushTimer: null
+      , healthcheckTimer: null
+      , rescanTimer: null
+      }
+
       if (process.env.LOGDNA_PLATFORM) {
         config.platform = process.env.LOGDNA_PLATFORM
         config.tags = config.tags ? `${config.tags},${config.platform}` : config.platform

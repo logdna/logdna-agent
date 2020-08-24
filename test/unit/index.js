@@ -30,7 +30,7 @@ test('loadConfig() settings based on user input', async (t) => {
         }, 'The config file was not written as expected')
         tt.end()
       })
-    }, 100)
+    }, 200)
   })
 
   t.test('Creates a config file, and puts minimum values in it', (tt) => {
@@ -52,7 +52,7 @@ test('loadConfig() settings based on user input', async (t) => {
       ].sort()
       tt.deepEqual(contents, expected, 'Config file was written correctly')
       tt.end()
-    }, 100)
+    }, 200)
   })
 
   t.test('Existing config file is parsed and log files array is added to it', (tt) => {
@@ -73,7 +73,7 @@ test('loadConfig() settings based on user input', async (t) => {
       ].sort()
       tt.deepEqual(contents, expected, 'log directories added to the config file')
       tt.end()
-    }, 100)
+    }, 200)
   })
 
   t.test('Test other supported CLI options', (tt) => {
@@ -119,7 +119,7 @@ test('loadConfig() settings based on user input', async (t) => {
       , 'tags were saved'
       )
       tt.end()
-    }, 100)
+    }, 200)
   })
 
   t.test('Test \'unset\' by removing a setting', (tt) => {
@@ -139,7 +139,7 @@ test('loadConfig() settings based on user input', async (t) => {
       , 'The second key/val pair still exists'
       )
       tt.end()
-    }, 100)
+    }, 200)
   })
 
   t.test('Test \'unset\' by removing all settings except key', (tt) => {
@@ -152,7 +152,7 @@ test('loadConfig() settings based on user input', async (t) => {
       const contents = (fs.readFileSync(configFile, 'utf8'))
       tt.equal(contents, 'key = abc123', 'All settings removed except for key')
       tt.end()
-    }, 100)
+    }, 200)
   })
 })
 
@@ -177,7 +177,7 @@ test('loadConfig() hostname decisions', async (t) => {
       ].sort()
       tt.deepEqual(contents, expected, 'Host name set to os.hostname()')
       tt.end()
-    }, 100)
+    }, 200)
   })
 })
 
@@ -225,5 +225,5 @@ test('Process options through commander', (t) => {
 
     t.deepEqual(contents, expected, 'Commander set options')
     t.end()
-  }, 100)
+  }, 200)
 })
