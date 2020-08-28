@@ -16,7 +16,7 @@
     <bugTrackerUrl>https://github.com/logdna/logdna-agent/issues</bugTrackerUrl>
     <tags>logdna-agent winevent tail logging devops logdna</tags>
     <copyright>Copyright 2020 LogDNA, Inc.</copyright>
-    <licenseUrl>https://github.com/logdna/logdna-agent/blob/master/LICENSE.md</licenseUrl>
+    <licenseUrl>https://github.com/logdna/logdna-agent/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>https://github.com/logdna/artwork/raw/master/ld-logo-square-480.png</iconUrl>
     <releaseNotes>LogDNA Agent for Windows</releaseNotes>

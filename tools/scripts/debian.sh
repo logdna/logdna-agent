@@ -55,7 +55,6 @@ cd ..
 ghr -draft \
 	-n "LogDNA Agent v${VERSION}" \
 	-r ${PACKAGE_NAME} \
-	-t ${GITHUB_API_TOKEN} \
 	-u logdna \
 	${VERSION} .pkg/
 
@@ -63,6 +62,7 @@ ghr -draft \
 pause
 
 # STEP 4: PUBLISH
+gpg --import ${SECRET_GPG_KEY_FILE}
 deb-s3 upload \
 	--access-key-id=${AWS_ACCESS_KEY} \
 	--gpg-options="--digest-algo SHA256" \

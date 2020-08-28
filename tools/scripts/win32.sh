@@ -24,10 +24,10 @@ nexe -i index.js -o .build/tools/${PACKAGE_NAME}.exe -t win32-${ARCH}-${NODE_VER
 
 # STEP 2: PACKAGE
 cd .build/
-sed "s/latest/${VERSION}/" ./tools/VERIFICATION.txt > ./tools/VERIFICATION.txt
+sed -i "s/latest/${VERSION}/" ./tools/VERIFICATION.txt
 SHA256CHECKSUM=$(shasum -a 256 tools/${PACKAGE_NAME}.exe | cut -d' ' -f1)
 OLDSHA256CHECKSUM=$(cat tools/VERIFICATION.txt | grep 'checksum: ' | cut -d' ' -f4)
-sed "s/${OLDSHA256CHECKSUM}/${SHA256CHECKSUM}/" ./tools/VERIFICATION.txt > ./tools/VERIFICATION.txt
+sed -i "s/${OLDSHA256CHECKSUM}/${SHA256CHECKSUM}/" ./tools/VERIFICATION.txt
 choco pack logdna-agent.nuspec
 cd ..
 cp .build/*.nupkg .build/tools/*.exe .pkg/
@@ -36,7 +36,6 @@ cp .build/*.nupkg .build/tools/*.exe .pkg/
 ghr -draft \
 	-n "LogDNA Agent v${VERSION}" \
 	-r ${PACKAGE_NAME} \
-	-t ${GITHUB_API_TOKEN} \
 	-u logdna \
 	${VERSION} .pkg/
 

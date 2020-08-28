@@ -41,3 +41,7 @@ package-lock.json
 
 # WebStorm config
 .idea
+
+# No private keys
+*.asc
+*.p12
