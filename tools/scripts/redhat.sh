@@ -54,7 +54,6 @@ cd ..
 ${HOME}/go/bin/ghr -draft \
 	-n "LogDNA Agent v${VERSION}" \
 	-r ${PACKAGE_NAME} \
-	-t ${GITHUB_API_TOKEN} \
 	-u logdna \
 	${VERSION} .pkg/
 
