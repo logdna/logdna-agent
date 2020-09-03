@@ -11,7 +11,7 @@ const properties = require('properties')
 const request = require('request')
 
 // Internal Modules
-const connectionManager = require('./lib/connection-manager.js')
+const start = require('./lib/start.js')
 const k8s = require('./lib/k8s')
 const pkg = require('./package.json')
 const utils = require('./lib/utils')
@@ -227,27 +227,27 @@ function loadConfig(program) {
         ...config
       , ...parsedConfig
       , tags: process.env.LOGDNA_TAGS || config.tags
-      , flushTimer: null
       , healthcheckTimer: null
       , rescanTimer: null
-      }
-
-      if (process.env.LOGDNA_PLATFORM) {
-        config.platform = process.env.LOGDNA_PLATFORM
-        config.tags = config.tags ? `${config.tags},${config.platform}` : config.platform
-        if (config.platform.indexOf('k8s') === 0) {
-          config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S
-        }
       }
 
       return getos(cb)
     }
   , (distro, cb) => {
-      config.package = `${pkg.name}/${pkg.version}`
-      config.distro = `${(distro.dist || distro.os).replace(/Linux| /g, '')}`
-      if (distro.release) { config.distro += `/${distro.release}` }
-      config.userAgent = `${config.package} (${config.distro})`
-      if (config.platform) { config.userAgent += ` ${config.platform}` }
+      let distroName = `${(distro.dist || distro.os).replace(/Linux| /g, '')}`
+      if (distro.release) {
+        distroName += `/${distro.release}`
+      }
+      config.UserAgent = `${pkg.name}/${pkg.version} ${distroName}`
+
+      if (process.env.LOGDNA_PLATFORM) {
+        const platform = process.env.LOGDNA_PLATFORM
+        config.tags = config.tags ? `${config.tags},${platform}` : platform
+        if (platform.indexOf('k8s') === 0) {
+          config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S
+        }
+        config.UserAgent += `, ${platform}`
+      }
 
       return request(config.AWS_INSTANCE_CHECK_URL, {
         timeout: 1000
@@ -288,7 +288,7 @@ function loadConfig(program) {
     }
 
     debug('connecting to log server')
-    connectionManager.connectLogServer(config)
+    start(config)
     debug('logdna agent successfully started')
   })
 }
