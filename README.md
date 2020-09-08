@@ -40,7 +40,6 @@ sudo node index.js -e /var/log/nginx/error.log            # exclude specific fil
 sudo node index.js -f /usr/local/nginx/logs/access.log    # add specific files
 sudo node index.js -t production                          # tags
 sudo node index.js -t production,app1=/opt/app1           # tags for specific paths
-sudo node index.js -w System                              # Windows System event logs (all providers)
 
 # other commands
 sudo node index.js -l                                     # show all saved options from config
@@ -78,7 +77,6 @@ key = <YOUR LOGDNA INGESTION KEY>
 * `tags`: tags can be used e.g. to separate data from production, staging, or autoscaling use cases
 * `hostname`: set this to override the os hostname
 * `autoupdate`: whether the agent should update itself when new versions are available on the public repo (default is `1`, set to `0` to disable)
-* `winevent`: sets Windows Event Log Configurations in `logname` format
 
 ### Features
 * The Agent maintains persistent connections to LogDNA ingestion servers with HTTPS encryption

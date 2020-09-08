@@ -8,13 +8,13 @@
     <authors>smusali,leeliu</authors>
     <owners>leeliu</owners>
     <summary>LogDNA Agent for Windows</summary>
-    <description>LogDNA Collector Agent Streaming File and Event Logs to LogDNA.</description>
+    <description>LogDNA Collector Agent Streaming File Logs to LogDNA.</description>
     <projectUrl>https://logdna.com/</projectUrl>
     <projectSourceUrl>https://github.com/logdna/logdna-agent</projectSourceUrl>
     <packageSourceUrl>https://github.com/logdna/logdna-agent</packageSourceUrl>
     <docsUrl>https://github.com/logdna/logdna-agent</docsUrl>
     <bugTrackerUrl>https://github.com/logdna/logdna-agent/issues</bugTrackerUrl>
-    <tags>logdna-agent winevent tail logging devops logdna</tags>
+    <tags>logdna-agent tail logging devops logdna</tags>
     <copyright>Copyright 2020 LogDNA, Inc.</copyright>
     <licenseUrl>https://github.com/logdna/logdna-agent/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
