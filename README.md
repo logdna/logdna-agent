@@ -114,56 +114,11 @@ If you don't have a LogDNA account, you can create one on https://logdna.com. Or
 ```
 brew cask install logdna-cli
 logdna register <email>
-# now paste the Ingestion Key into the kubectl commands above
 ```
 
 ## Kubernetes Logging
 
-Set up Kubernetes logging with with the LogDNA Agent using just 2 `kubectl` commands! We extract pertinent Kubernetes metadata including the
-pod name, container name, container id, namespace, and labels:
-
-```
-kubectl create secret generic logdna-agent-key --from-literal=logdna-agent-key=<YOUR LOGDNA INGESTION KEY>
-kubectl create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds.yaml
-```
-
-This automatically installs a logdna-agent pod into each node in your cluster and ships stdout/stderr from all containers, both application
-logs and node logs. Note: by default, the agent pod will collect logs from all namespaces on each node, including `kube-system`. View your logs
-at https://app.logdna.com. See [YAML file](https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds.yaml) for additional options
-such as `LOGDNA_TAGS`.
-
-### Upgrading to LogDNA Agent 2.0 for Kubernetes
-
-We've recently made the LogDNA Agent 2.0 publicly available for Kubernetes users. We'll be rolling this out to existing users as well as other
-platforms and operating systems over the next few weeks, but if you'd like to upgrade your existing Kubernetes agent you can simply run the following:
-
-```
-kubectl patch ds/logdna-agent -p '{"spec":{"updateStrategy":{"type":"RollingUpdate", "maxUnavailable":"100%"}}}'
-
-kubectl patch ds/logdna-agent -p '{"spec":{"template":{"spec":{"containers":[{"name":"logdna-agent","image":"logdna/logdna-agent-v2:stable", "imagePullPolicy": "Always"}]}}}}'
-```
-
-To confirm that it upgraded correctly, please run `kubectl get ds logdna-agent -o yaml | grep "image: logdna/"`.
-If you see `image: logdna/logdna-agent-v2:stable` then you are good to go.
-
-If you'd like to to install LogDNA's Agent 2.0 into a new cluster, you can simply run the following two `kubectl` commands:
-
-```
-kubectl create secret generic logdna-agent-key --from-literal=logdna-agent-key=<YOUR LOGDNA INGESTION KEY>
-
-kubectl create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-v2.yaml
-```
-
-If you don't have a LogDNA account, you can create one at https://logdna.com or if you're on macOS w/[Homebrew](https://brew.sh) installed:
-
-```
-brew cask install logdna-cli
-logdna register <email>
-# now paste the Ingestion Key into the kubectl commands above
-```
-
-We created this integration mainly based on customer feedback and that
-[logging with Kubernetes should not be this painful](https://blog.logdna.com/2017/03/14/logging-with-kubernetes-should-not-be-this-painful/).
+Please see [our documentation](./docs/kubernetes.md) for Kubernetes instructions.
 
 ## OpenShift Logging
 

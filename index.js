@@ -12,7 +12,6 @@ const request = require('request')
 
 // Internal Modules
 const start = require('./lib/start.js')
-const k8s = require('./lib/k8s')
 const pkg = require('./package.json')
 const utils = require('./lib/utils')
 
@@ -243,9 +242,6 @@ function loadConfig(program) {
       if (process.env.LOGDNA_PLATFORM) {
         const platform = process.env.LOGDNA_PLATFORM
         config.tags = config.tags ? `${config.tags},${platform}` : platform
-        if (platform.indexOf('k8s') === 0) {
-          config.RESCAN_INTERVAL = config.RESCAN_INTERVAL_K8S
-        }
         config.UserAgent += `, ${platform}`
       }
 
@@ -281,13 +277,12 @@ function loadConfig(program) {
     }
 
     utils.log(`${config.package} started on ${config.hostname} (${config.ip})`)
-    if (config.platform && config.platform.startsWith('k8s')) { k8s.init() }
     if (config.userAgent) {
       config.DEFAULT_REQ_HEADERS['user-agent'] = config.userAgent
       config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] = config.userAgent
     }
 
-    debug('connecting to log server')
+    debug('Configuration loaded.  Starting log client and watching files.')
     start(config)
     debug('logdna agent successfully started')
   })
