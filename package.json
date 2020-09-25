@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/logdna/logdna-agent",
   "eslintConfig": {
+    "extends": [
+      "logdna"
+    ],
     "root": true,
     "ignorePatterns": [
       "node_modules/",
@@ -46,8 +49,7 @@
   },
   "devDependencies": {
     "eslint": "^7.6.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-sensible": "^2.2.0",
+    "eslint-config-logdna": "^1.0.0",
     "nock": "^13.0.4",
     "tap": "^14.10.8"
   }
