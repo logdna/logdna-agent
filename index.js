@@ -225,7 +225,7 @@ function loadConfig(program) {
       config = {
         ...config
       , ...parsedConfig
-      , tags: process.env.LOGDNA_TAGS || config.tags
+      , tags: process.env.LOGDNA_TAGS || parsedConfig.tags
       , healthcheckTimer: null
       , rescanTimer: null
       }
@@ -276,7 +276,7 @@ function loadConfig(program) {
       if (networkInterface.address) { config.ip = networkInterface.address }
     }
 
-    utils.log(`${config.package} started on ${config.hostname} (${config.ip})`)
+    utils.log(`Agent started on ${config.hostname} (${config.ip})`)
     if (config.userAgent) {
       config.DEFAULT_REQ_HEADERS['user-agent'] = config.userAgent
       config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] = config.userAgent
