@@ -10,7 +10,7 @@ To verify logdna-agent.exe:
   - Use chocolatey utility 'checksum.exe'
 
   checksum type: sha256
-  checksum: 9daf22c15f4f42e8c7ac4cdf73c26f7154d325d0defe14ece18d1203a9c7afd1
+  checksum: 0B44C47558B1BAF207AD3D9A8D93A37422E96877319BCB4A0A4ED78B3CA626B8
  
 This package is published by LogDNA. You can build a binary directly
 by following the instructions here:
