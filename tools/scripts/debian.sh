@@ -6,7 +6,7 @@ ARCH=x64
 DEB_SIGNATURE_ID=EF506BE8
 INPUT_TYPE=dir
 LICENSE=MIT
-NODE_VERSION=8.3.0 # Will upgrade after 1.6.5
+NODE_VERSION=12.16.2
 OUTPUT_TYPE=deb
 PACKAGE_NAME=logdna-agent
 S3_BUCKET=repo.logdna.com
@@ -52,7 +52,7 @@ mv *.deb ../.pkg/
 cd ..
 
 # STEP 3: RELEASE
-ghr -draft \
+ghr \
 	-n "LogDNA Agent v${VERSION}" \
 	-r ${PACKAGE_NAME} \
 	-u logdna \

@@ -5,12 +5,12 @@
 ARCH=x64
 INPUT_TYPE=dir
 LICENSE=MIT
-NODE_VERSION=8.3.0 # Will upgrade after 1.6.5
+NODE_VERSION=12.16.2
 OSXPKG_IDENTIFIER_PREFIX=com.logdna
 OUTPUT_TYPE=osxpkg
 PACKAGE_NAME=logdna-agent
 S3_BUCKET=repo.logdna.com
-VERSION=$(cat tools/files/darwin/logdna-agent.rb | grep "version '" | cut -d"'" -f2)
+VERSION=$(cat tools/files/darwin/logdna-agent.rb | grep "version \"" | cut -d"\"" -f2)
 
 # PAUSE FUNCTION
 function pause(){
@@ -58,7 +58,7 @@ sed "s/${OLDSHA256CHECKSUM}/${SHA256CHECKSUM}/" ../tools/files/darwin/logdna-age
 cd ..
 
 # STEP 4: RELEASE
-ghr -draft \
+ghr \
 	-n "LogDNA Agent v${VERSION}" \
 	-r ${PACKAGE_NAME} \
 	-u logdna \

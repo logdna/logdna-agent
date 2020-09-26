@@ -10,7 +10,7 @@
 LogDNA Agent can be built and released for Debian systems by running the `scripts/debian.sh` script: `bash tools/scripts/debian.sh`. Versioning for Linux Systems is tracked using [`package.json`](../package.json#L3).
 
 ### Dependencies
-- `Node.js: v8.3.0` and `NPM: v5.3.0`
+- `Node.js: v12.16.2` and `NPM: v6.14.4`
 - `NEXE: v3.3.3` by `npm install -g nexe@3.3.3`
 - `fpm` by `sudo gem install --no-document fpm`
 - `ghr` by `go get -u github.com/tcnksm/ghr`
@@ -53,7 +53,7 @@ LogDNA Agent can be built and released for RedHat systems by running the `script
 LogDNA Agent can be built and released for Darwin systems by running the `scripts/darwin.sh` script from the project directory: `bash tools/scripts/darwin.sh`. Versioning for Darwin Systems is tracked using [`logdna-agent.rb`](./files/darwin/logdna-agent.rb#L2).
 
 ### Dependencies
-- `Node.js: v8.3.0` and `NPM: v5.3.0`
+- `Node.js: v12.16.2` and `NPM: v6.14.4`
 - `NEXE: v3.3.3` by `npm install -g nexe@3.3.3`
 - `fpm` by `sudo gem install --no-document fpm`
 - `ghr` by `brew install ghr`
@@ -76,7 +76,7 @@ LogDNA Agent can be built and released for Win32 systems by running the `scripts
 ### Dependencies
 - `choco` by `iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))` on `PowerShell`
 - `nssm` by `choco install -y nssm`
-- `Node.js: v8.3.0` and `NPM: v5.3.0` by `choco install nodejs --version=8.3.0`
+- `Node.js: v12.16.2` and `NPM: v6.14.4`
 - `NEXE: v3.3.3` by `npm install -g nexe@3.3.3`
 - `ghr` by `go get -u github.com/tcnksm/ghr`
 

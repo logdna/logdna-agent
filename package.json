@@ -1,7 +1,7 @@
 {
   "name": "logdna-agent",
   "version": "1.6.5",
-  "description": "LogDNA Collector Agent",
+  "description": "LogDNA Agent streams from log files to your LogDNA account. Works with Linux, Windows, and macOS Servers",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
@@ -36,11 +36,9 @@
   },
   "dependencies": {
     "@logdna/logger": "^1.3.2",
-    "agentkeepalive": "^4.1.0",
     "async": "^3.2.0",
     "commander": "^4.1.1",
     "debug": "^4.1.1",
-    "file-queue": "^0.3.0",
     "getos": "^3.1.4",
     "glob": "^7.1.6",
     "is-administrator": "^1.0.1",

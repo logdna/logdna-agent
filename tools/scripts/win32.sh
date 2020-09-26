@@ -3,7 +3,7 @@
 
 # VARIABLES
 ARCH=x64
-NODE_VERSION=8.3.0 # Will upgrade after 1.6.5
+NODE_VERSION=12.16.2
 PACKAGE_NAME=logdna-agent
 VERSION=$(cat tools/files/win32/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
 
@@ -33,7 +33,7 @@ cd ..
 cp .build/*.nupkg .build/tools/*.exe .pkg/
 
 # STEP 3: RELEASE
-ghr -draft \
+ghr \
 	-n "LogDNA Agent v${VERSION}" \
 	-r ${PACKAGE_NAME} \
 	-u logdna \
