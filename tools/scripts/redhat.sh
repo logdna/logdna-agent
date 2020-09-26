@@ -5,7 +5,7 @@
 ARCH=x64
 INPUT_TYPE=dir
 LICENSE=MIT
-NODE_VERSION=8.3.0 # Will upgrade after 1.6.5
+NODE_VERSION=8.3.0
 OUTPUT_TYPE=rpm
 PACKAGE_NAME=logdna-agent
 S3_BUCKET=repo.logdna.com
@@ -17,7 +17,7 @@ function pause(){
 }
 
 # PREPARE FOLDER AND FILES
-mkdir -p .build/
+mkdir -p .build/ .pkg/
 cp \
 	tools/files/linux/before-remove \
 	tools/files/linux/after-upgrade \
@@ -51,7 +51,7 @@ mv *.rpm ../.pkg/
 cd ..
 
 # STEP 3: RELEASE
-${HOME}/go/bin/ghr -draft \
+${HOME}/go/bin/ghr \
 	-n "LogDNA Agent v${VERSION}" \
 	-r ${PACKAGE_NAME} \
 	-u logdna \

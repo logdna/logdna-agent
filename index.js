@@ -276,7 +276,7 @@ function loadConfig(program) {
       if (networkInterface.address) { config.ip = networkInterface.address }
     }
 
-    utils.log(`Agent started on ${config.hostname} (${config.ip})`)
+    utils.log(`${pkg.name}/${pkg.version} started on ${config.hostname} (${config.ip})`)
     if (config.userAgent) {
       config.DEFAULT_REQ_HEADERS['user-agent'] = config.userAgent
       config.DEFAULT_REQ_HEADERS_GZIP['user-agent'] = config.userAgent

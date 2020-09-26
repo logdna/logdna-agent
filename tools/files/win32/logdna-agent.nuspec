@@ -8,7 +8,7 @@
     <authors>smusali,leeliu</authors>
     <owners>leeliu</owners>
     <summary>LogDNA Agent for Windows</summary>
-    <description>LogDNA Collector Agent Streaming File Logs to LogDNA.</description>
+    <description>LogDNA Agent streams from log files to your LogDNA account.</description>
     <projectUrl>https://logdna.com/</projectUrl>
     <projectSourceUrl>https://github.com/logdna/logdna-agent</projectSourceUrl>
     <packageSourceUrl>https://github.com/logdna/logdna-agent</packageSourceUrl>

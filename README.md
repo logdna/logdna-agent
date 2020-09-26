@@ -1,9 +1,6 @@
-# logdna-agent
+# LogDNA Agent
 
-[![Build Status](https://travis-ci.org/logdna/logdna-agent.svg?branch=master)](https://travis-ci.org/logdna/logdna-agent)
-[![Build status](https://ci.appveyor.com/api/projects/status/mk5rb0uk6xkjxhk2/branch/master?svg=true)](https://ci.appveyor.com/project/mikehu/logdna-agent/branch/master)
-
-LogDNA's collector agent which streams log files to your LogDNA account. LogDNA is a hosted, cloud logging service.
+LogDNA Agent streams from log files to your LogDNA account. Works with Linux, Windows, and macOS Servers.
 
 ## Getting Started
 
