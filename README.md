@@ -131,7 +131,7 @@ oc project logdna-agent
 oc create serviceaccount logdna-agent
 oc adm policy add-scc-to-user privileged system:serviceaccount:logdna-agent:logdna-agent
 oc create secret generic logdna-agent-key --from-literal=logdna-agent-key=<YOUR LOGDNA INGESTION KEY>
-oc create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds-os.yml
+oc create -f https://raw.githubusercontent.com/logdna/logdna-agent/master/logdna-agent-ds-os.yaml
 ```
 
 This automatically installs a logdna-agent pod into each node in your cluster and ships stdout/stderr from all containers, both application logs
