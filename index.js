@@ -113,11 +113,6 @@ function loadConfig(program) {
         parsedConfig.exclude = process.env.LOGDNA_EXCLUDE
       }
 
-      // allow exclude regex to be passed via env
-      if (process.env.LOGDNA_EXCLUDE_REGEX) {
-        parsedConfig.exclude_regex = process.env.LOGDNA_EXCLUDE_REGEX
-      }
-
       if (process.env.USEJOURNALD) {
         parsedConfig.usejournald = process.env.USEJOURNALD
       }
@@ -190,12 +185,12 @@ function loadConfig(program) {
         saveMessages.push(`Exclusions: ${processed.diff} been saved to config.`)
       }
 
-      if (program.excludeRegex) {
-        parsedConfig.exclude_regex = program.excludeRegex
-        // strip leading and trailing / if exists
-        if (parsedConfig.exclude_regex.substring(0, 1) === '/' && parsedConfig.exclude_regex.substring(parsedConfig.exclude_regex.length - 1) === '/') {
-          parsedConfig.exclude_regex = parsedConfig.exclude_regex.substring(1, parsedConfig.exclude_regex.length - 1)
-        }
+      if (program.excludeRegex || process.env.LOGDNA_EXCLUDE_REGEX) {
+        const re = program.excludeRegex || process.env.LOGDNA_EXCLUDE_REGEX
+        // FIXME(darinspivey) - Error prone. Doesn't support modifiers or ending with
+        // a slash.  The user should be forced to provide open and closing slashes,
+        // otherwise it's too hard to know what's part of the pattern text.
+        parsedConfig.exclude_regex = re.replace(/^\//, '').replace(/\/$/, '')
         saveMessages.push(`Exclude pattern: /${parsedConfig.exclude_regex}/ been saved to config.`)
       }
 
@@ -228,6 +223,10 @@ function loadConfig(program) {
       , tags: process.env.LOGDNA_TAGS || parsedConfig.tags
       , healthcheckTimer: null
       , rescanTimer: null
+      }
+
+      if (config.exclude_regex) {
+        config.exclude_regex = new RegExp(config.exclude_regex)
       }
 
       return getos(cb)
