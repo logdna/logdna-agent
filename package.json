@@ -1,11 +1,12 @@
 {
   "name": "logdna-agent",
-  "version": "1.6.2",
-  "description": "LogDNA Collector Agent",
+  "version": "2.0.0",
+  "description": "LogDNA Agent streams from log files to your LogDNA account. Works with Linux, Windows, and macOS Servers",
   "main": "index.js",
   "scripts": {
-    "lint": "./node_modules/.bin/eslint -c .eslintrc *.js **/*.js",
-    "unit": "./node_modules/.bin/jest"
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "tap"
   },
   "repository": {
     "type": "git",
@@ -17,12 +18,27 @@
     "url": "https://github.com/logdna/logdna-agent/issues"
   },
   "homepage": "https://github.com/logdna/logdna-agent",
+  "eslintConfig": {
+    "extends": [
+      "logdna"
+    ],
+    "root": true,
+    "ignorePatterns": [
+      "node_modules/",
+      "coverage/"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2019
+    },
+    "rules": {
+      "node/no-deprecated-api": 0
+    }
+  },
   "dependencies": {
-    "agentkeepalive": "^4.1.0",
+    "@logdna/logger": "^1.3.2",
     "async": "^3.2.0",
     "commander": "^4.1.1",
     "debug": "^4.1.1",
-    "file-queue": "^0.3.0",
     "getos": "^3.1.4",
     "glob": "^7.1.6",
     "is-administrator": "^1.0.1",
@@ -30,12 +46,9 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "grunt": "^1.0.4",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-exec": "^3.0.0",
-    "jest": "^25.1.0",
-    "load-grunt-tasks": "^5.1.0",
-    "rimraf": "^3.0.2"
+    "eslint": "^7.6.0",
+    "eslint-config-logdna": "^1.0.0",
+    "nock": "^13.0.4",
+    "tap": "^14.10.8"
   }
 }
