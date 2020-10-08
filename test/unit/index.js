@@ -6,8 +6,6 @@ const fs = require('fs')
 const {test} = require('tap')
 const {loadConfig, commander} = require('../../index.js')
 
-const uid = 0
-
 test('Commander help output', (t) => {
   commander.outputHelp((help) => {
     t.match(help, /^Usage: logdna-agent \[options\]/, 'Help menu printed')
@@ -23,7 +21,7 @@ test('loadConfig() settings based on user input', async (t) => {
   t.test('Errors if no key is found', (tt) => {
     loadConfig({
       config: configFile
-    }, uid)
+    })
 
     setTimeout(() => {
       fs.stat(configFile, (err) => {
@@ -32,7 +30,7 @@ test('loadConfig() settings based on user input', async (t) => {
         }, 'The config file was not written as expected')
         tt.end()
       })
-    }, 100)
+    }, 200)
   })
 
   t.test('Creates a config file, and puts minimum values in it', (tt) => {
@@ -42,7 +40,7 @@ test('loadConfig() settings based on user input', async (t) => {
     , hostname: 'myMachine'
     }
 
-    loadConfig(input, uid)
+    loadConfig(input)
 
     // The callback is not exposed.  We have to wait for the file to be written to.
     setTimeout(() => {
@@ -54,7 +52,7 @@ test('loadConfig() settings based on user input', async (t) => {
       ].sort()
       tt.deepEqual(contents, expected, 'Config file was written correctly')
       tt.end()
-    }, 100)
+    }, 200)
   })
 
   t.test('Existing config file is parsed and log files array is added to it', (tt) => {
@@ -64,7 +62,7 @@ test('loadConfig() settings based on user input', async (t) => {
     , logdir: logs
     }
 
-    loadConfig(input, uid)
+    loadConfig(input)
 
     setTimeout(() => {
       const contents = (fs.readFileSync(configFile, 'utf8')).split('\n').sort()
@@ -75,7 +73,7 @@ test('loadConfig() settings based on user input', async (t) => {
       ].sort()
       tt.deepEqual(contents, expected, 'log directories added to the config file')
       tt.end()
-    }, 100)
+    }, 200)
   })
 
   t.test('Test other supported CLI options', (tt) => {
@@ -91,7 +89,7 @@ test('loadConfig() settings based on user input', async (t) => {
     , tags
     }
 
-    loadConfig(input, uid)
+    loadConfig(input)
 
     setTimeout(() => {
       const contents = (fs.readFileSync(configFile, 'utf8')).split('\n')
@@ -121,14 +119,14 @@ test('loadConfig() settings based on user input', async (t) => {
       , 'tags were saved'
       )
       tt.end()
-    }, 100)
+    }, 200)
   })
 
   t.test('Test \'unset\' by removing a setting', (tt) => {
     loadConfig({
       config: configFile
     , unset: ['set1']
-    }, uid)
+    })
 
     setTimeout(() => {
       const contents = (fs.readFileSync(configFile, 'utf8')).split('\n')
@@ -141,20 +139,20 @@ test('loadConfig() settings based on user input', async (t) => {
       , 'The second key/val pair still exists'
       )
       tt.end()
-    }, 100)
+    }, 200)
   })
 
   t.test('Test \'unset\' by removing all settings except key', (tt) => {
     loadConfig({
       config: configFile
     , unset: ['all']
-    }, uid)
+    })
 
     setTimeout(() => {
       const contents = (fs.readFileSync(configFile, 'utf8'))
       tt.equal(contents, 'key = abc123', 'All settings removed except for key')
       tt.end()
-    }, 100)
+    }, 200)
   })
 })
 
@@ -167,7 +165,7 @@ test('loadConfig() hostname decisions', async (t) => {
     , key: 'abc123'
     }
 
-    loadConfig(input, uid)
+    loadConfig(input)
 
     // The callback is not exposed.  We have to wait for the file to be written to.
     setTimeout(() => {
@@ -179,7 +177,7 @@ test('loadConfig() hostname decisions', async (t) => {
       ].sort()
       tt.deepEqual(contents, expected, 'Host name set to os.hostname()')
       tt.end()
-    }, 100)
+    }, 200)
   })
 })
 
@@ -211,7 +209,7 @@ test('Process options through commander', (t) => {
   ]
 
   commander.parse(input)
-  loadConfig(commander, uid)
+  loadConfig(commander)
 
   setTimeout(() => {
     const contents = (fs.readFileSync(configFile, 'utf8')).split('\n').sort()
@@ -227,5 +225,5 @@ test('Process options through commander', (t) => {
 
     t.deepEqual(contents, expected, 'Commander set options')
     t.end()
-  }, 100)
+  }, 200)
 })

@@ -5,12 +5,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.0.0] - October 2, 2020
+### Removed
+- Deprecate the unstable WinEvent Logging component [#194](https://github.com/logdna/logdna-agent/pull/194)
+- Remove Kubernetes support [#196](https://github.com/logdna/logdna-agent/pull/196)
+
+### Changed
+- Use the node client for logging [#195](https://github.com/logdna/logdna-agent/pull/195)
+- Use `eslint-config-logdna` from NPM [#198](https://github.com/logdna/logdna-agent/pull/198)
+- Upgrade node version to `12.16.2` [#199](https://github.com/logdna/logdna-agent/pull/199)
+
+## [1.6.5] - August 21, 2020
 ### Changed
 - Update internal logging [#164](https://github.com/logdna/logdna-agent/pull/164)
 
 ### Fixed
 - Fix stringification issue on handling 207 [#152](https://github.com/logdna/logdna-agent/pull/152)
 - Fix memory leak issue [#157](https://github.com/logdna/logdna-agent/pull/157)
+- Make sure `process.getuid` doesn't get called on `Windows` [#188](https://github.com/logdna/logdna-agent/pull/188)
 
 ## [1.6.2] - December 5, 2019
 ### Added
@@ -230,7 +243,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor agent code
 - Lint & Style Validations
 
-[Unreleased]: https://github.com/logdna/logdna-agent/compare/1.6.2...HEAD
+[Unreleased]: https://github.com/logdna/logdna-agent/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/logdna/logdna-agent/compare/1.6.5...2.0.0
+[1.6.5]: https://github.com/logdna/logdna-agent/compare/1.6.2...1.6.5
 [1.6.2]: https://github.com/logdna/logdna-agent/compare/1.6.1...1.6.2
 [1.6.1]: https://github.com/logdna/logdna-agent/compare/1.5.6...1.6.1
 [1.5.6]: https://github.com/logdna/logdna-agent/compare/1.5.5...1.5.6
