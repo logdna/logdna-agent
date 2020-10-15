@@ -14,7 +14,7 @@ coverage-report:
 - html
 files:
 - test/**/*.js
-statements: 71
+statements: 70
 branches: 57
-functions: 77
-lines: 71
+functions: 74
+lines: 70
