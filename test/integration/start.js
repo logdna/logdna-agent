@@ -7,6 +7,7 @@ const nock = require('nock')
 const constants = require('../../lib/config.js')
 const start = require('../../lib/start.js')
 const fileUtilities = require('../../lib/file-utilities.js')
+const buildLoggerURL = require('../../lib/build-logger-url.js')
 
 nock.disableNetConnect()
 
@@ -34,7 +35,7 @@ test('start() creates a client logger and tails a log', (t) => {
   , key: '<MY KEY HERE>'
   }
 
-  nock(config.LOGDNA_URL)
+  nock(buildLoggerURL(config))
     .post(/.*/, (body) => {
       const expected = {
         e: 'ls'
@@ -95,7 +96,7 @@ test('exclude_regex successfully ignores lines', (t) => {
   , exclude_regex: /\bNOPE\b/
   }
 
-  nock(config.LOGDNA_URL)
+  nock(buildLoggerURL(config))
     .post(/.*/, (body) => {
       const expected = {
         e: 'ls'
