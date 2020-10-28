@@ -1,5 +1,5 @@
 cask "logdna-agent" do
-  version "2.0.0"
+  version "2.1.0"
   sha256 "fa6039599c9d3fcb6c33b69c95b7e86bd88261db0d3a73076ea2887876423ded"
 
   # github.com/logdna/logdna-agent/ was verified as official when first introduced to the cask

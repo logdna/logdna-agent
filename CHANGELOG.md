@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0]
+### Changed
+- Use systemd service name as the app name [#210](https://github.com/logdna/logdna-agent/pull/210)
+
+### Fixed
+- Revert environment variable changes [#208](https://github.com/logdna/logdna-agent/pull/208)
+
 ## [2.0.0] - October 2, 2020
 ### Removed
 - Deprecate the unstable WinEvent Logging component [#194](https://github.com/logdna/logdna-agent/pull/194)
