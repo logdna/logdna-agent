@@ -28,8 +28,26 @@ get_pid() {
     cat "$pid_file"
 }
 
+rm_pid_file() {
+    if [ -f "$pid_file" ]; then
+        rm "$pid_file"
+    fi
+}
+
 is_running() {
     [ -f "$pid_file" ] && ps `get_pid` > /dev/null 2>&1
+}
+
+wait_for_exit() {
+    for i in {1..10}
+    do
+        if ! is_running; then
+            break
+        fi
+
+        echo -n "."
+        sleep 1
+    done
 }
 
 case "$1" in
@@ -58,26 +76,29 @@ case "$1" in
     if is_running; then
         echo -n "Stopping $name..."
         kill `get_pid`
-        for i in {1..10}
-        do
-            if ! is_running; then
-                break
-            fi
-
-            echo -n "."
-            sleep 1
-        done
+        wait_for_exit
         echo
 
         if is_running; then
-            echo "Not stopped; may still be shutting down or shutdown may have failed"
-            echo "Not stopped; may still be shutting down or shutdown may have failed" >> $stdout_log
-            exit 1
+            msg="Not stopped; may still be shutting down or shutdown may have failed, sending SIGKILL"
+            echo "$msg"
+            echo "$msg" >> $stdout_log
+            kill -9 `get_pid`
+            wait_for_exit
+            if is_running; then
+                msg="Failed to stop service"
+                echo "$msg"
+                echo "$msg" >> $stdout_log
+                exit 1
+            else
+                msg="Stopped using SIGKILL"
+                echo "$msg"
+                echo "$msg" >> $stdout_log
+                rm_pid_file
+            fi
         else
             echo "Stopped"
-            if [ -f "$pid_file" ]; then
-                rm "$pid_file"
-            fi
+            rm_pid_file
         fi
     else
         echo "Not running"
