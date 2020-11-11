@@ -221,7 +221,6 @@ function loadConfig(program) {
         ...config
       , ...parsedConfig
       , tags: process.env.LOGDNA_TAGS || parsedConfig.tags
-      , healthcheckTimer: null
       , rescanTimer: null
       }
 
