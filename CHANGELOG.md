@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.1.0]
+## [2.1.1] - November 12, 2020
+### Fixed
+- Cancel timers to prevent shutdown hanging [#215](https://github.com/logdna/logdna-agent/pull/215)
+
+## [2.1.0] - November 2, 2020
 ### Changed
 - Use systemd service name as the app name [#210](https://github.com/logdna/logdna-agent/pull/210)
 
@@ -250,7 +254,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor agent code
 - Lint & Style Validations
 
-[Unreleased]: https://github.com/logdna/logdna-agent/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/logdna/logdna-agent/compare/2.1.1...HEAD
+[2.1.1]: https://github.com/logdna/logdna-agent/compare/2.1.0...2.1.1
+[2.1.0]: https://github.com/logdna/logdna-agent/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/logdna/logdna-agent/compare/1.6.5...2.0.0
 [1.6.5]: https://github.com/logdna/logdna-agent/compare/1.6.2...1.6.5
 [1.6.2]: https://github.com/logdna/logdna-agent/compare/1.6.1...1.6.2
