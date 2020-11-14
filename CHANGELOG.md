@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.2] - November 16, 2020
+### Fixed
+- Send SIGKILL if the process refuses to stop [#213](https://github.com/logdna/logdna-agent/pull/213)
+
 ## [2.1.1] - November 12, 2020
 ### Fixed
 - Cancel timers to prevent shutdown hanging [#215](https://github.com/logdna/logdna-agent/pull/215)
@@ -254,7 +258,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor agent code
 - Lint & Style Validations
 
-[Unreleased]: https://github.com/logdna/logdna-agent/compare/2.1.1...HEAD
+[Unreleased]: https://github.com/logdna/logdna-agent/compare/2.1.2...HEAD
+[2.1.2]: https://github.com/logdna/logdna-agent/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/logdna/logdna-agent/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/logdna/logdna-agent/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/logdna/logdna-agent/compare/1.6.5...2.0.0
