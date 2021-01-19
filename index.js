@@ -222,6 +222,7 @@ function loadConfig(program) {
       , ...parsedConfig
       , tags: process.env.LOGDNA_TAGS || parsedConfig.tags
       , rescanTimer: null
+      , sendUserAgent: program.sendUserAgent || process.env.LOGGER_SEND_USER_AGENT
       }
 
       if (config.exclude_regex) {
