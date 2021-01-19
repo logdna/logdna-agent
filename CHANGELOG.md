@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - January 19, 2021
+### Changed
+- Bump @logdna/logger which includes an `axios` fix for a SSRF vulerability. This bump
+  also includes a passthrough for the `sendUserAgent` option. [#219](https://github.com/logdna/logdna-agent/pull/219)
+
 ## [2.1.2] - November 16, 2020
 ### Fixed
 - Send SIGKILL if the process refuses to stop [#213](https://github.com/logdna/logdna-agent/pull/213)
@@ -258,7 +263,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor agent code
 - Lint & Style Validations
 
-[Unreleased]: https://github.com/logdna/logdna-agent/compare/2.1.2...HEAD
+[Unreleased]: https://github.com/logdna/logdna-agent/compare/2.2.0...HEAD
+[2.2.0]: https://github.com/logdna/logdna-agent/compare/2.1.2...2.2.0
 [2.1.2]: https://github.com/logdna/logdna-agent/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/logdna/logdna-agent/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/logdna/logdna-agent/compare/2.0.0...2.1.0
