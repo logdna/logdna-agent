@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 cask "logdna-agent" do
-  version "2.2.0"
+  version "2.2.1"
   sha256 "b5c44e27cd6f4a92ff2eb12be09ff0be7e8a56309db33c139db42f5110a037fb"
 
   # github.com/logdna/logdna-agent/ was verified as official when first introduced to the cask
@@ -18,6 +18,7 @@ cask "logdna-agent" do
             launchctl: "com.logdna.logdna-agentd"
 
   caveats <<~EOS
+    DEPRECATION WARNING!!! logdna-agent will soon be deprecated. please refer to LogDNA Agent V2 https://github.com/logdna/logdna-agent-v2
     When you first start logdna-agent, you must set your LogDNA Ingestion Key with the command:
       sudo logdna-agent -k <ingestion-key>
 
