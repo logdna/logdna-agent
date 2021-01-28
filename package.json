@@ -1,6 +1,6 @@
 {
   "name": "logdna-agent",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "LogDNA Agent streams from log files to your LogDNA account. Works with Linux, Windows, and macOS Servers",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     }
   },
   "dependencies": {
-    "@logdna/logger": "^2.2.0",
+    "@logdna/logger": "^2.2.2",
     "async": "^3.2.0",
     "commander": "^4.1.1",
     "debug": "^4.1.1",

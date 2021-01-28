@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 cask "logdna-agent" do
-  version "2.2.0"
+  version "2.2.1"
   sha256 "b5c44e27cd6f4a92ff2eb12be09ff0be7e8a56309db33c139db42f5110a037fb"
 
   # github.com/logdna/logdna-agent/ was verified as official when first introduced to the cask
