@@ -32,7 +32,7 @@ LogDNA Agent can be built and released for Debian systems by running the `script
 LogDNA Agent can be built and released for RedHat systems by running the `scripts/redhat.sh` script from the project directory: `bash tools/scripts/redhat.sh`. Versioning for Linux Systems is tracked using [`package.json`](../package.json#L3).
 
 ### Dependencies
-- `Node.js: v8.3.0` and `NPM: v5.3.0`
+- `Node.js: v10.15.0` and `NPM: v6.4.1`
 - `NEXE: v3.3.3` by `npm install -g nexe@3.3.3`
 - `fpm` by `sudo gem install --no-document fpm`
 - `ghr` by `go get -u github.com/tcnksm/ghr`

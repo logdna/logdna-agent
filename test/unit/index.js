@@ -225,5 +225,5 @@ test('Process options through commander', (t) => {
 
     t.deepEqual(contents, expected, 'Commander set options')
     t.end()
-  }, 200)
+  }, 2000)
 })

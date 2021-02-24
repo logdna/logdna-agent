@@ -290,7 +290,13 @@ function loadConfig(program) {
 process.on('uncaughtException', err => utils.log(`uncaught error: ${(err.stack || '').split('\r\n')}`, 'error'))
 
 if (require.main === module) {
-  commander.parse(process.argv)
+  // In older versions of node, argv[2] gets swallowed into process.execArgv.
+  // Manually splice it into the argument list. In later versions, this array
+  // is blank and everything is correctly parsed into process.argv
+  const processArgs = process.argv
+  processArgs.splice(2, 0, ...process.execArgv)
+
+  commander.parse(processArgs)
   const isAdmin = os.platform() === 'win32' ? require('is-administrator')() : process.getuid() === 0
 
   if (!isAdmin) {
