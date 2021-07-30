@@ -1,214 +1,26 @@
 version: 2.1
-executors:
-  docker-publisher:
-    environment:
-      IMAGE_NAME: logdna/logdna-agent
-    docker:
-      - image: circleci/buildpack-deps:stretch
+tagged_build_filters: &tagged_build_filters
+  tags:
+    only: /[0-9]+\.[0-9]+\.[0-9]+/
+  branches:
+    ignore: /.*/
+test_build_filters: &test_build_filters
+  branches:
+    only: /.*/
+  tags:
+    ignore: /[0-9]+\.[0-9]+\.[0-9]+/
+orbs:
+  slack: circleci/slack@3.4.2
 jobs:
   test:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12.13.0
     steps:
       - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Run Tests
-          command: ./node_modules/.bin/grunt test
-  image-build:
-    executor: docker-publisher
-    steps:
-      - checkout
-      - run:
-          echo "export DATESTAMP=$(date +%Y%m%d)" > env-vars
-          echo "export MAJOR_VERSION=1" >> env-vars
-      - setup_remote_docker
-      - run:
-          name: Build Docker image
-          command: |
-            docker build -t ${IMAGE_NAME}:sandbox-${DATESTAMP} .
-      - run:
-          name: Archive Docker image
-          command: docker save -o image.tar ${IMAGE_NAME}:sandbox-${DATESTAMP}
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./image.tar
-            - ./env-vars
-  docker-hub:
-    executor: docker-publisher
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
-      - setup_remote_docker
-      - run:
-          name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
-      - run:
-          name: Publish Docker Image to Docker Hub as Sandbox
-          command: |
-            echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            docker push ${IMAGE_NAME}:sandbox-${DATESTAMP}
-            docker run -e IMAGE_TO_SCAN=${IMAGE_NAME}:sandbox-${DATESTAMP} -e SYSDIG_SECURE_TOKEN=$SYSDIG_SECURE_TOKEN logdna/sysdigsecure
-  docker-approved:
-    executor: docker-publisher
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
-      - setup_remote_docker
-      - run:
-          name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            IMAGE_TAG=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
-            docker tag ${IMAGE_NAME}:sandbox-${DATESTAMP} ${IMAGE_NAME}:latest
-            docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
-            docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
-            docker push ${IMAGE_NAME}:${IMAGE_TAG}
-            docker push ${IMAGE_NAME}:${IMAGE_TAG}-${DATESTAMP}
-            docker push ${IMAGE_NAME}:latest
-  ibm-registry:
-    executor: docker-publisher
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - run: cat /tmp/workspace/env-vars >> $BASH_ENV
-      - setup_remote_docker
-      - run:
-          name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
-      - run:
-          name: Publish Docker Image to IBM registry
-          command: |
-            IMAGE_TAG=${CIRCLE_TAG}
-            echo "${IBM_API_KEY}" | docker login -u iamapikey --password-stdin icr.io
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:${IMAGE_TAG}
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:latest
-            docker tag ${IMAGE_NAME}:latest icr.io/ext/logdna-agent:{IMAGE_TAG}-${DATESTAMP}
-            docker push icr.io/ext/logdna-agent:${IMAGE_TAG}
-            docker push icr.io/ext/logdna-agent:latest
-            docker push icr.io/ext/logdna-agent:${IMAGE_TAG}-${DATESTAMP}
-  build_windows:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - run:
-          name: Check Tagged Push
-          command: |
-            NUSPEC_VERSION=$(cat scripts/windows/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
-            if [[ "${CIRCLE_TAG}" != "${NUSPEC_VERSION}" ]]; then
-              echo "There is mismatch:"
-              echo "  TAG_VERSION: ${CIRCLE_TAG}"
-              echo "  NUSPEC_VERSION: ${NUSPEC_VERSION}"
-              exit 1
-            fi
-      - run:
-          name: Install Dependencies - AWS CLI, Grunt CLI, and NEXE
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y python3 python-dev python3-dev \
-              build-essential libssl-dev libffi-dev \
-              libxml2-dev libxslt1-dev zlib1g-dev python-pip
-            sudo pip install --upgrade pip
-            sudo pip install awscli
-            sudo npm install -g nexe grunt-cli
-      - run:
-          name: Do Gruntfile Steps
-          command: |
-            VERSION=$(git tag --sort=-creatordate | head -n 1 | cut -d'-' -f2)
-            npm install
-            npm install grunt grunt-cli --save-dev
-            grunt lineremover && grunt eslint
-            nexe -i index.js -t win32-x86-8.11.3 -o scripts/windows/logdna-agent.exe
-            sha256sum scripts/windows/logdna-agent.exe
-            echo ${VERSION} >> scripts/windows/VERSION.txt
-            cp LICENSE.md scripts/windows/LICENSE.txt
-            sed -i "s|logdna-agent.latest.zip|logdna-agent.${VERSION}.zip|" scripts/windows/VERIFICATION.txt
-            mkdir -p .builds/windows/tools/
-            cp scripts/windows/*.ps1 scripts/windows/*.txt scripts/windows/logdna-agent.exe .builds/windows/tools
-            cp scripts/windows/logdna-agent.nuspec .builds/windows
-            zip -r logdna-agent.${VERSION}.zip .builds/windows
-            zip -r logdna-agent.latest.zip .builds/windows
-            aws s3 cp logdna-agent.${VERSION}.zip s3://repo.logdna.com/win/logdna-agent.${VERSION}.zip
-            aws s3 cp logdna-agent.latest.zip s3://repo.logdna.com/win/logdna-agent.latest.zip
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./scripts/windows/VERSION.txt
-            - ./logdna-agent.latest.zip
-  push_to_choco:
-    docker:
-      - image: linuturk/mono-choco
-    steps:
-      - attach_workspace:
-          at: .
-      - run: apt-get update && apt-get install -y unzip curl
-      - run:
-          name: Prepare NuPKG and Push to Chocolatey
-          command: |
-            VERSION=$(cat ./scripts/windows/VERSION.txt)
-            unzip logdna-agent.latest.zip && cd .builds/windows
-            sed -i 's/tools\\/tools\//g' ./logdna-agent.nuspec
-            choco pack logdna-agent.nuspec 2>/dev/null
-            choco push -v -y -f --api-key=${CHOCO_API_KEY} ./logdna-agent.${VERSION}.nupkg 2>/dev/null
+      - run: npm install
+      - run: npm run test
 workflows:
-  version: 2
-  build_windows:
+  test:
     jobs:
-      - test
-      - build_windows:
-          requires:
-            - test
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
-            branches:
-              ignore: /.*/
-      - push_to_choco:
-          requires:
-            - build_windows
-  build-tags:
-    jobs:
-      - image-build:
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?/
-            branches:
-              ignore: /.*/
-      - docker-hub:
-          requires:
-            - image-build
-      - docker-approved:
-          type: approval
-          requires:
-            - docker-hub
-      - ibm-registry:
-          requires:
-            - docker-approved
-  monthly-build:
-    triggers:
-      - schedule:
-          cron: "0 21 17 * *"
-          filters:
-            branches:
-              only: master
-    jobs:
-      - image-build
-      - docker-hub:
-          requires:
-            - image-build
-      - docker-approved:
-          type: approval
-          requires:
-            - docker-hub
-      - ibm-registry:
-          requires:
-            - docker-approved
+      - test:
+          filters: *test_build_filters

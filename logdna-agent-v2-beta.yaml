@@ -1,0 +1,139 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logdna-agent
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: logdna-agent
+  namespace: logdna-agent
+spec:
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 100%
+  selector:
+    matchLabels:
+      app: logdna-agent
+  template:
+    metadata:
+      labels:
+        app: logdna-agent
+    spec:
+      serviceAccountName: logdna-agent
+      containers:
+        - name: logdna-agent
+          image: logdna/logdna-agent:2.1.8-beta2
+          imagePullPolicy: Always
+          env:
+            - name: LOGDNA_AGENT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: logdna-agent-key
+                  key: logdna-agent-key
+            - name: RUST_LOG
+              value: info
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            requests:
+              cpu: 20m
+            limits:
+              memory: 500Mi
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: vardata
+              mountPath: /var/data
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: mnt
+              mountPath: /mnt
+              readOnly: true
+            - name: osrelease
+              mountPath: /etc/os-release
+            - name: logdnahostname
+              mountPath: /etc/logdna-hostname
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: vardata
+          hostPath:
+            path: /var/data
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: mnt
+          hostPath:
+            path: /mnt
+        - name: osrelease
+          hostPath:
+            path: /etc/os-release
+        - name: logdnahostname
+          hostPath:
+            path: /etc/hostname
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logdna-agent
+  namespace: logdna-agent
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: logdna-agent
+rules:
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get","list", "create", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get","list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: logdna-agent
+  name: logdna-agent
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get","list", "create", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: logdna-agent
+  namespace: logdna-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: logdna-agent
+subjects:
+  - kind: ServiceAccount
+    name: logdna-agent
+    namespace: logdna-agent
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: logdna-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: logdna-agent
+subjects:
+  - kind: ServiceAccount
+    name: logdna-agent
+    namespace: logdna-agent
