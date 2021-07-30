@@ -1,8 +1,13 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: logdna-agent
+  labels:
+    app: logdna-agent
 spec:
+  selector:
+    matchLabels:
+      app: logdna-agent
   template:
     metadata:
       labels:
@@ -20,8 +25,8 @@ spec:
               key: logdna-agent-key
         - name: LOGDNA_PLATFORM
           value: k8s
-      #   - name: LOGDNA_TAGS
-      #     value: production,cluster1,othertags
+        # - name: LOGDNA_TAGS
+        #   value: production,cluster1,othertags
         resources:
           requests:
             cpu: 20m
@@ -66,3 +71,7 @@ spec:
       - name: logdnahostname
         hostPath:
           path: /etc/hostname
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 100%

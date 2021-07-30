@@ -1,8 +1,0 @@
-/var/log/logdna-agent.log {
-    rotate 7
-    daily
-    missingok
-    notifempty
-    copytruncate
-    compress
-}

@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: logdna-agent
+spec:
+  allowPrivilegeEscalation: true
+  fsGroup:
+    rule: RunAsAny
+  hostNetwork: true
+  privileged: true
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes: ['*']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: logdna-agent
+rules:
+- apiGroups: ['*']
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - extensions
+  resourceNames:
+  - logdna-agent
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
