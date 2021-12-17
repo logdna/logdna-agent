@@ -104,7 +104,7 @@ sudo apt-get update
 ## How it Works
 
 The LogDNA agent authenticates using your [LogDNA Ingestion Key](https://app.logdna.com/manage/profile) and opens a secure web socket to LogDNA's
-ingestion servers. It then 'tails' for new log data, as well as watches for new files added to your specific logging directories.
+ingestion servers. It then 'tails' for new log data, as well as watches for new files added to your specific logging directories.  Of note, for a single log in a log file to be considered ready to send to LogDNA, it must end with ```\n``` or ```\r\n```.  Otherwise it is assumed more information is being added and the agent holds off.
 
 If you don't have a LogDNA account, you can create one on https://logdna.com. Or if you're using macOS w/[Homebrew](https://brew.sh) installed:
 
