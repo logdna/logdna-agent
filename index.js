@@ -143,8 +143,7 @@ function loadConfig(program) {
 
       if (!program.hostname && !parsedConfig.hostname) {
         if (fs.existsSync(HOSTNAME_PATH) && fs.statSync(HOSTNAME_PATH).isFile()) {
-          parsedConfig.hostname = fs.readFileSync(HOSTNAME_PATH)
-            .toString()
+          parsedConfig.hostname = fs.readFileSync(HOSTNAME_PATH, 'utf-8')
             .trim()
             .replace(HOSTNAME_IP_REGEX, '')
         } else if (os.hostname()) {
