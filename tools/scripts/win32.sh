@@ -3,7 +3,7 @@
 
 # VARIABLES
 ARCH=x64
-NODE_VERSION=12.16.2
+NODE_VERSION=14.15.3
 PACKAGE_NAME=logdna-agent
 VERSION=$(cat tools/files/win32/logdna-agent.nuspec | grep "<version>" | cut -d'>' -f2 | cut -d'<' -f1)
 
