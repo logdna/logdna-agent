@@ -1,7 +1,8 @@
 # LogDNA Agent
 
 LogDNA Agent streams from log files to your LogDNA account. Works with Linux, Windows, and macOS Servers.
-
+## :warning: Deprecation Warning
+logdna-agent will soon be deprecated and will cease to have support. Please refer to [LogDNA Agent V2](https://github.com/logdna/logdna-agent-v2) for all future implementations. 
 ## Getting Started
 
 ### From an Official Release
