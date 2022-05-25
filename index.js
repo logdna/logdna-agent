@@ -1,11 +1,12 @@
+/* eslint-disable no-multi-str */ // Adding this to be able to better format the console logs
 'use strict'
 
 // External Modules
+const fs = require('fs')
+const os = require('os')
 const async = require('async')
 const debug = require('debug')('logdna:index')
-const fs = require('fs')
 const getos = require('getos')
-const os = require('os')
 const {Command} = require('commander')
 const properties = require('properties')
 const request = require('request')
@@ -13,7 +14,7 @@ const request = require('request')
 // Internal Modules
 const start = require('./lib/start.js')
 const pkg = require('./package.json')
-const utils = require('./lib/utils')
+const utils = require('./lib/utils.js')
 
 // Constants
 const HOSTNAME_IP_REGEX = /[^0-9a-zA-Z\-.]/g
@@ -29,34 +30,76 @@ process.title = 'logdna-agent'
 commander._name = 'logdna-agent'
 commander
   .version(pkg.version, '-v, --version')
-  .description('This agent collect and ship logs for processing. Defaults to /var/log if run without parameters.')
-  .option('-c, --config <file>', `uses alternate config file (default: ${config.DEFAULT_CONF_FILE})`)
+  .description(
+    'This agent collects and ships logs for processing.'
+      + ' Defaults to /var/log if run without parameters.'
+  )
+  .option(
+    '-c, --config <file>'
+  , `Uses alternate config file (default: ${config.DEFAULT_CONF_FILE})`
+  )
   .option('-k, --key <key>', 'sets your LogDNA Ingestion Key in the config')
-  .option('-d, --logdir <dir>', 'adds log directories to config, supports glob patterns', utils.appender(), [])
-  .option('-f, --logfile <file>', 'adds log files to config', utils.appender(), [])
-  .option('-e, --exclude <file>', 'exclude files from logdir', utils.appender(), [])
+  .option(
+    '-d, --logdir <dir>'
+  , 'Adds log directories to config, supports glob patterns'
+  , utils.appender()
+  , []
+  )
+  .option('-f, --logfile <file>', 'Adds log files to config', utils.appender(), [])
+  .option('-e, --exclude <file>', 'Exclude files from logdir', utils.appender(), [])
   .option('-r, --exclude-regex <pattern>', 'filter out lines matching pattern')
-  .option('-n, --hostname <hostname>', `uses alternate hostname (default: ${os.hostname().replace('.ec2.internal', '')})`)
-  .option('-t, --tags <tags>', 'add tags for this host, separate multiple tags by comma', utils.appender(), [])
-  .option('-l, --list [params]', 'show the saved configuration (all unless params specified)', utils.appender(), false)
-  .option('-u, --unset <params>', 'clear some saved configurations (use "all" to unset all except key)', utils.appender(), [])
-  .option('-s, --set [key=value]', 'set config variables', utils.appender(), false)
+  .option(
+    '-n, --hostname <hostname>'
+  , `Uses alternate hostname (default: ${os.hostname().replace('.ec2.internal', '')})`
+  )
+  .option(
+    '-t, --tags <tags>',
+    'Add tags for this host, separate multiple tags by comma'
+  , utils.appender(),
+    []
+  )
+  .option(
+    '-l, --list [params]'
+  , 'Show the saved configuration (all unless params specified)'
+  , utils.appender(),
+
+    false
+  )
+  .option(
+    '-u, --unset <params>'
+  , 'Clear some saved configurations (use "all" to unset all except key)'
+  , utils.appender(),
+
+    []
+  )
+  .option('-s, --set [key=value]', 'Set config variables', utils.appender(), false)
   .on('--help', () => {
     console.log('  Examples:')
     console.log()
     console.log('    $ logdna-agent --key YOUR_INGESTION_KEY')
     console.log('    $ logdna-agent -d /home/ec2-user/logs')
-    console.log('    $ logdna-agent -d /home/ec2-user/logs -d /path/to/another/log_dir  # multiple logdirs in 1 go')
-    console.log('    $ logdna-agent -d "/var/log/*.txt"                                 # supports glob patterns')
-    console.log('    $ logdna-agent -d "/var/log/**/myapp.log"                          # myapp.log in any subfolder')
+    console.log('\
+    $ logdna-agent -d /home/ec2-user/logs -d /path/to/another/log_dir\
+    # multiple logdirs in 1 go\
+    ')
+    console.log('    $ logdna-agent -d "/var/log/*.txt"                                 '
+      + '# supports glob patterns')
+    console.log('    $ logdna-agent -d "/var/log/**/myapp.log"                          '
+      + '# myapp.log in any subfolder')
     console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log')
-    console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log -f /usr/local/nginx/logs/error.log')
-    console.log('    $ logdna-agent -t production                                       # tags')
+    console.log('    $ logdna-agent -f /usr/local/nginx/logs/access.log '
+      + '-f /usr/local/nginx/logs/error.log')
+    console.log('    $ logdna-agent -t production                                       '
+      + '# tags')
     console.log('    $ logdna-agent -t staging,2ndtag')
-    console.log('    $ logdna-agent -l tags,key,logdir                                  # show specific config parameters')
-    console.log('    $ logdna-agent -l                                                  # show all')
-    console.log('    $ logdna-agent -u tags,logdir                                      # unset specific entries from config')
-    console.log('    $ logdna-agent -u all                                              # unset all except LogDNA API Key')
+    console.log('    $ logdna-agent -l tags,key,logdir                                  '
+      + '# show specific config parameters')
+    console.log('    $ logdna-agent -l                                                  '
+      + '# show all')
+    console.log('    $ logdna-agent -u tags,logdir                                      '
+      + '# unset specific entries from config')
+    console.log('    $ logdna-agent -u all                                              '
+      + '# unset all except LogDNA API Key')
     console.log()
   })
 
@@ -89,7 +132,8 @@ function loadConfig(program) {
       }
 
       if (!program.key && !parsedConfig.key) {
-        console.error('LogDNA Ingestion Key not set! Use -k to set or use environment variable LOGDNA_AGENT_KEY.')
+        console.error('LogDNA Ingestion Key not set! '
+          + 'Use -k to set or use environment variable LOGDNA_AGENT_KEY.')
         return
       }
 
@@ -99,11 +143,15 @@ function loadConfig(program) {
 
       if (!program.hostname && !parsedConfig.hostname) {
         if (fs.existsSync(HOSTNAME_PATH) && fs.statSync(HOSTNAME_PATH).isFile()) {
-          parsedConfig.hostname = fs.readFileSync(HOSTNAME_PATH).toString().trim().replace(HOSTNAME_IP_REGEX, '')
+          parsedConfig.hostname = fs.readFileSync(HOSTNAME_PATH)
+            .toString()
+            .trim()
+            .replace(HOSTNAME_IP_REGEX, '')
         } else if (os.hostname()) {
           parsedConfig.hostname = os.hostname().replace('.ec2.internal', '')
         } else {
-          console.error('Hostname information cannot be found! Use -n to set or use environment variable LOGDNA_HOSTNAME.')
+          console.error('Hostname information cannot be found! '
+            + 'Use -n to set or use environment variable LOGDNA_HOSTNAME.')
           return
         }
       }
@@ -140,7 +188,8 @@ function loadConfig(program) {
           const kvPair = setOption.split('=')
           if (kvPair.length === 2) {
             parsedConfig[kvPair[0]] = kvPair[1]
-            saveMessages.push(`Config variable: ${kvPair[0]} = ${kvPair[1]} has been saved to config.`)
+            saveMessages.push(`Config variable: ${kvPair[0]} = ${kvPair[1]} `
+              + 'has been saved to config.')
           } else {
             saveMessages.push(`Unknown setting: ${setOption}. Usage: -s [key=value]`)
           }
@@ -191,7 +240,8 @@ function loadConfig(program) {
         // a slash.  The user should be forced to provide open and closing slashes,
         // otherwise it's too hard to know what's part of the pattern text.
         parsedConfig.exclude_regex = re.replace(/^\//, '').replace(/\/$/, '')
-        saveMessages.push(`Exclude pattern: /${parsedConfig.exclude_regex}/ been saved to config.`)
+        saveMessages
+          .push(`Exclude pattern: /${parsedConfig.exclude_regex}/ been saved to config.`)
       }
 
       if (program.hostname) {
@@ -260,15 +310,20 @@ function loadConfig(program) {
       config.awstype = responseBody.instanceType
     }
 
-    const networkInterface = Object.values(os.networkInterfaces()).reduce((networkData, interfaces) => {
-      interfaces.forEach(interfce => networkData.push(interfce))
-      return networkData
-    }, []).filter((interfce) => {
-      return interfce.family && interfce.family === 'IPv4' && interfce.mac && interfce.address && (
-        interfce.address.startsWith('10.')
-          || interfce.address.startsWith('172.')
-          || interfce.address.startsWith('192.168.'))
-    })[0]
+    const networkInterface = Object.values(os.networkInterfaces())
+      .reduce((networkData, interfaces) => {
+        interfaces.forEach((interfce) => { return networkData.push(interfce) })
+        return networkData
+      }, []).filter((interfce) => {
+        return interfce.family
+          && interfce.family === 'IPv4'
+          && interfce.mac && interfce.address
+          && (
+          interfce.address.startsWith('10.')
+            || interfce.address.startsWith('172.')
+            || interfce.address.startsWith('192.168.')
+        )
+      })[0]
 
     if (networkInterface) {
       if (networkInterface.mac) { config.mac = networkInterface.mac }
@@ -287,14 +342,21 @@ function loadConfig(program) {
   })
 }
 
-process.on('uncaughtException', err => utils.log(`uncaught error: ${(err.stack || '').split('\r\n')}`, 'error'))
+process.on('uncaughtException', (err) => {
+  return utils.log(`uncaught error: ${(err.stack || '').split('\r\n')}`, 'error')
+})
 
 if (require.main === module) {
   commander.parse(process.argv)
-  const isAdmin = os.platform() === 'win32' ? require('is-administrator')() : process.getuid() === 0
+  const isAdmin = os.platform() === 'win32'
+    ? require('is-administrator')()
+    : process.getuid() === 0
 
   if (!isAdmin) {
-    console.log('You must be an Administrator (root, sudo) to run this agent! See -h or --help for more info.')
+    console.log('You must be an Administrator (root, sudo) to run this agent! '
+      + 'See -h or --help for more info.')
+
+    process.exitCode = 1
     return
   }
 

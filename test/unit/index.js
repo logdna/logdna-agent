@@ -50,7 +50,7 @@ test('loadConfig() settings based on user input', async (t) => {
       , 'key = abc123'
       , 'hostname = myMachine'
       ].sort()
-      tt.deepEqual(contents, expected, 'Config file was written correctly')
+      tt.same(contents, expected, 'Config file was written correctly')
       tt.end()
     }, 200)
   })
@@ -71,7 +71,7 @@ test('loadConfig() settings based on user input', async (t) => {
       , 'key = abc123'
       , 'hostname = myMachine'
       ].sort()
-      tt.deepEqual(contents, expected, 'log directories added to the config file')
+      tt.same(contents, expected, 'log directories added to the config file')
       tt.end()
     }, 200)
   })
@@ -175,7 +175,7 @@ test('loadConfig() hostname decisions', async (t) => {
       , 'key = abc123'
       , `hostname = ${os.hostname()}`
       ].sort()
-      tt.deepEqual(contents, expected, 'Host name set to os.hostname()')
+      tt.same(contents, expected, 'Host name set to os.hostname()')
       tt.end()
     }, 200)
   })
@@ -223,7 +223,7 @@ test('Process options through commander', (t) => {
     , 'propkey = val'
     ].sort()
 
-    t.deepEqual(contents, expected, 'Commander set options')
+    t.same(contents, expected, 'Commander set options')
     t.end()
   }, 200)
 })

@@ -1,8 +1,8 @@
 'use strict'
 
+const fs = require('fs')
 const path = require('path')
 const {test} = require('tap')
-const fs = require('fs')
 const fileUtilities = require('../../lib/file-utilities.js')
 
 test('getFiles()', async (t) => {
@@ -24,7 +24,7 @@ test('getFiles()', async (t) => {
       tt.error(err, 'No error')
       tt.type(files, Array, 'files is an array')
       tt.equal(files.length, 5, 'File count is correct')
-      tt.deepEqual(files.sort(), [
+      tt.same(files.sort(), [
         path.join(tempDir, 'somelog1.log')
       , path.join(tempDir, 'somelog2')
       , path.join(tempDir, 'somelog3-file')
@@ -62,7 +62,7 @@ test('getFiles()', async (t) => {
       tt.error(err, 'No error')
       tt.type(files, Array, 'files is an array')
       tt.equal(files.length, 1, 'File count is correct')
-      tt.deepEqual(files[0], path.join(tempDir, 'somelog1.txt'), 'Filename is correct')
+      tt.same(files[0], path.join(tempDir, 'somelog1.txt'), 'Filename is correct')
       tt.end()
     })
   })
@@ -83,7 +83,7 @@ test('getFiles()', async (t) => {
       tt.error(err, 'No error')
       tt.type(files, Array, 'files is an array')
       tt.equal(files.length, 3, 'File count is correct')
-      tt.deepEqual(files.sort(), [
+      tt.same(files.sort(), [
         path.join(tempDir, 'somelog1.txt')
       , path.join(tempDir, 'somelink.txt')
       , path.join(tempDir, 'subdir', 'somelog2.txt')
@@ -102,7 +102,7 @@ test('getFiles()', async (t) => {
       tt.error(err, 'No error')
       tt.type(files, Array, 'files is an array')
       tt.equal(files.length, 1, 'File count is correct')
-      tt.deepEqual(files, [file], 'Single filename is correct')
+      tt.same(files, [file], 'Single filename is correct')
       tt.end()
     })
   })
