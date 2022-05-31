@@ -50,15 +50,15 @@ fpm \
 mv *.rpm ../.pkg/
 cd ..
 
-# STEP 3: RELEASE
-${HOME}/go/bin/ghr \
-	-n "LogDNA Agent v${VERSION}" \
-	-r ${PACKAGE_NAME} \
-	-u logdna \
-	${VERSION} .pkg/
+# # STEP 3: RELEASE
+# ${HOME}/go/bin/ghr \
+# 	-n "LogDNA Agent v${VERSION}" \
+# 	-r ${PACKAGE_NAME} \
+# 	-u logdna \
+# 	${VERSION} .pkg/
 
-# PAUSE TO GET APPROVAL
-pause
+# # PAUSE TO GET APPROVAL
+# pause
 
-# STEP 4: PUBLISH
-AWS_ACCESS_KEY="${AWS_ACCESS_KEY}" AWS_SECRET_KEY="${AWS_SECRET_KEY}" ../rpm-s3/bin/rpm-s3 -v --sign -k 8 -p el6 -b ${S3_BUCKET} ${PACKAGE_NAME}*${VERSION}*.rpm
+# # STEP 4: PUBLISH
+# AWS_ACCESS_KEY="${AWS_ACCESS_KEY}" AWS_SECRET_KEY="${AWS_SECRET_KEY}" ../rpm-s3/bin/rpm-s3 -v --sign -k 8 -p el6 -b ${S3_BUCKET} ${PACKAGE_NAME}*${VERSION}*.rpm

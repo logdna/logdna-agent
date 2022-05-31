@@ -33,15 +33,15 @@ cd ..
 cp .build/*.nupkg .build/tools/*.exe .pkg/
 
 # STEP 3: RELEASE
-ghr \
-	-n "LogDNA Agent v${VERSION}" \
-	-r ${PACKAGE_NAME} \
-	-u logdna \
-	${VERSION} .pkg/
+# ghr \
+# 	-n "LogDNA Agent v${VERSION}" \
+# 	-r ${PACKAGE_NAME} \
+# 	-u logdna \
+# 	${VERSION} .pkg/
 
-# PAUSE TO GET APPROVAL
-pause
+# # PAUSE TO GET APPROVAL
+# pause
 
-# STEP 4: PUBLISH
-choco apikey --key ${CHOCO_API_KEY} --source https://push.chocolatey.org/
-choco push .pkg/*.nupkg --source https://push.chocolatey.org/
+# # STEP 4: PUBLISH
+# choco apikey --key ${CHOCO_API_KEY} --source https://push.chocolatey.org/
+# choco push .pkg/*.nupkg --source https://push.chocolatey.org/

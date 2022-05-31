@@ -40,7 +40,7 @@ fpm \
 	--vendor "LogDNA, Inc." \
 	--description "LogDNA Agent for Darwin" \
 	--url "https://logdna.com/" \
-	--maintainer "LogDNA <support@logdna.com>" \
+	--maintainer "LogDNA <support@logdna.com>" \≠
 	--after-install ./mac-after-install \
 	--osxpkg-identifier-prefix ${OSXPKG_IDENTIFIER_PREFIX} \
 	--force \
@@ -57,16 +57,16 @@ OLDSHA256CHECKSUM=$(cat ../tools/files/darwin/logdna-agent.rb | grep sha256 | cu
 sed "s/${OLDSHA256CHECKSUM}/${SHA256CHECKSUM}/" ../tools/files/darwin/logdna-agent.rb > logdna-agent.rb
 cd ..
 
-# STEP 4: RELEASE
-ghr \
-	-n "LogDNA Agent v${VERSION}" \
-	-r ${PACKAGE_NAME} \
-	-u logdna \
-	${VERSION} .pkg/
+# # STEP 4: RELEASE
+# ghr \
+# 	-n "LogDNA Agent v${VERSION}" \
+# 	-r ${PACKAGE_NAME} \
+# 	-u logdna \
+# 	${VERSION} .pkg/
 
-# PAUSE TO GET APPROVAL
-pause
+# # PAUSE TO GET APPROVAL
+# pause
 
-# STEP 5: PUBLISH
-echo "Update logdna-agent.rb on https://github.com/logdnabot/homebrew-cask/blob/master/Casks/logdna-agent.rb"
-echo "Create a Pull Request to update logdna-agent.rb on https://github.com/Homebrew/homebrew-cask/blob/master/Casks/logdna-agent.rb"
+# # STEP 5: PUBLISH
+# echo "Update logdna-agent.rb on https://github.com/logdnabot/homebrew-cask/blob/master/Casks/logdna-agent.rb"
+# echo "Create a Pull Request to update logdna-agent.rb on https://github.com/Homebrew/homebrew-cask/blob/master/Casks/logdna-agent.rb"
