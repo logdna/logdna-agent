@@ -17,17 +17,17 @@ function pause(){
 }
 
 # PREPARE FOLDER AND FILES
-mkdir -p .build/ .pkg/
+mkdir -p .rpm-build/
 cp \
 	tools/files/linux/before-remove \
 	tools/files/linux/after-upgrade \
 	tools/files/linux/init-script \
 	tools/files/linux/logrotate \
-	.build/
+	.rpm-build/
 
 # STEP 1: COMPILE AND BUILD EXECUTABLE
 npm install --production
-nexe -i index.js -o .build/${PACKAGE_NAME} -t linux-${ARCH}-${NODE_VERSION}
+nexe -i index.js -o .rpm-build/${PACKAGE_NAME} -t linux-${ARCH}-${NODE_VERSION}
 
 # STEP 2: PACKAGE
 cd .build/
@@ -50,15 +50,15 @@ fpm \
 mv *.rpm ../.pkg/
 cd ..
 
-# # STEP 3: RELEASE
-# ${HOME}/go/bin/ghr \
-# 	-n "LogDNA Agent v${VERSION}" \
-# 	-r ${PACKAGE_NAME} \
-# 	-u logdna \
-# 	${VERSION} .pkg/
+# STEP 3: RELEASE
+${HOME}/go/bin/ghr \
+	-n "LogDNA Agent v${VERSION}" \
+	-r ${PACKAGE_NAME} \
+	-u logdna \
+	${VERSION} .pkg/
 
-# # PAUSE TO GET APPROVAL
-# pause
+# PAUSE TO GET APPROVAL
+pause
 
-# # STEP 4: PUBLISH
-# AWS_ACCESS_KEY="${AWS_ACCESS_KEY}" AWS_SECRET_KEY="${AWS_SECRET_KEY}" ../rpm-s3/bin/rpm-s3 -v --sign -k 8 -p el6 -b ${S3_BUCKET} ${PACKAGE_NAME}*${VERSION}*.rpm
+# STEP 4: PUBLISH
+AWS_ACCESS_KEY="${AWS_ACCESS_KEY}" AWS_SECRET_KEY="${AWS_SECRET_KEY}" ../rpm-s3/bin/rpm-s3 -v --sign -k 8 -p el6 -b ${S3_BUCKET} ${PACKAGE_NAME}*${VERSION}*.rpm
