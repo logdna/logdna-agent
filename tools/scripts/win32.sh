@@ -13,9 +13,9 @@ function pause(){
 }
 
 # PREPARE FOLDER AND FILES
-mkdir -p .build/tools/ .pkg/
+mkdir -p .win-build/tools/ 
 cp tools/files/win32/logdna-agent.nuspec .build/
-cp LICENSE .build/tools/license.txt
+cp LICENSE .win-build/tools/license.txt
 cp tools/files/win32/*.ps1 tools/files/win32/*.txt .build/tools/
 
 # STEP 1: COMPILE AND BUILD EXECUTABLE

@@ -18,7 +18,7 @@ function pause(){
 }
 
 # PREPARE FOLDER AND FILES
-mkdir -p .build/ .pkg/
+mkdir -p .mac-build/ .pkg/
 cp \
 	tools/files/darwin/com.logdna.logdna-agent.plist \
 	tools/files/darwin/mac-after-install \
@@ -50,14 +50,14 @@ fpm \
 rm logdna-agent
 
 # STEP 3: SIGN THE PACKAGE
-# cd ../.pkg
-# mv ../.build/logdna-agent-${VERSION}.pkg logdna-agent-${VERSION}-unsigned.pkg
-# sudo security import ${MAC_SIGNING_KEY_FILE} -P ${MAC_SIGNING_KEY_PASSWORD}
-# productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-${VERSION}-unsigned.pkg logdna-agent-${VERSION}.pkg
-# SHA256CHECKSUM=$(shasum -a 256 logdna-agent-${VERSION}.pkg | cut -d' ' -f1)
-# OLDSHA256CHECKSUM=$(cat ../tools/files/darwin/logdna-agent.rb | grep sha256 | cut -d"'" -f2)
-# sed "s/${OLDSHA256CHECKSUM}/${SHA256CHECKSUM}/" ../tools/files/darwin/logdna-agent.rb > logdna-agent.rb
-# cd ..
+cd ../.pkg
+mv ../.build/logdna-agent-${VERSION}.pkg logdna-agent-${VERSION}-unsigned.pkg
+sudo security import ${MAC_SIGNING_KEY_FILE} -P ${MAC_SIGNING_KEY_PASSWORD}
+productsign --sign "Developer ID Installer: Answerbook, Inc. (TT7664HMU3)" logdna-agent-${VERSION}-unsigned.pkg logdna-agent-${VERSION}.pkg
+SHA256CHECKSUM=$(shasum -a 256 logdna-agent-${VERSION}.pkg | cut -d' ' -f1)
+OLDSHA256CHECKSUM=$(cat ../tools/files/darwin/logdna-agent.rb | grep sha256 | cut -d"'" -f2)
+sed "s/${OLDSHA256CHECKSUM}/${SHA256CHECKSUM}/" ../tools/files/darwin/logdna-agent.rb > logdna-agent.rb
+cd ..
 
 # # STEP 4: RELEASE
 # ghr \
