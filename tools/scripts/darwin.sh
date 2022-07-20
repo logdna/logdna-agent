@@ -18,7 +18,7 @@ function pause(){
 }
 
 # PREPARE FOLDER AND FILES
-mkdir -p .mac-build/ .pkg/
+mkdir -p .build/ .pkg/
 cp \
 	tools/files/darwin/com.logdna.logdna-agent.plist \
 	tools/files/darwin/mac-after-install \
