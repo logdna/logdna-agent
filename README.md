@@ -142,7 +142,7 @@ docker info
 ### Heroku
 
 Please visit the following documentation to uninstall the Heroku LogDNA add-on:
-[https://devcenter.heroku.com/articles/logdna#remove-the-add-on]
+https://devcenter.heroku.com/articles/logdna#remove-the-add-on
 
 ## How it Works
 
