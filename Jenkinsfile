@@ -20,6 +20,17 @@ pipeline {
   }
 
   stages {
+    stage('Validate PR Source') {
+      when {
+        expression { env.CHANGE_FORK }
+        not {
+          triggeredBy 'issueCommentCause'
+        }
+      }
+      steps {
+        error("A maintainer needs to approve this PR for CI by commenting")
+      }
+    }
     stage('Test Suite') {
       matrix {
         axes {
