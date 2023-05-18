@@ -105,7 +105,7 @@ sudo apt-get update
 ## How it Works
 
 The LogDNA agent authenticates using your [LogDNA Ingestion Key](https://app.logdna.com/manage/profile) and opens a secure web socket to LogDNA's
-ingestion servers. It then 'tails' for new log data, as well as watches for new files added to your specific logging directories.
+ingestion servers. It then 'tails' for new log data, as well as watches for new files added to your specific logging directories.  Of note, for a single log in a log file to be considered ready to send to LogDNA, it must end with ```\n``` or ```\r\n```.  Otherwise it is assumed more information is being added and the agent holds off.
 
 If you don't have a LogDNA account, you can create one on https://logdna.com. Or if you're using macOS w/[Homebrew](https://brew.sh) installed:
 
@@ -204,6 +204,19 @@ The LogDNA agent can be installed through Chocolatey. You will need:
 
 For more details, view our [Windows Agent docs](https://docs.logdna.com/docs/windows-logging)
 
+## Manual Install
+In some cases, you may have a system that is restricted from incoming connections.  You can find executables in this repo's [Releases](https://github.com/logdna/logdna-agent/releases) and install them directly any time via a flash drive or connection behind your firewall.
+
+### Windows Specific
+To automatically run the agent and avoid nssm install/setup, you can use the following ```.bat``` in conjunction with the default Task Scheduler on bootup.  Note that the executable, configuration file and debug output are defined via the ```set``` commands.  You will likely need to tweak these for your system.
+
+```bash
+set agent_exe_loc=C:\Users\Administrator\Documents\logdna-agent.exe
+set agent_conf_loc=C:\Users\Administrator\Documents\logdna.conf
+set agent_debug_log_loc=C:\Users\Administrator\Documents\logdna_debug_out.log
+
+%agent_exe_loc% -c %agent_conf_loc% > %agent_debug_log_loc%
+```
 
 ### LogDNA Pay-per-gig Pricing
 
