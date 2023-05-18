@@ -102,6 +102,48 @@ wget -O- https://repo.logdna.com/logdna.gpg | sudo apt-key add -
 sudo apt-get update
 ```
 
+## Uninstalling the Agent
+
+### Centos
+
+`sudo yum remove logdna-agent`
+
+### Debian
+
+`sudo apt-get remove logdna-agent`
+
+### macOS
+
+`sudo launchctl unload -w /Library/LaunchDaemons/com.logdna.logdna-agent.plist`
+
+### Kubernetes
+
+`kubectl delete ds logdna-agent`
+
+### SysLog
+
+Edit your /etc/syslog.conf to remove the following line:
+
+`*.* @syslog-a.logdna.com:<PORT>`
+
+### Docker
+
+```
+docker stop <container id | name>
+docker rm <container id | name>
+
+docker images
+docker rmi <image id>
+
+//check to see that it has been removed
+docker info 
+```
+
+### Heroku
+
+Please visit the following documentation to uninstall the Heroku LogDNA add-on:
+https://devcenter.heroku.com/articles/logdna#remove-the-add-on
+
 ## How it Works
 
 The LogDNA agent authenticates using your [LogDNA Ingestion Key](https://app.logdna.com/manage/profile) and opens a secure web socket to LogDNA's
